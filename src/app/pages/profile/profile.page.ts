@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Auth, updateProfile, updateEmail } from '@angular/fire/auth';
+import { Auth, updateProfile, updateEmail, updatePassword, User } from '@angular/fire/auth';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-profile',
@@ -20,6 +19,7 @@ export class ProfilePage implements OnInit {
   photoURL: string = '';
   isEditing: boolean = false;
   newPhotoURL: string = '';
+  newPassword: string = ''; // 🔥 campo nuevo para cambiar contraseña
 
   ngOnInit() {
     this.loadUserData();
@@ -45,6 +45,13 @@ export class ProfilePage implements OnInit {
 
       if (this.email !== this.user.email) {
         await updateEmail(this.user, this.email);
+      }
+
+      // 👇 si el usuario escribió una nueva contraseña
+      if (this.newPassword.trim() !== '') {
+        await updatePassword(this.user, this.newPassword);
+        this.newPassword = '';
+        alert('🔒 Contraseña actualizada correctamente');
       }
 
       this.isEditing = false;
