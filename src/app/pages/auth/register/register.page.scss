@@ -1,0 +1,61 @@
+.login-bg {
+  --background: linear-gradient(to bottom, #000000, #141414);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #e50914;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.input-item {
+  --background: rgba(255, 255, 255, 0.1);
+  --color: #fff;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+ion-input {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.btn-login {
+  --background: #e50914;
+  --background-activated: #b00610;
+  --border-radius: 6px;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.footer-text {
+  margin-top: 1.5rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.footer-text a {
+  color: #e50914;
+  text-decoration: none;
+  font-weight: 500;
+}
