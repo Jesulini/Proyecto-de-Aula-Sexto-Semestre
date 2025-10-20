@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
   },
   {
     path: '',
@@ -13,36 +13,36 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./pages/auth/login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./pages/auth/login/login.module').then(m => m.LoginPageModule)
   },
   {
     path: 'register',
-    loadChildren: () => import('./pages/auth/register/register.module').then( m => m.RegisterPageModule)
+    loadChildren: () => import('./pages/auth/register/register.module').then(m => m.RegisterPageModule)
   },
   {
     path: 'forgot-password',
-    loadChildren: () => import('./pages/auth/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+    loadChildren: () => import('./pages/auth/forgot-password/forgot-password.module').then(m => m.ForgotPasswordPageModule)
   },
   {
     path: 'cartelera',
-    loadChildren: () => import('./pages/cartelera/cartelera.module').then( m => m.CarteleraPageModule)
+    loadChildren: () => import('./pages/cartelera/cartelera.module').then(m => m.CarteleraPageModule)
   },
   {
     path: 'detalle-pelicula',
-    loadChildren: () => import('./pages/detalle-pelicula/detalle-pelicula.module').then( m => m.DetallePeliculaPageModule)
+    loadChildren: () => import('./pages/detalle-pelicula/detalle-pelicula.module').then(m => m.DetallePeliculaPageModule)
   },
   {
     path: 'compra',
-    loadChildren: () => import('./pages/compra/compra.module').then( m => m.CompraPageModule)
+    loadChildren: () => import('./pages/compra/compra.module').then(m => m.CompraPageModule)
   },
   {
     path: 'admin',
-    loadChildren: () => import('./pages/admin/admin.module').then( m => m.AdminPageModule)
+    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
   },
   {
     path: 'profile',
-    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
-  },
+    loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule)
+  }
 ];
 
 @NgModule({
@@ -51,4 +51,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

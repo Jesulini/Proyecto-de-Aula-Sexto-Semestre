@@ -1,27 +1,368 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+/*////////RECURSOS*/
+:root {
+    --fondo: #141414;
+    --dorado: #FFD700;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+body {
+    background-color: var(--fondo);
+    margin: 0;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+/*//////HEADER*/
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    flex-wrap: wrap;
 }
 
-#container a {
-  text-decoration: none;
+.page-title {
+    flex-shrink: 0;
+    max-width: 60%;
+}
+
+.logo-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+}
+
+nav {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 20px;
+    padding: 0;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+    text-decoration-color: yellow;
+}
+
+/*////SECTION (SLIDER) */
+.slider {
+    position: relative;
+    height: 60vh;
+    max-height: 500px;
+    min-height: 250px;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: none;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.slide.active {
+    display: flex;
+    animation: fadeIn 1s ease;
+}
+
+.slide>.content {
+    position: relative;
+    z-index: 2;
+    max-width: 60%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.slide h2 {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.slide p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
+
+.dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin: 0 6px;
+    background-color: #888;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dot.active {
+    background-color: white;
+}
+
+.slide .boton {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 0.31em;
+    padding: 0.93em 1.87em;
+    color: #fff;
+    margin-right: 1.25em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.12em;
+}
+
+.slide .boton:hover,
+.slide .boton:active {
+    background-color: var(--dorado);
+    color: black !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.slide .boton i {
+    margin-right: 1.25em;
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/*/////////////SECTION (CARRUSEL)*/
+.content-section {
+    width: 80%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+.content-section h2 {
+    text-align: left;
+    margin-left: 30px;
+}
+
+.carrusel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.contenedor-carrusel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    justify-content: center;
+}
+
+.movie {
+    min-width: 300px;
+    margin: 0 10px;
+    background: #222;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.movie img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+.movie h3 {
+    margin: 10px;
+    font-size: 16px;
+}
+
+.btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 30px;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover,
+.btn:active {
+    background-color: var(--dorado);
+    color: black !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+/*///////ADJUSTES PARA MOVILES*/
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .page-title {
+        max-width: 80%;
+        margin-bottom: 10px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav {
+        display: none;
+        width: 100%;
+        justify-content: center;
+    }
+
+    nav.active {
+        display: block;
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .slider {
+        height: 250px;
+    }
+
+    .slide>.content {
+        max-width: 90%;
+        padding: 10px;
+    }
+
+    .slide h2 {
+        font-size: 1.2rem;
+    }
+
+    .slide p {
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+
+    .slide .boton {
+        font-size: 0.9rem;
+        padding: 0.6em 1.2em;
+        margin-right: 0.6em;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 4px;
+    }
+
+    .content-section {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .content-section h2 {
+        font-size: 1.2rem;
+        margin-left: 15px;
+    }
+
+    .movie {
+        min-width: 200px;
+        margin: 0 5px;
+    }
+
+    .movie img {
+        height: 250px;
+    }
+
+    .btn {
+        font-size: 22px;
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider {
+        height: 180px;
+    }
+
+    .slide h2 {
+        font-size: 1rem;
+    }
+
+    .slide p {
+        display: none;
+    }
+
+    .slide .boton {
+        font-size: 0.8rem;
+        padding: 0.5em 1em;
+    }
+
+    .slide .boton i {
+        margin-right: 0.5em;
+    }
+
+    .movie {
+        min-width: 150px;
+    }
+
+    .movie img {
+        height: 180px;
+    }
+
+    .content-section h2 {
+        font-size: 1rem;
+    }
 }
