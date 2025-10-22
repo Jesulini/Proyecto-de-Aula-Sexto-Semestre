@@ -1,32 +1,34 @@
-<ion-header>
-  <ion-toolbar color="dark">
-    <ion-title>Iniciar sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="ion-padding custom-login">
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Correo electrónico</ion-label>
-    <ion-input type="email" [(ngModel)]="email"></ion-input>
-  </ion-item>
+  <div class="login-container">
+    <h2>Inicia sesión</h2>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input type="password" [(ngModel)]="password"></ion-input>
-  </ion-item>
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <ion-item>
+        <ion-label position="floating">Correo electrónico</ion-label>
+        <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+      </ion-item>
 
-  <ion-button expand="block" color="primary" (click)="login()">
-    Ingresar
-  </ion-button>
+      <ion-item>
+        <ion-label position="floating">Contraseña</ion-label>
+        <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+      </ion-item>
 
-  <ion-text color="medium">
-    <p class="ion-text-center">
-      ¿No tienes cuenta?
-      <a (click)="goToRegister()">Regístrate aquí</a>
-    </p>
-    <p class="ion-text-center">
-      ¿Olvidaste tu contraseña? 
-      <a routerLink="/forgot-password">Restablécela aquí</a>
-    </p>
-  </ion-text>
+      <ion-button expand="block" color="primary" type="submit" [disabled]="!loginForm.valid">
+        Ingresar
+      </ion-button>
+    </form>
+
+    <ion-text color="medium" class="extra-links">
+      <p>
+        ¿No tienes cuenta?
+        <a (click)="goToRegister()">Regístrate aquí</a>
+      </p>
+      <p>
+        ¿Olvidaste tu contraseña?
+        <a routerLink="/forgot-password">Restablécela aquí</a>
+      </p>
+    </ion-text>
+  </div>
+
 </ion-content>

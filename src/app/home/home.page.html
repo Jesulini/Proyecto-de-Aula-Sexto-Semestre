@@ -1,20 +1,30 @@
 <ion-content class="custom-home">
 
+  <!-- HEADER -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
     </div>
-    <button class="menu-toggle" id="menu-toggle">&#9776;</button>
-    <nav id="main-nav">
-      <ul>
-        <li><a routerLink="/home">Inicio</a></li>
-        <li><a routerLink="/cartelera">Películas</a></li>
-        <li><a routerLink="/series">Series</a></li>
-        <li><a routerLink="/mi-lista">Mi lista</a></li>
-      </ul>
-    </nav>
+    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
   </header>
 
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.active]="menuAbierto">
+    <div class="sidebar-header">
+      <h3>Menú</h3>
+      <button class="close-btn" (click)="toggleMenu()">✕</button>
+    </div>
+    <ul>
+      <li><a routerLink="/home" class="active" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
+      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
+      <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
+      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
+      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
+    </ul>
+  </aside>
+
+  <!-- SLIDER PRINCIPAL -->
   <section class="slider">
     <div
       class="slide"
@@ -25,10 +35,15 @@
     >
       <div class="content">
         <h2>{{ movie.title }}</h2>
-        <button role="button" class="boton"><i class="fa-solid fa-circle-play"></i>Reproducir</button>
-        <button role="button" class="boton"><i class="fa-solid fa-circle-question"></i>Más Información</button>
+        <div class="buttons">
+          <button class="boton"><i class="fa-solid fa-circle-play"></i> Reproducir</button>
+          <button class="boton"><i class="fa-solid fa-circle-question"></i> Más información</button>
+        </div>
       </div>
     </div>
+    <div class="arrow left" (click)="prevSlide()">&#10094;</div>
+    <div class="arrow right" (click)="nextSlide()">&#10095;</div>
+
     <div class="indicators">
       <span
         class="dot"
@@ -39,6 +54,7 @@
     </div>
   </section>
 
+  <!-- CARRUSEL DE DESTACADOS -->
   <section class="content-section">
     <h2>Destacadas</h2>
     <div class="carrusel">

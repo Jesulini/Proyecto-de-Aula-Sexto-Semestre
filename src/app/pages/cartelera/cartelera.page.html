@@ -1,13 +1,57 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>cartelera</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="custom-cartelera">
+  <header>
+    <div class="page-title">
+      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    </div>
+    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+  </header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">cartelera</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Barra lateral animada -->
+  <aside class="sidebar" [class.active]="menuAbierto">
+    <div class="sidebar-header">
+      <h3>Menú</h3>
+      <button class="close-btn" (click)="toggleMenu()">✕</button>
+    </div>
+    <ul>
+      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/cartelera" class="active" (click)="toggleMenu()">Películas</a></li>
+      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
+      <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
+      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
+    </ul>
+  </aside>
+
+  <div class="cartelera-container" [class.menu-open]="menuAbierto">
+    <!-- Barra lateral de categorías -->
+    <aside class="categorias">
+      <h3>Categorías</h3>
+      <ul>
+        <li *ngFor="let categoria of categorias"
+            (click)="filtrarPorCategoria(categoria)"
+            [class.active]="categoriaSeleccionada === categoria">
+          {{ categoria }}
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar película..."
+          [(ngModel)]="terminoBusqueda"
+          (input)="buscarPeliculas()"
+        />
+      </div>
+
+      <div class="movies-grid">
+        <div class="movie-card" *ngFor="let movie of peliculasFiltradas">
+          <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+          <h4>{{ movie.title }}</h4>
+          <p>{{ movie.category }}</p>
+        </div>
+      </div>
+    </main>
+  </div>
 </ion-content>

@@ -1,42 +1,40 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  AfterViewInit
-} from '@angular/core';
-import { Movie } from 'src/app/models/movie.model';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Movie } from 'src/app/models/movie.model';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class HomePage implements OnInit, AfterViewInit {
   featuredList: Movie[] = [
     { id: '1', title: 'Inception', imageUrl: 'assets/inception.jpg' },
     { id: '2', title: 'Interstellar', imageUrl: 'assets/interstellar.jpg' },
     { id: '3', title: 'The Dark Knight', imageUrl: 'assets/dark-knight.jpg' },
-    { id: '4', title: 'Tenet', imageUrl: 'assets/tenet.jpg' }
+    { id: '4', title: 'Tenet', imageUrl: 'assets/tenet.jpg' },
   ];
 
   currentIndex = 0;
   slideInterval: any;
-
   @ViewChild('carruselContainer') carruselContainer!: ElementRef;
   carruselIndex = 0;
+  menuAbierto = false;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
+    this.slideInterval = setInterval(() => this.nextSlide(), 6000);
   }
 
   ngAfterViewInit(): void {
     this.updateCarrusel();
     window.addEventListener('resize', () => this.updateCarrusel());
+  }
+
+  toggleMenu() {
+    this.menuAbierto = !this.menuAbierto;
   }
 
   showSlide(index: number) {
@@ -48,9 +46,14 @@ export class HomePage implements OnInit, AfterViewInit {
     this.currentIndex = (this.currentIndex + 1) % this.featuredList.length;
   }
 
+  prevSlide() {
+    this.currentIndex =
+      (this.currentIndex - 1 + this.featuredList.length) % this.featuredList.length;
+  }
+
   resetInterval() {
     clearInterval(this.slideInterval);
-    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
+    this.slideInterval = setInterval(() => this.nextSlide(), 6000);
   }
 
   goToMovie(id: string) {
@@ -82,5 +85,9 @@ export class HomePage implements OnInit, AfterViewInit {
       parseInt(style.marginRight);
 
     container.style.transform = `translateX(-${this.carruselIndex * itemWidth}px)`;
+  }
+
+  logout() {
+    this.router.navigate(['/login']);
   }
 }
