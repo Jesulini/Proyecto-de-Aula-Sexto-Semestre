@@ -1,13 +1,56 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>admin</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="admin-page">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- HEADER -->
+  <header>
+    <h1>Panel del Administrador 🎬</h1>
+    <button (click)="logout()">Cerrar sesión</button>
+  </header>
+
+  <!-- FORMULARIO PARA AÑADIR/EDITAR PELÍCULAS -->
+  <section class="movie-form">
+    <h2>{{ editMode ? 'Editar película' : 'Agregar nueva película' }}</h2>
+
+    <form (ngSubmit)="saveMovie()">
+      <ion-item>
+        <ion-label position="floating">Título</ion-label>
+        <ion-input [(ngModel)]="movieForm.title" name="title" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">URL de imagen</ion-label>
+        <ion-input [(ngModel)]="movieForm.imageUrl" name="imageUrl" required></ion-input>
+      </ion-item>
+
+      <div style="text-align: center; margin-top: 10px;" *ngIf="movieForm.imageUrl">
+        <img [src]="movieForm.imageUrl" alt="Vista previa" width="200" style="border-radius: 10px;">
+      </div>
+
+      <ion-button expand="block" type="submit" color="success">
+        {{ editMode ? 'Guardar cambios' : 'Agregar película' }}
+      </ion-button>
+
+      <ion-button expand="block" color="medium" fill="outline" (click)="resetForm()" *ngIf="editMode">
+        Cancelar edición
+      </ion-button>
+    </form>
+  </section>
+
+  <!-- LISTA DE PELÍCULAS -->
+  <section>
+    <h2 style="color: #ffd700; text-align: center; margin-bottom: 15px;">Películas en cartelera</h2>
+
+    <div class="movie-list">
+      <div class="movie-card" *ngFor="let movie of featuredList; let i = index">
+        <img [src]="movie.imageUrl" alt="{{ movie.title }}">
+        <div class="info">
+          <h3>{{ movie.title }}</h3>
+          <div style="display: flex; justify-content: center; gap: 10px;">
+            <button (click)="editMovie(i)">Editar</button>
+            <button (click)="deleteMovie(i)">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </ion-content>

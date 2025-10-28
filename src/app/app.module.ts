@@ -7,9 +7,12 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
+
+// 🔥 AÑADE ESTOS IMPORTS
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -21,8 +24,11 @@ import { environment } from '../environments/environment';
     IonicModule.forRoot(),
     AppRoutingModule,
     FormsModule,
+
+    // 🔥 Inicializa Firebase y servicios
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideAuth(() => getAuth())
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()), // <-- ESTE ES EL QUE TE FALTABA
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

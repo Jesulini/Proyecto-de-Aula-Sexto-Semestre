@@ -1,4 +1,5 @@
 <ion-content class="custom-cartelera">
+  <!-- 🔹 Encabezado -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
@@ -6,7 +7,7 @@
     <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
   </header>
 
-  <!-- Barra lateral animada -->
+  <!-- 🔹 Menú lateral -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
@@ -17,25 +18,36 @@
       <li><a routerLink="/cartelera" class="active" (click)="toggleMenu()">Películas</a></li>
       <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
       <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
-      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
+      <li class="logout" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+      </li>
     </ul>
   </aside>
 
+  <!-- 🔹 Contenedor principal -->
   <div class="cartelera-container" [class.menu-open]="menuAbierto">
-    <!-- Barra lateral de categorías -->
+    <!-- 🎬 Categorías -->
     <aside class="categorias">
       <h3>Categorías</h3>
       <ul>
-        <li *ngFor="let categoria of categorias"
-            (click)="filtrarPorCategoria(categoria)"
-            [class.active]="categoriaSeleccionada === categoria">
+        <li
+          *ngFor="let categoria of categorias"
+          (click)="filtrarPorCategoria(categoria)"
+          [class.active]="categoriaSeleccionada === categoria"
+        >
           {{ categoria }}
         </li>
       </ul>
+
+      <!-- 👑 Botón solo para admin -->
+      <div *ngIf="esAdmin" class="admin-actions">
+        <button (click)="abrirModalAgregar()" class="add-btn">+ Agregar Película</button>
+      </div>
     </aside>
 
-    <!-- Contenido principal -->
+    <!-- 🎥 Contenido principal -->
     <main class="main-content">
+      <!-- 🔎 Barra de búsqueda -->
       <div class="search-bar">
         <input
           type="text"
@@ -45,13 +57,74 @@
         />
       </div>
 
+      <!-- 🧩 Grilla de películas -->
       <div class="movies-grid">
         <div class="movie-card" *ngFor="let movie of peliculasFiltradas">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h4>{{ movie.title }}</h4>
           <p>{{ movie.category }}</p>
+
+          <!-- 🛠️ Controles de administrador -->
+          <div *ngIf="esAdmin" class="admin-controls">
+            <button (click)="abrirModalEditar(movie)" class="edit-btn" title="Editar">✎</button>
+            <button (click)="confirmarEliminacion(movie.id)" class="delete-btn" title="Eliminar">🗑</button>
+          </div>
         </div>
       </div>
+
+      <!-- 👑 Panel informativo del admin -->
+      <section *ngIf="esAdmin" class="admin-panel">
+        <h2>Panel de Administración</h2>
+        <p>Desde aquí puedes agregar, editar o eliminar películas de la cartelera.</p>
+        <button class="admin-add" (click)="abrirModalAgregar()">➕ Agregar Película</button>
+      </section>
     </main>
   </div>
+
+  <!-- 🔸 MODAL AGREGAR / EDITAR -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>{{ editando ? 'Editar Película' : 'Agregar Película' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-label position="floating">Título</ion-label>
+          <ion-input [(ngModel)]="peliculaTemp.title" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">URL de la imagen</ion-label>
+          <ion-input [(ngModel)]="peliculaTemp.imageUrl" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+        <ion-label>Categoría</ion-label>
+        <ion-select [(ngModel)]="peliculaTemp.category" interface="alert" placeholder="Seleccionar categoría">
+          <ion-select-option value="Acción">Acción</ion-select-option>
+          <ion-select-option value="Romance">Romance</ion-select-option>
+          <ion-select-option value="Ciencia Ficción">Ciencia Ficción</ion-select-option>
+          <ion-select-option value="Animación">Animación</ion-select-option>
+          <ion-select-option value="Terror">Terror</ion-select-option>
+        </ion-select>
+        </ion-item>
+
+
+        <ion-item>
+          <ion-label position="floating">Descripción (opcional)</ion-label>
+          <ion-textarea [(ngModel)]="peliculaTemp.description"></ion-textarea>
+        </ion-item>
+
+        <ion-button expand="block" color="warning" (click)="guardarPelicula()">
+          {{ editando ? 'Guardar Cambios' : 'Agregar Película' }}
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

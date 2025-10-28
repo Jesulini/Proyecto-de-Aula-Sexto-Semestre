@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail} from '@angular/fire/auth';
+import { 
+  Auth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  updateProfile, 
+  sendPasswordResetEmail 
+} from '@angular/fire/auth';
 import { inject } from '@angular/core';
 
 @Injectable({
@@ -30,5 +37,11 @@ export class AuthService {
 
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
+  }
+
+  // 🔥 Nuevo método para obtener el correo del usuario autenticado
+  async getCurrentUserEmail(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.email : null;
   }
 }
