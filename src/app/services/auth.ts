@@ -1,12 +1,5 @@
 import { Injectable } from '@angular/core';
-import { 
-  Auth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  updateProfile, 
-  sendPasswordResetEmail 
-} from '@angular/fire/auth';
+import {Auth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,updateProfile,sendPasswordResetEmail} from '@angular/fire/auth';
 import { inject } from '@angular/core';
 
 @Injectable({
@@ -20,14 +13,18 @@ export class AuthService {
   async register(nombre: string, email: string, password: string) {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
     await updateProfile(userCredential.user, { displayName: nombre });
+    localStorage.setItem('user', JSON.stringify(userCredential.user));
     return userCredential;
   }
 
-  login(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  async login(email: string, password: string) {
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    localStorage.setItem('user', JSON.stringify(userCredential.user));
+    return userCredential;
   }
 
   logout() {
+    localStorage.removeItem('user');
     return signOut(this.auth);
   }
 
@@ -35,11 +32,14 @@ export class AuthService {
     return this.auth.currentUser;
   }
 
+  async getCurrentUser(): Promise<any> {
+    return this.auth.currentUser;
+  }
+
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }
 
-  // 🔥 Nuevo método para obtener el correo del usuario autenticado
   async getCurrentUserEmail(): Promise<string | null> {
     const user = this.auth.currentUser;
     return user ? user.email : null;

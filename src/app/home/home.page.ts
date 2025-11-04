@@ -22,10 +22,18 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   menuAbierto = false;
   isAdmin = false;
 
-  // 🔹 Modal
+  // Modal
   modalAbierto = false;
   editando = false;
-  peliculaTemp: Movie = { id: '', title: '', imageUrl: '', category: '', description: '' };
+  peliculaTemp: Movie = { 
+    id: '', 
+    title: '', 
+    imageUrl: '', 
+    category: '', 
+    description: '',
+    trailerUrl: '',
+    movieUrl: ''
+  };
 
   categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
 
@@ -55,7 +63,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     if (this.slideInterval) clearInterval(this.slideInterval);
   }
 
-  /** 🔁 Cargar películas desde el documento único */
   async loadMovies(): Promise<void> {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
@@ -70,19 +77,15 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // 📂 Menú lateral
   toggleMenu(): void { this.menuAbierto = !this.menuAbierto; }
 
-  // 🔄 Slider principal
   showSlide(index: number): void { this.currentIndex = index; this.resetInterval(); }
   nextSlide(): void { this.currentIndex = (this.currentIndex + 1) % this.featuredList.length; }
   prevSlide(): void { this.currentIndex = (this.currentIndex - 1 + this.featuredList.length) % this.featuredList.length; }
   resetInterval(): void { clearInterval(this.slideInterval); this.slideInterval = setInterval(() => this.nextSlide(), 5000); }
 
-  // 🎬 Navegación
   goToMovie(id: string): void { this.router.navigate(['/detalle-pelicula'], { queryParams: { id } }); }
 
-  // 🎞️ Carrusel
   nextCarrusel(): void { this.carruselIndex = (this.carruselIndex + 1) % this.featuredList.length; this.updateCarrusel(); }
   prevCarrusel(): void { this.carruselIndex = (this.carruselIndex - 1 + this.featuredList.length) % this.featuredList.length; this.updateCarrusel(); }
 
@@ -97,10 +100,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     container.style.transition = 'transform 0.5s ease';
   }
 
-  // 👑 Modal / ADMINISTRADOR
   abrirModalAgregar(): void {
     this.editando = false;
-    this.peliculaTemp = { id: '', title: '', imageUrl: '', category: '', description: '' };
+    this.peliculaTemp = { id: '', title: '', imageUrl: '', category: '', description: '', trailerUrl: '', movieUrl: '' };
     this.modalAbierto = true;
   }
 
@@ -113,27 +115,39 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   cerrarModal(): void { this.modalAbierto = false; }
 
   async guardarPelicula(): Promise<void> {
-    const { title, imageUrl, category, description, id } = this.peliculaTemp;
+    const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
+
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      this.presentToast('⚠️ Todos los campos son obligatorios.');
+      this.presentToast('⚠️ Todos los campos obligatorios deben estar llenos.');
       return;
     }
+
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
+
       if (this.editando && id) {
         this.featuredList = this.featuredList.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description } : p
+          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
         );
         await updateDoc(docRef, { items: this.featuredList });
         this.presentToast('✅ Película actualizada.');
       } else {
-        const nuevaPeli: Movie = { id: this.generarId(), title, imageUrl, category, description };
+        const nuevaPeli: Movie = { 
+          id: this.generarId(), 
+          title, 
+          imageUrl, 
+          category, 
+          description, 
+          trailerUrl, 
+          movieUrl 
+        };
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
         this.presentToast('✅ Película agregada.');
       }
       this.cerrarModal();
       this.updateCarrusel();
+
     } catch (error) {
       console.error('Error guardando película:', error);
       this.presentToast('❌ Error al guardar la película.');
@@ -145,15 +159,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       await updateDoc(docRef, { items: this.featuredList });
-      this.presentToast('🗑️ Película eliminada correctamente.');
+      this.presentToast('🗑️ Película eliminada.');
       this.updateCarrusel();
     } catch (error) {
       console.error('Error eliminando película:', error);
-      this.presentToast('❌ Error al eliminar la película.');
+      this.presentToast('❌ Error al eliminar.');
     }
   }
 
-  // 🔔 Toast helper
   async presentToast(message: string): Promise<void> {
     const toast = await this.toastCtrl.create({ message, duration: 2000, position: 'bottom' });
     await toast.present();
@@ -164,6 +177,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  /** 🔹 Generar ID aleatorio para películas */
   generarId(): string { return Math.random().toString(36).substring(2, 10); }
+
 }

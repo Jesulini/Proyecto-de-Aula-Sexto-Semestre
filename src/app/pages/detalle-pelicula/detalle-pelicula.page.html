@@ -9,7 +9,7 @@
 
 <ion-content class="detalle-page">
 
-  <!-- HEADER ESTILO HOME -->
+  <!-- HEADER IGUAL AL HOME -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
@@ -33,26 +33,30 @@
     </ul>
   </aside>
 
-  <!-- DETALLE DE PELÍCULA -->
+  <!-- DETALLE -->
   <div *ngIf="pelicula" class="detalle-container">
 
-    <!-- 🎬 Poster de la película -->
     <div class="detalle-poster">
       <img [src]="pelicula.imageUrl" [alt]="pelicula.title" />
     </div>
 
-    <!-- 📝 Información de la película -->
     <div class="detalle-info">
       <h1>{{ pelicula.title }}</h1>
       <p class="categoria" *ngIf="pelicula.category">{{ pelicula.category }}</p>
       <p class="descripcion" *ngIf="pelicula.description">{{ pelicula.description }}</p>
 
       <div class="botones">
-        <ion-button class="reproducir">
+        <ion-button class="reproducir" (click)="verPelicula()">
           <ion-icon slot="start" name="play"></ion-icon>
           Reproducir
         </ion-button>
-        <ion-button class="mi-lista">
+
+        <ion-button class="trailer" (click)="verTrailer(pelicula?.trailerUrl)">
+          <ion-icon slot="start" name="videocam"></ion-icon>
+          Trailer
+        </ion-button>
+
+        <ion-button class="mi-lista" (click)="agregarMiLista()">
           <ion-icon slot="start" name="add"></ion-icon>
           Mi lista
         </ion-button>

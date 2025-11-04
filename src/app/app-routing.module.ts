@@ -36,13 +36,14 @@ const routes: Routes = [
     loadChildren: () => import('./pages/compra/compra.module').then(m => m.CompraPageModule)
   },
   {
-    path: 'admin',
-    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule)
-  },
-  {
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule)
+  },
+  {
+    path: 'mi-lista',
+    loadChildren: () => import('./pages/mi-lista/mi-lista.module').then( m => m.MiListaPageModule)
   }
+
 ];
 
 @NgModule({

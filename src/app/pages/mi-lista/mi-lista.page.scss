@@ -1,0 +1,68 @@
+.mi-lista-page {
+  padding: 15px;
+  color: #fff;
+  background: #0d0d0d;
+}
+
+/* header menu */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.logo-img {
+  width: 120px;
+}
+
+.menu-toggle {
+  font-size: 26px;
+  color: white;
+  background: none;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0; left: -260px;
+  width: 240px;
+  height: 100%;
+  background: #111;
+  padding: 20px;
+  transition: .3s;
+  z-index: 999;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar ul li {
+  padding: 12px 0;
+  font-size: 18px;
+}
+
+/* Sección de películas */
+.movie-section {
+  margin-top: 25px;
+}
+
+.movie-section h2 {
+  margin-bottom: 10px;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.movie-card img {
+  width: 100%;
+  border-radius: 8px;
+  transition: .2s;
+}
+.movie-card img:hover {
+  transform: scale(1.06);
+}

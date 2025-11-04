@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Mi Lista & Historial</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="mi-lista-page">
+
+  <!-- Logo + menú -->
+  <header>
+    <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    <button class="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.active]="menuAbierto">
+    <div class="sidebar-header">
+      <h3>Menú</h3>
+      <button class="close-btn" (click)="toggleMenu()">✕</button>
+    </div>
+    <ul>
+      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
+      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
+      <li><a routerLink="/mi-lista" class="active" (click)="toggleMenu()">Mi lista</a></li>
+      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
+      <li class="logout" (click)="logout()">Cerrar sesión</li>
+    </ul>
+  </aside>
+
+
+  <!-- ✅ Lista del usuario -->
+  <section class="movie-section">
+    <h2>⭐ Mi Lista</h2>
+    <div class="movies-grid">
+      <div *ngFor="let movie of miLista" class="movie-card" (click)="irADetalle(movie)">
+        <img [src]="movie.imageUrl" [alt]="movie.title" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ Historial -->
+  <section class="movie-section">
+    <h2>⏱️ Historial</h2>
+    <div class="movies-grid">
+      <div *ngFor="let movie of historial" class="movie-card" (click)="irADetalle(movie)">
+        <img [src]="movie.imageUrl" [alt]="movie.title" />
+      </div>
+    </div>
+  </section>
+
+</ion-content>

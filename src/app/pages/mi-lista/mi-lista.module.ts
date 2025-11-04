@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { AdminPageRoutingModule } from './admin-routing.module';
+import { MiListaPageRoutingModule } from './mi-lista-routing.module';
 
-import { AdminPage } from './admin.page';
+import { MiListaPage } from './mi-lista.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AdminPageRoutingModule
+    MiListaPageRoutingModule
   ],
-  declarations: [AdminPage]
+  declarations: [MiListaPage]
 })
-export class AdminPageModule {}
+export class MiListaPageModule {}
