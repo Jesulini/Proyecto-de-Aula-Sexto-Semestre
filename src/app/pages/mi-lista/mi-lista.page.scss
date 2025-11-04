@@ -1,68 +1,209 @@
 .mi-lista-page {
-  padding: 15px;
+  --background: #141414;
   color: #fff;
-  background: #0d0d0d;
-}
+  font-family: "Poppins", sans-serif;
+  position: relative;
 
-/* header menu */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-}
+  $neon-gold: #ffb703;
+  $neon-blue: #00f5ff;
+  $neon-red: #ff0054;
+  $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
 
-.logo-img {
-  width: 120px;
-}
+  /* ===== HEADER ===== */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 25px;
+    backdrop-filter: blur(12px);
+    background: rgba(20, 20, 20, 0.85);
+    border-bottom: 2px solid $neon-gold;
 
-.menu-toggle {
-  font-size: 26px;
-  color: white;
-  background: none;
-}
+    .logo-img {
+      height: 45px;
+      filter: drop-shadow(0 0 6px $neon-gold);
+      transition: 0.3s;
 
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  top: 0; left: -260px;
-  width: 240px;
-  height: 100%;
-  background: #111;
-  padding: 20px;
-  transition: .3s;
-  z-index: 999;
-}
+      &:hover {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 12px $neon-gold);
+      }
+    }
 
-.sidebar.active {
-  left: 0;
-}
+    .menu-toggle {
+      font-size: 28px;
+      background: none;
+      border: none;
+      color: $neon-gold;
+      cursor: pointer;
+      transition: 0.3s;
 
-.sidebar ul li {
-  padding: 12px 0;
-  font-size: 18px;
-}
+      &:hover {
+        color: $neon-blue;
+        text-shadow: 0 0 12px $neon-blue;
+      }
+    }
+  }
 
-/* Sección de películas */
-.movie-section {
-  margin-top: 25px;
-}
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 250px;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(12px);
+    border-left: 2px solid $neon-gold;
+    transition: right 0.4s ease;
+    z-index: 2000;
+    padding: 20px;
 
-.movie-section h2 {
-  margin-bottom: 10px;
-}
+    &.active { right: 0; }
 
-.movies-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-.movie-card img {
-  width: 100%;
-  border-radius: 8px;
-  transition: .2s;
-}
-.movie-card img:hover {
-  transform: scale(1.06);
+      h3 { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+      .close-btn {
+        background: none;
+        border: none;
+        color: $neon-gold;
+        font-size: 22px;
+        cursor: pointer;
+        &:hover { color: $neon-red; text-shadow: 0 0 12px $neon-red; }
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+
+      li {
+        padding: 12px 10px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #fff;
+        transition: 0.3s;
+
+        &:hover { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+
+        &.logout { margin-top: 20px; color: $neon-red; font-weight: bold; }
+
+        a {
+          text-decoration: none;
+          color: inherit;
+          width: 100%;
+          &.active { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+        }
+      }
+    }
+  }
+
+  /* ===== SECCIONES MI LISTA Y HISTORIAL ===== */
+  section {
+    padding: 30px;
+    h2 {
+      color: $neon-gold;
+      text-shadow: $neon-shadow;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+
+    .peliculas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+
+      .pelicula-card {
+        background: rgba(20, 20, 20, 0.85);
+        border: 2px solid $neon-gold;
+        border-radius: 12px;
+        overflow: hidden;
+        width: 180px;
+        text-align: center;
+        transition: 0.3s;
+        cursor: pointer;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 15px $neon-gold;
+        }
+
+        img {
+          width: 100%;
+          border-bottom: 2px solid $neon-gold;
+        }
+
+        h3 {
+          font-size: 1rem;
+          margin: 10px 0;
+          color: $neon-gold;
+          text-shadow: 0 0 6px $neon-gold;
+        }
+
+        .visto-en {
+          font-size: 0.8rem;
+          color: #ccc;
+          margin-bottom: 10px;
+        }
+
+        .acciones {
+          display: flex;
+          justify-content: space-around;
+          padding: 10px;
+
+          ion-button {
+            font-size: 0.75rem;
+            border-color: $neon-gold;
+            color: $neon-gold;
+
+            &:hover {
+              background: $neon-gold;
+              color: #000;
+              box-shadow: 0 0 12px $neon-gold;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* ===== MENSAJES SIN INFO ===== */
+  .sin-info, .loading {
+    text-align: center;
+    margin-top: 60px;
+    color: #ccc;
+    font-size: 1.2rem;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    section {
+      padding: 20px;
+
+      .peliculas-grid {
+        .pelicula-card {
+          width: 45%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    section {
+      .peliculas-grid {
+        .pelicula-card {
+          width: 100%;
+        }
+      }
+    }
+  }
 }

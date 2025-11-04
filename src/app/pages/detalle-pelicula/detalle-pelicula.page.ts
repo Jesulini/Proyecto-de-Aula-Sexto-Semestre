@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService } from 'src/app/services/auth';
-import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-detalle-pelicula',
@@ -24,15 +24,16 @@ export class DetallePeliculaPage implements OnInit {
     private route: ActivatedRoute,
     private firestore: Firestore,
     private authService: AuthService,
-    private router: Router,
-    private iab: InAppBrowser
+    private router: Router
   ) {}
 
   async ngOnInit() {
     this.peliculaId = this.route.snapshot.queryParamMap.get('id');
+
     if (this.peliculaId) {
       await this.cargarPelicula(this.peliculaId);
     }
+
     await this.cargarPeliculasDestacadas();
   }
 
@@ -54,6 +55,7 @@ export class DetallePeliculaPage implements OnInit {
     try {
       const ref = doc(this.firestore, 'peliculas/peliculas');
       const snap = await getDoc(ref);
+
       if (snap.exists()) {
         const data = snap.data() as { items: Movie[] };
         this.featuredList = data.items;
@@ -70,16 +72,22 @@ export class DetallePeliculaPage implements OnInit {
     this.router.navigate(['/detalle-pelicula'], { queryParams: { id }});
   }
 
-  verTrailer(url?: string) {
+  async verTrailer(url?: string) {
     if (!url) return;
 
-    try { this.iab.create(url, "_blank", { location: "yes" }); }
-    catch { window.open(url, "_blank"); }
+    await Browser.open({
+      url,
+      windowName: '_blank'
+    });
   }
 
-  verPelicula() {
+  async verPelicula() {
     if (!this.pelicula?.movieUrl) return;
-    window.open(this.pelicula.movieUrl, "_blank");
+
+    await Browser.open({
+      url: this.pelicula.movieUrl,
+      windowName: '_blank'
+    });
   }
 
   agregarMiLista() {

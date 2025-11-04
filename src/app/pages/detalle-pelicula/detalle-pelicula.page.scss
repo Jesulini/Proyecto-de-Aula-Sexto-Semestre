@@ -1,5 +1,5 @@
 .detalle-page {
-  --background: #141414;
+  --background: #0a0a0a;
   color: #fff;
   font-family: "Poppins", sans-serif;
   position: relative;
@@ -7,27 +7,26 @@
   $neon-gold: #ffb703;
   $neon-blue: #00f5ff;
   $neon-red: #ff0054;
-  $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
+  $shadow: 0 0 15px rgba(255, 183, 3, 0.5);
 
-  /* ===== HEADER ESTILO HOME ===== */
-  header {
+  /* === NAV SUPERIOR ESTILO NETFLIX === */
+  .top-nav {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 15px 25px;
-    backdrop-filter: blur(12px);
-    background: rgba(20, 20, 20, 0.85);
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(10px);
     border-bottom: 2px solid $neon-gold;
+    z-index: 5;
+    position: sticky;
+    top: 0;
 
     .logo-img {
-      height: 45px;
-      filter: drop-shadow(0 0 6px $neon-gold);
-      transition: 0.3s;
-
-      &:hover {
-        transform: scale(1.08);
-        filter: drop-shadow(0 0 12px $neon-gold);
-      }
+      height: 42px;
+      filter: drop-shadow(0 0 8px $neon-gold);
+      transition: .3s;
+      &:hover { transform: scale(1.08); }
     }
 
     .menu-toggle {
@@ -36,27 +35,22 @@
       border: none;
       color: $neon-gold;
       cursor: pointer;
-      transition: 0.3s;
-
-      &:hover {
-        color: $neon-blue;
-        text-shadow: 0 0 12px $neon-blue;
-      }
+      &:hover { color: $neon-blue; }
     }
   }
 
-  /* ===== SIDEBAR ===== */
+  /* === MENU LATERAL === */
   .sidebar {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 250px;
-    height: 100%;
-    background: rgba(20, 20, 20, 0.95);
+    width: 260px;
+    height: 100vh;
+    background: rgba(10,10,10,0.95);
     backdrop-filter: blur(12px);
     border-left: 2px solid $neon-gold;
-    transition: right 0.4s ease;
-    z-index: 2000;
+    transition: .35s;
+    z-index: 999;
     padding: 20px;
 
     &.active { right: 0; }
@@ -66,133 +60,130 @@
       justify-content: space-between;
       align-items: center;
 
-      h3 { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+      h3 {
+        color: $neon-gold;
+        text-shadow: 0 0 6px $neon-gold;
+      }
+
       .close-btn {
         background: none;
         border: none;
-        color: $neon-gold;
         font-size: 22px;
-        cursor: pointer;
-        &:hover { color: $neon-red; text-shadow: 0 0 12px $neon-red; }
+        color: $neon-gold;
+        &:hover { color: $neon-red; }
       }
     }
 
     ul {
-      list-style: none;
-      padding: 0;
       margin-top: 30px;
+      padding: 0;
+      list-style: none;
 
       li {
-        padding: 12px 10px;
-        font-weight: 500;
+        padding: 12px;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
         color: #fff;
-        transition: 0.3s;
+        transition: .25s;
+        display: block;
 
-        &:hover { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+        &:hover { color: $neon-gold; }
 
-        &.logout { margin-top: 20px; color: $neon-red; font-weight: bold; }
+        &.logout {
+          margin-top: 22px;
+          color: $neon-red;
+          font-weight: bold;
+        }
 
         a {
           text-decoration: none;
           color: inherit;
-          width: 100%;
-          &.active { color: $neon-gold; text-shadow: 0 0 8px $neon-gold; }
+          display: block;
         }
       }
     }
   }
 
-  /* ===== DETALLE DE PELÍCULA ===== */
-  .detalle-container {
+  /* === FONDO BLUR ESTILO NETFLIX === */
+  .bg-blur {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) brightness(.4);
+    z-index: -1;
+  }
+
+  /* === CONTENIDO CENTRAL === */
+  .detalle-wrapper {
+    text-align: center;
+    padding: 40px 20px;
     display: flex;
-    gap: 40px;
-    padding: 40px;
-    align-items: flex-start;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
 
-    .detalle-poster {
-      flex: 0 0 300px;
-      img {
-        width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 0 25px rgba(255, 183, 3, 0.5);
-        transition: 0.3s;
-      }
+    .poster img {
+      width: 260px;
+      max-width: 80%;
+      border-radius: 14px;
+      box-shadow: $shadow;
+      margin-bottom: 22px;
+      transition: .3s;
+      &:hover { transform: scale(1.04); box-shadow: 0 0 25px $neon-gold; }
     }
 
-    .detalle-info {
-      flex: 1;
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: $neon-gold;
+      text-shadow: 0 0 8px rgba(255, 183, 3, .7);
+    }
+
+    .categoria {
+      font-size: 1rem;
+      color: #ccc;
+    }
+
+    .descripcion {
+      font-size: 1rem;
+      margin-top: 12px;
       max-width: 600px;
-      h1 {
-        font-size: 2.2rem;
-        color: $neon-gold;
-        text-shadow: $neon-shadow;
-        margin-bottom: 15px;
-      }
+      color: #ddd;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      padding: 0 10px;
+    }
 
-      .categoria {
-        color: #ccc;
-        font-size: 1rem;
-        margin-bottom: 10px;
-      }
+    /* === BOTONES === */
+    .acciones ion-button {
+      width: 85%;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+    }
 
-      .descripcion {
-        color: #ddd;
-        line-height: 1.6;
-        margin-bottom: 25px;
-      }
+    .btn-play {
+      --background: $neon-gold;
+      color: #000;
+      font-weight: bold;
+      &:hover { box-shadow: 0 0 16px $neon-gold; }
+    }
 
-      .botones {
-        display: flex;
-        gap: 15px;
+    .btn-trailer {
+      border: 2px solid $neon-gold;
+      color: $neon-gold;
+      &:hover { background: rgba(255,183,3,.1); box-shadow: $shadow; }
+    }
 
-        ion-button.reproducir {
-          border-color: $neon-gold;
-          color: $neon-gold;
-          font-weight: bold;
-          &:hover {
-            background: $neon-gold;
-            color: #000;
-            box-shadow: 0 0 20px $neon-gold;
-          }
-        }
-
-        ion-button.mi-lista {
-          border-color: $neon-gold;
-          color: $neon-gold;
-          font-weight: bold;
-          &:hover {
-            background: $neon-gold;
-            color: #000;
-            box-shadow: 0 0 20px $neon-gold;
-          }
-        }
-      }
+    .btn-lista {
+      color: $neon-blue;
+      &:hover { text-shadow: 0 0 12px $neon-blue; }
     }
   }
 
-  /* ===== SIN PELÍCULA ===== */
   .sin-info {
     text-align: center;
     margin-top: 60px;
     color: #ccc;
-    font-size: 1.2rem;
-  }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    .detalle-container {
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-
-      .detalle-poster { flex: 0 0 70%; margin-bottom: 25px; }
-      .detalle-info { max-width: 90%; text-align: center; }
-    }
   }
 }

@@ -1,52 +1,80 @@
 <ion-header>
   <ion-toolbar color="dark">
-    <ion-title>Mi Lista & Historial</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mi Lista</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="mi-lista-page">
 
-  <!-- Logo + menú -->
+  <!-- HEADER -->
   <header>
-    <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    <button class="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+    <div class="page-title">
+      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    </div>
+    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
   </header>
 
-  <!-- Sidebar -->
+  <!-- SIDEBAR -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
       <button class="close-btn" (click)="toggleMenu()">✕</button>
     </div>
     <ul>
-      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/home" class="active" (click)="toggleMenu()">Inicio</a></li>
       <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
       <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
-      <li><a routerLink="/mi-lista" class="active" (click)="toggleMenu()">Mi lista</a></li>
+      <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
       <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
-      <li class="logout" (click)="logout()">Cerrar sesión</li>
+      <li class="logout" (click)="auth.logout(); router.navigate(['/login'])"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
     </ul>
   </aside>
 
+  <!-- CARGANDO -->
+  <div *ngIf="cargando" class="loading">
+    <p>Cargando tus películas...</p>
+  </div>
 
-  <!-- ✅ Lista del usuario -->
-  <section class="movie-section">
-    <h2>⭐ Mi Lista</h2>
-    <div class="movies-grid">
-      <div *ngFor="let movie of miLista" class="movie-card" (click)="irADetalle(movie)">
-        <img [src]="movie.imageUrl" [alt]="movie.title" />
+  <!-- MI LISTA -->
+  <section *ngIf="!cargando && lista.length > 0" class="lista-section">
+    <h2>Mi Lista</h2>
+    <div class="peliculas-grid">
+      <div *ngFor="let peli of lista" class="pelicula-card">
+        <img [src]="peli.imageUrl" [alt]="peli.title" (click)="irDetalle(peli.id)" />
+        <h3>{{ peli.title }}</h3>
+        <div class="acciones">
+          <ion-button size="small" fill="outline" (click)="verPelicula(peli.movieUrl, peli)">
+            <ion-icon slot="start" name="play"></ion-icon> Ver
+          </ion-button>
+          <ion-button size="small" fill="clear" color="danger" (click)="eliminar(peli)">
+            <ion-icon slot="start" name="trash"></ion-icon> Eliminar
+          </ion-button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ✅ Historial -->
-  <section class="movie-section">
-    <h2>⏱️ Historial</h2>
-    <div class="movies-grid">
-      <div *ngFor="let movie of historial" class="movie-card" (click)="irADetalle(movie)">
-        <img [src]="movie.imageUrl" [alt]="movie.title" />
+  <div *ngIf="!cargando && lista.length === 0" class="sin-info">
+    <p>😢 No tienes películas en tu lista.</p>
+  </div>
+
+  <!-- HISTORIAL -->
+  <section *ngIf="!cargando && historial.length > 0" class="historial-section">
+    <h2>Historial</h2>
+    <div class="peliculas-grid">
+      <div *ngFor="let peli of historial" class="pelicula-card">
+        <img [src]="peli.imageUrl" [alt]="peli.title" (click)="verPelicula(peli.movieUrl, peli)" />
+        <h3>{{ peli.title }}</h3>
+        <p class="visto-en">Visto en: {{ peli.vistoEn?.toDate() | date:'short' }}</p>
       </div>
     </div>
   </section>
+
+  <div *ngIf="!cargando && historial.length === 0" class="sin-info">
+    <p>😢 Aún no has visto ninguna película.</p>
+  </div>
 
 </ion-content>

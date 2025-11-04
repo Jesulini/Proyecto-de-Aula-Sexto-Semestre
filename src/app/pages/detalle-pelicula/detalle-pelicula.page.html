@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar color="dark">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
@@ -7,15 +7,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="detalle-page">
+<ion-content fullscreen class="detalle-page">
 
-  <!-- HEADER IGUAL AL HOME -->
-  <header>
-    <div class="page-title">
-      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    </div>
-    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
-  </header>
+  <!-- NAV SUPERIOR TIPO NETFLIX -->
+  <div class="top-nav">
+    <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    <button class="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+  </div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" [class.active]="menuAbierto">
@@ -24,7 +22,7 @@
       <button class="close-btn" (click)="toggleMenu()">✕</button>
     </div>
     <ul>
-      <li><a routerLink="/home" class="active" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
       <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
       <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
       <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
@@ -33,34 +31,41 @@
     </ul>
   </aside>
 
-  <!-- DETALLE -->
-  <div *ngIf="pelicula" class="detalle-container">
+  <!-- DETALLE PELÍCULA -->
+  <div *ngIf="pelicula" class="detalle-wrapper">
 
-    <div class="detalle-poster">
-      <img [src]="pelicula.imageUrl" [alt]="pelicula.title" />
-    </div>
+    <!-- Fondo con blur -->
+    <div class="bg-blur" [style.background-image]="'url(' + pelicula.imageUrl + ')'"></div>
 
-    <div class="detalle-info">
+    <div class="detalle-content">
+
+      <div class="poster">
+        <img [src]="pelicula.imageUrl" [alt]="pelicula.title"/>
+      </div>
+
       <h1>{{ pelicula.title }}</h1>
       <p class="categoria" *ngIf="pelicula.category">{{ pelicula.category }}</p>
       <p class="descripcion" *ngIf="pelicula.description">{{ pelicula.description }}</p>
 
-      <div class="botones">
-        <ion-button class="reproducir" (click)="verPelicula()">
-          <ion-icon slot="start" name="play"></ion-icon>
-          Reproducir
+      <!-- BOTONES -->
+      <div class="acciones">
+
+        <ion-button expand="block" class="btn-play" (click)="verPelicula()">
+          <ion-icon slot="start" name="play"></ion-icon> Ver ahora
         </ion-button>
 
-        <ion-button class="trailer" (click)="verTrailer(pelicula?.trailerUrl)">
-          <ion-icon slot="start" name="videocam"></ion-icon>
-          Trailer
+        <ion-button expand="block" fill="outline" class="btn-trailer"
+          (click)="verTrailer(pelicula?.trailerUrl)">
+          <ion-icon slot="start" name="film"></ion-icon> Ver trailer
         </ion-button>
 
-        <ion-button class="mi-lista" (click)="agregarMiLista()">
-          <ion-icon slot="start" name="add"></ion-icon>
-          Mi lista
+        <ion-button expand="block" fill="clear" class="btn-lista"
+          (click)="agregarMiLista()">
+          <ion-icon slot="start" name="add"></ion-icon> Mi lista
         </ion-button>
+
       </div>
+
     </div>
   </div>
 

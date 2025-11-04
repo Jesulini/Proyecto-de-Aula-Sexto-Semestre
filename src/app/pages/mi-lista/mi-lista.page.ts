@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
-import { AuthService } from '../../services/auth';
-import { Movie } from '../../models/movie.model';
+import { Firestore, collection, query, where, getDocs, doc, deleteDoc, setDoc } from '@angular/fire/firestore';
+import { AuthService } from 'src/app/services/auth';
+import { Movie } from 'src/app/models/movie.model';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-mi-lista',
@@ -12,45 +13,74 @@ import { Movie } from '../../models/movie.model';
 })
 export class MiListaPage implements OnInit {
 
-  miLista: Movie[] = [];
+  lista: Movie[] = [];
   historial: Movie[] = [];
+  cargando = true;
   menuAbierto = false;
-  uid: string = "";
 
   constructor(
-    private auth: AuthService,
     private firestore: Firestore,
+    private auth: AuthService,
     private router: Router
   ) {}
 
   async ngOnInit() {
-    const user = await this.auth.getCurrentUser();
-    if (!user) return;
-
-    this.uid = user.uid;
     await this.cargarDatos();
   }
 
+  toggleMenu() { this.menuAbierto = !this.menuAbierto; }
+
   async cargarDatos() {
-    const userRef = doc(this.firestore, `usuarios/${this.uid}`);
-    const docSnap = await getDoc(userRef);
+    const usuario = this.auth.getUsuarioActual();
+    if (!usuario) return;
 
-    if (docSnap.exists()) {
-      const data: any = docSnap.data();
-      this.miLista = data.miLista || [];
-      this.historial = data.historial || [];
-    }
+    await this.obtenerMiLista(usuario.uid);
+    await this.obtenerHistorial(usuario.uid);
+
+    this.cargando = false;
   }
 
-  irADetalle(movie: Movie) {
-    this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
+  async obtenerMiLista(uid: string) {
+    const colRef = collection(this.firestore, 'mi-lista');
+    const q = query(colRef, where("userId", "==", uid));
+    const snap = await getDocs(q);
+    this.lista = snap.docs.map(d => ({ id: d.id, ...d.data() } as Movie));
   }
 
-  toggleMenu() {
-    this.menuAbierto = !this.menuAbierto;
+  async obtenerHistorial(uid: string) {
+    const colRef = collection(this.firestore, 'historial');
+    const q = query(colRef, where("userId", "==", uid));
+    const snap = await getDocs(q);
+    this.historial = snap.docs.map(d => ({ id: d.id, ...d.data() } as Movie));
   }
 
-  logout() {
-    this.auth.logout();
+  async verPelicula(url: string, peli: Movie) {
+    if (!url) return;
+
+    // Abre la película en el navegador
+    await Browser.open({ url });
+
+    // Guarda en historial
+    const usuario = this.auth.getUsuarioActual();
+    if (!usuario) return;
+
+    await setDoc(doc(this.firestore, `historial/${peli.id}_${usuario.uid}`), {
+      ...peli,
+      userId: usuario.uid,
+      vistoEn: new Date()
+    });
+
+    // Actualiza la lista de historial local
+    await this.obtenerHistorial(usuario.uid);
+  }
+
+  irDetalle(id: string) {
+    this.router.navigate(['/detalle-pelicula'], { queryParams: { id }});
+  }
+
+  async eliminar(item: Movie) {
+    const ref = doc(this.firestore, `mi-lista/${item.id}`);
+    await deleteDoc(ref);
+    this.lista = this.lista.filter(m => m.id !== item.id);
   }
 }
