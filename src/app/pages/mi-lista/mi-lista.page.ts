@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Firestore, collection, query, where, getDocs, doc, deleteDoc, setDoc } from '@angular/fire/firestore';
-import { AuthService } from 'src/app/services/auth';
-import { Movie } from 'src/app/models/movie.model';
-import { Browser } from '@capacitor/browser';
+import { Firestore, doc, getDoc, updateDoc, arrayRemove } from '@angular/fire/firestore';
+import { AuthService, User } from '../../services/auth';
+import { Movie } from '../../models/movie.model';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-mi-lista',
@@ -13,74 +12,72 @@ import { Browser } from '@capacitor/browser';
 })
 export class MiListaPage implements OnInit {
 
-  lista: Movie[] = [];
-  historial: Movie[] = [];
-  cargando = true;
-  menuAbierto = false;
+  usuarioActual: User | null = null;
+  peliculas: Movie[] = [];
 
   constructor(
+    private authService: AuthService,
     private firestore: Firestore,
-    private auth: AuthService,
-    private router: Router
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
-    await this.cargarDatos();
-  }
+    this.usuarioActual = this.authService.getUsuarioActual();
+    if (this.usuarioActual) {
+      await this.cargarMiLista();
+    }
 
-  toggleMenu() { this.menuAbierto = !this.menuAbierto; }
-
-  async cargarDatos() {
-    const usuario = this.auth.getUsuarioActual();
-    if (!usuario) return;
-
-    await this.obtenerMiLista(usuario.uid);
-    await this.obtenerHistorial(usuario.uid);
-
-    this.cargando = false;
-  }
-
-  async obtenerMiLista(uid: string) {
-    const colRef = collection(this.firestore, 'mi-lista');
-    const q = query(colRef, where("userId", "==", uid));
-    const snap = await getDocs(q);
-    this.lista = snap.docs.map(d => ({ id: d.id, ...d.data() } as Movie));
-  }
-
-  async obtenerHistorial(uid: string) {
-    const colRef = collection(this.firestore, 'historial');
-    const q = query(colRef, where("userId", "==", uid));
-    const snap = await getDocs(q);
-    this.historial = snap.docs.map(d => ({ id: d.id, ...d.data() } as Movie));
-  }
-
-  async verPelicula(url: string, peli: Movie) {
-    if (!url) return;
-
-    // Abre la película en el navegador
-    await Browser.open({ url });
-
-    // Guarda en historial
-    const usuario = this.auth.getUsuarioActual();
-    if (!usuario) return;
-
-    await setDoc(doc(this.firestore, `historial/${peli.id}_${usuario.uid}`), {
-      ...peli,
-      userId: usuario.uid,
-      vistoEn: new Date()
+    // Suscribirse a cambios de usuario
+    this.authService.usuarioActual$().subscribe(async usuario => {
+      this.usuarioActual = usuario;
+      if (usuario) {
+        await this.cargarMiLista();
+      } else {
+        this.peliculas = [];
+      }
     });
-
-    // Actualiza la lista de historial local
-    await this.obtenerHistorial(usuario.uid);
   }
 
-  irDetalle(id: string) {
-    this.router.navigate(['/detalle-pelicula'], { queryParams: { id }});
+  async cargarMiLista() {
+    if (!this.usuarioActual) return;
+
+    try {
+      const listaRef = doc(this.firestore, `usuarios/${this.usuarioActual.uid}/mi-lista/lista`);
+      const snap = await getDoc(listaRef);
+
+      if (snap.exists()) {
+        const data = snap.data() as { items: Movie[] };
+        this.peliculas = data.items || [];
+      } else {
+        this.peliculas = [];
+      }
+    } catch (e) {
+      console.error('Error cargando Mi Lista', e);
+      this.peliculas = [];
+    }
   }
 
-  async eliminar(item: Movie) {
-    const ref = doc(this.firestore, `mi-lista/${item.id}`);
-    await deleteDoc(ref);
-    this.lista = this.lista.filter(m => m.id !== item.id);
+  async eliminarPelicula(pelicula: Movie) {
+    if (!this.usuarioActual) return;
+
+    try {
+      const listaRef = doc(this.firestore, `usuarios/${this.usuarioActual.uid}/mi-lista/lista`);
+      await updateDoc(listaRef, { items: arrayRemove(pelicula) });
+      this.peliculas = this.peliculas.filter(p => p.id !== pelicula.id);
+      this.showToast('Película eliminada de Mi Lista');
+    } catch (e) {
+      console.error('Error eliminando película', e);
+      this.showToast('Error al eliminar película 😢');
+    }
+  }
+
+  verTrailer(trailerUrl?: string) {
+    if (!trailerUrl) return;
+    window.open(trailerUrl, '_blank');
+  }
+
+  private async showToast(message: string) {
+    const toast = await this.toastController.create({ message, duration: 2000, position: 'bottom' });
+    toast.present();
   }
 }

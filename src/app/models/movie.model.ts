@@ -1,9 +1,10 @@
 export interface Movie {
-  id: string;
-  title: string;
-  imageUrl: string;
+  id: string;             // obligatorio
+  title: string;          // obligatorio
+  imageUrl: string;       // obligatorio
+  movieUrl?: string;
+  trailerUrl?: string;
   category?: string;
   description?: string;
-  trailerUrl?: string;
-  movieUrl?: string;
+  vistoEn?: any;
 }

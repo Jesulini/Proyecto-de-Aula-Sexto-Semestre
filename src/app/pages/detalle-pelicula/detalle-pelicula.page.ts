@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
 import { Movie } from 'src/app/models/movie.model';
-import { AuthService } from 'src/app/services/auth';
+import { AuthService, User } from 'src/app/services/auth';
 import { Browser } from '@capacitor/browser';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-detalle-pelicula',
@@ -19,12 +20,14 @@ export class DetallePeliculaPage implements OnInit {
   menuAbierto = false;
   featuredList: Movie[] = [];
   currentIndex = 0;
+  enMiLista = false; // ✅ Variable para controlar el estado del botón
 
   constructor(
     private route: ActivatedRoute,
     private firestore: Firestore,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
@@ -32,6 +35,7 @@ export class DetallePeliculaPage implements OnInit {
 
     if (this.peliculaId) {
       await this.cargarPelicula(this.peliculaId);
+      await this.checkMiLista();
     }
 
     await this.cargarPeliculasDestacadas();
@@ -75,23 +79,71 @@ export class DetallePeliculaPage implements OnInit {
   async verTrailer(url?: string) {
     if (!url) return;
 
-    await Browser.open({
-      url,
-      windowName: '_blank'
-    });
+    await Browser.open({ url, windowName: '_blank' });
   }
 
   async verPelicula() {
     if (!this.pelicula?.movieUrl) return;
 
-    await Browser.open({
-      url: this.pelicula.movieUrl,
-      windowName: '_blank'
-    });
+    await Browser.open({ url: this.pelicula.movieUrl, windowName: '_blank' });
   }
 
-  agregarMiLista() {
-    console.log("Pendiente: guardar en lista");
+  // ✅ Verifica si la película ya está en la lista del usuario
+  private async checkMiLista() {
+    const usuario: User | null = this.authService.getUsuarioActual();
+    if (!usuario || !this.pelicula) return;
+
+    try {
+      const miListaDocRef = doc(this.firestore, `usuarios/${usuario.uid}/mi-lista/lista`);
+      const docSnap = await getDoc(miListaDocRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data() as { items: Movie[] };
+        this.enMiLista = data.items.some(p => p.id === this.pelicula?.id);
+      } else {
+        this.enMiLista = false;
+      }
+    } catch (e) {
+      console.error('Error verificando Mi Lista', e);
+    }
+  }
+
+  // ✅ Agregar o quitar de Mi Lista
+  async toggleMiLista() {
+    const usuario: User | null = this.authService.getUsuarioActual();
+    if (!usuario || !this.pelicula) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const miListaDocRef = doc(this.firestore, `usuarios/${usuario.uid}/mi-lista/lista`);
+    try {
+      const docSnap = await getDoc(miListaDocRef);
+
+      if (this.enMiLista) {
+        // Quitar de la lista
+        await updateDoc(miListaDocRef, { items: arrayRemove(this.pelicula) });
+        this.enMiLista = false;
+        this.showToast('Película removida de Mi Lista');
+      } else {
+        // Agregar a la lista
+        if (docSnap.exists()) {
+          await updateDoc(miListaDocRef, { items: arrayUnion(this.pelicula) });
+        } else {
+          await setDoc(miListaDocRef, { items: [this.pelicula] });
+        }
+        this.enMiLista = true;
+        this.showToast('Película agregada a Mi Lista ✅');
+      }
+    } catch (e) {
+      console.error('Error modificando Mi Lista', e);
+      this.showToast('Error al modificar Mi Lista 😢');
+    }
+  }
+
+  private async showToast(message: string) {
+    const toast = await this.toastController.create({ message, duration: 2000, position: 'bottom' });
+    toast.present();
   }
 
   logout() {

@@ -60,8 +60,9 @@
         </ion-button>
 
         <ion-button expand="block" fill="clear" class="btn-lista"
-          (click)="agregarMiLista()">
-          <ion-icon slot="start" name="add"></ion-icon> Mi lista
+          (click)="toggleMiLista()">
+          <ion-icon slot="start" [name]="enMiLista ? 'checkmark' : 'add'"></ion-icon>
+          {{ enMiLista ? 'En Mi Lista' : 'Mi Lista' }}
         </ion-button>
 
       </div>
