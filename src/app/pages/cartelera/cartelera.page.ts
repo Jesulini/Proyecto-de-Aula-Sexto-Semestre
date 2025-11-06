@@ -23,7 +23,17 @@ export class CarteleraPage implements OnInit, OnDestroy {
   esAdmin = false;
   modalAbierto = false;
   editando = false;
-  peliculaTemp: Movie = { id: '', title: '', imageUrl: '', category: '', description: '' };
+
+  // 🎬 Modelo temporal (solo campos que usas)
+  peliculaTemp: Movie = {
+    id: '',
+    title: '',
+    imageUrl: '',
+    category: '',
+    description: '',
+    trailerUrl: '',
+    movieUrl: ''
+  };
 
   constructor(
     private router: Router,
@@ -33,22 +43,17 @@ export class CarteleraPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Detectar si es admin
-    const user = this.authService.getUser();
+    const user = this.authService.getUsuarioActual();
     const email = user?.email?.trim().toLowerCase() || '';
     this.esAdmin = email === 'jesulini14@gmail.com';
-
-    // Cargar películas
     this.cargarPeliculas();
   }
 
-  /** 🔁 Cargar películas desde el documento único */
   async cargarPeliculas() {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        // Tipado seguro para evitar error TS
         const data = docSnap.data() as { items: Movie[] };
         this.peliculas = data.items || [];
         this.buscarPeliculas();
@@ -58,53 +63,54 @@ export class CarteleraPage implements OnInit, OnDestroy {
     }
   }
 
-  /** 🧠 Buscar películas */
   buscarPeliculas() {
     const termino = this.terminoBusqueda.toLowerCase();
     this.peliculasFiltradas = this.peliculas.filter(movie => {
-      const coincideTitulo = movie.title?.toLowerCase().includes(termino);
+      const coincideTitulo = (movie.title || '').toLowerCase().includes(termino);
       const coincideCategoria =
         this.categoriaSeleccionada === 'Todos' || movie.category === this.categoriaSeleccionada;
       return coincideTitulo && coincideCategoria;
     });
   }
 
-  /** 🎭 Filtrar por categoría */
   filtrarPorCategoria(categoria: string) {
     this.categoriaSeleccionada = categoria;
     this.buscarPeliculas();
   }
 
-  /** 📱 Menú lateral */
   toggleMenu() {
     this.menuAbierto = !this.menuAbierto;
   }
 
-  /** ➕ Abrir modal agregar */
   abrirModalAgregar() {
     this.editando = false;
-    this.peliculaTemp = { id: '', title: '', imageUrl: '', category: '', description: '' };
+    this.peliculaTemp = {
+      id: '',
+      title: '',
+      imageUrl: '',
+      category: '',
+      description: '',
+      trailerUrl: '',
+      movieUrl: ''
+    };
     this.modalAbierto = true;
   }
 
-  /** ✏️ Abrir modal editar */
   abrirModalEditar(movie: Movie) {
     this.editando = true;
     this.peliculaTemp = { ...movie };
     this.modalAbierto = true;
   }
 
-  /** ❌ Cerrar modal */
   cerrarModal() {
     this.modalAbierto = false;
   }
 
-  /** 💾 Guardar o actualizar película en el arreglo del documento */
   async guardarPelicula() {
-    const { title, imageUrl, category, description, id } = this.peliculaTemp;
+    const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      alert('⚠️ Todos los campos son obligatorios.');
+      alert('⚠️ Todos los campos obligatorios deben estar completos.');
       return;
     }
 
@@ -112,18 +118,24 @@ export class CarteleraPage implements OnInit, OnDestroy {
 
     try {
       if (this.editando && id) {
-        // Editar: reemplazamos el arreglo completo con la película actualizada
         this.peliculas = this.peliculas.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description } : p
+          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
         );
         await updateDoc(docRef, { items: this.peliculas });
-        alert('✅ Película actualizada.');
+        alert('✅ Película actualizada correctamente.');
       } else {
-        // Agregar: generamos ID y usamos arrayUnion
-        const nuevaPeli: Movie = { id: this.generarId(), title, imageUrl, category, description };
+        const nuevaPeli: Movie = {
+          id: this.generarId(),
+          title,
+          imageUrl,
+          category,
+          description,
+          trailerUrl,
+          movieUrl
+        };
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
-        this.peliculas.push(nuevaPeli); // actualizar localmente
-        alert('🎬 Película agregada.');
+        this.peliculas.push(nuevaPeli);
+        alert('🎬 Película agregada exitosamente.');
       }
 
       this.cerrarModal();
@@ -134,7 +146,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
     }
   }
 
-  /** 🗑️ Eliminar película */
   async confirmarEliminacion(id: string) {
     const alerta = await this.alertCtrl.create({
       header: 'Eliminar película',
@@ -163,16 +174,18 @@ export class CarteleraPage implements OnInit, OnDestroy {
     await alerta.present();
   }
 
-  /** 🚪 Cerrar sesión */
+  // 🟢 Abre detalle de película
+  verDetalle(id: string) {
+    this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  /** 🧹 Limpiar recursos */
   ngOnDestroy() {}
 
-  /** 🔹 Generar ID aleatorio para películas */
   generarId() {
     return Math.random().toString(36).substring(2, 10);
   }

@@ -18,6 +18,7 @@
       <li><a routerLink="/cartelera" class="active" (click)="toggleMenu()">Películas</a></li>
       <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
       <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
+      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
       <li class="logout" (click)="logout()">
         <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
       </li>
@@ -26,6 +27,7 @@
 
   <!-- 🔹 Contenedor principal -->
   <div class="cartelera-container" [class.menu-open]="menuAbierto">
+
     <!-- 🎬 Categorías -->
     <aside class="categorias">
       <h3>Categorías</h3>
@@ -59,15 +61,27 @@
 
       <!-- 🧩 Grilla de películas -->
       <div class="movies-grid">
-        <div class="movie-card" *ngFor="let movie of peliculasFiltradas">
+        <div
+          class="movie-card"
+          *ngFor="let movie of peliculasFiltradas"
+          (click)="verDetalle(movie.id)"
+        >
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h4>{{ movie.title }}</h4>
           <p>{{ movie.category }}</p>
 
           <!-- 🛠️ Controles de administrador -->
           <div *ngIf="esAdmin" class="admin-controls">
-            <button (click)="abrirModalEditar(movie)" class="edit-btn" title="Editar">✎</button>
-            <button (click)="confirmarEliminacion(movie.id)" class="delete-btn" title="Eliminar">🗑</button>
+            <button
+              (click)="abrirModalEditar(movie); $event.stopPropagation()"
+              class="edit-btn"
+              title="Editar"
+            >✏️</button>
+            <button
+              (click)="confirmarEliminacion(movie.id); $event.stopPropagation()"
+              class="delete-btn"
+              title="Eliminar"
+            >🗑️</button>
           </div>
         </div>
       </div>
@@ -105,20 +119,25 @@
         </ion-item>
 
         <ion-item>
-        <ion-label>Categoría</ion-label>
-        <ion-select [(ngModel)]="peliculaTemp.category" interface="alert" placeholder="Seleccionar categoría">
-          <ion-select-option value="Acción">Acción</ion-select-option>
-          <ion-select-option value="Romance">Romance</ion-select-option>
-          <ion-select-option value="Ciencia Ficción">Ciencia Ficción</ion-select-option>
-          <ion-select-option value="Animación">Animación</ion-select-option>
-          <ion-select-option value="Terror">Terror</ion-select-option>
-        </ion-select>
+          <ion-label>Categoría</ion-label>
+          <ion-select [(ngModel)]="peliculaTemp.category" interface="alert" placeholder="Seleccionar categoría">
+            <ion-select-option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</ion-select-option>
+          </ion-select>
         </ion-item>
-
 
         <ion-item>
           <ion-label position="floating">Descripción (opcional)</ion-label>
           <ion-textarea [(ngModel)]="peliculaTemp.description"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">URL del tráiler (opcional)</ion-label>
+          <ion-input [(ngModel)]="peliculaTemp.trailerUrl" placeholder="https://youtube.com/..."></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">URL de la película (opcional)</ion-label>
+          <ion-input [(ngModel)]="peliculaTemp.movieUrl" placeholder="https://cdn.mi-sitio/..."></ion-input>
         </ion-item>
 
         <ion-button expand="block" color="warning" (click)="guardarPelicula()">
