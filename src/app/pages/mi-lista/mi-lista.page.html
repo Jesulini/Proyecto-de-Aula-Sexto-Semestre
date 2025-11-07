@@ -1,39 +1,74 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Mi Lista</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="custom-home">
+  <!-- 🔹 ENCABEZADO -->
+  <header>
+    <div class="page-title">
+      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    </div>
+    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+  </header>
 
-<ion-content *ngIf="usuarioActual">
-  <ion-list *ngIf="peliculas.length > 0; else vacia">
-    <ion-item *ngFor="let pelicula of peliculas">
-      <ion-thumbnail slot="start">
-        <img [src]="pelicula.imageUrl" />
-      </ion-thumbnail>
-      <ion-label>
-        <h2>{{ pelicula.title }}</h2>
-        <p>{{ pelicula.category }}</p>
-      </ion-label>
-      <ion-buttons slot="end">
-        <ion-button color="primary" (click)="verTrailer(pelicula.trailerUrl)">
-          Ver Trailer
-        </ion-button>
-        <ion-button color="danger" (click)="eliminarPelicula(pelicula)">
-          Eliminar
-        </ion-button>
-      </ion-buttons>
-    </ion-item>
-  </ion-list>
+  <!-- 🔹 MENÚ LATERAL -->
+  <aside class="sidebar" [class.active]="menuAbierto">
+    <div class="sidebar-header">
+      <h3>Menú</h3>
+      <button class="close-btn" (click)="toggleMenu()">✕</button>
+    </div>
+    <ul>
+      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
+      <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
+      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
+      <li><a routerLink="/mi-lista" class="active" (click)="toggleMenu()">Mi lista</a></li>
+      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
+      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
+    </ul>
+  </aside>
 
-  <ng-template #vacia>
-    <ion-text class="ion-padding">
-      <p>No tienes películas en tu lista.</p>
-    </ion-text>
-  </ng-template>
-</ion-content>
+  <!-- 🔹 CONTENIDO -->
+  <section class="mi-lista-section">
+    <h2 class="section-title">🎞️ Mi Lista</h2>
 
-<ion-content *ngIf="!usuarioActual">
-  <ion-text class="ion-padding">
-    <p>Inicia sesión para ver tu lista de películas.</p>
-  </ion-text>
+    <div *ngIf="cargando" class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando tus películas...</p>
+    </div>
+
+    <div *ngIf="!cargando && peliculas.length === 0" class="vacio">
+      <p>No tienes películas guardadas 😢</p>
+    </div>
+
+    <div class="lista-grid">
+      <div *ngFor="let pelicula of peliculas" class="movie-card">
+        <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
+        <div class="movie-info">
+          <h3>{{ pelicula.title }}</h3>
+          <p>{{ pelicula.category || 'Sin categoría' }}</p>
+          <div class="buttons">
+            <button class="boton" (click)="verDetalles(pelicula)">
+              <i class="fa-solid fa-play"></i> Ver Detalles
+            </button>
+            <button class="boton eliminar" (click)="eliminarPelicula(pelicula)">
+              <i class="fa-solid fa-trash"></i> Quitar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">📜 Historial</h2>
+
+    <div *ngIf="historial.length === 0" class="vacio">
+      <p>No has visto ninguna película aún.</p>
+    </div>
+
+    <div class="lista-grid">
+      <div *ngFor="let pelicula of historial" class="movie-card">
+        <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
+        <div class="movie-info">
+          <h3>{{ pelicula.title }}</h3>
+          <p>{{ pelicula.category }}</p>
+          <small>Visto el {{ pelicula.vistoEn | date:'medium' }}</small>
+        </div>
+      </div>
+    </div>
+  </section>
 </ion-content>

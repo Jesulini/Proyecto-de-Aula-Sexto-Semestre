@@ -1,5 +1,6 @@
 <ion-content class="custom-home">
 
+  <!-- 🔹 ENCABEZADO -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
@@ -7,6 +8,7 @@
     <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
   </header>
 
+  <!-- 🔹 MENÚ LATERAL -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
@@ -22,20 +24,26 @@
     </ul>
   </aside>
 
+  <!-- 🎞️ SLIDER PRINCIPAL -->
   <section class="slider">
-    <div class="slide"
+    <div
+      class="slide"
       *ngFor="let movie of featuredList; let i = index"
       [class.active]="i === currentIndex"
       [style.backgroundImage]="'url(' + movie.imageUrl + ')'"
-      (click)="goToMovie(movie.id)"
     >
       <div class="content">
         <h2>{{ movie.title }}</h2>
         <p *ngIf="movie.description">{{ movie.description }}</p>
 
         <div class="buttons">
-          <button class="boton"><i class="fa-solid fa-circle-play"></i> Reproducir</button>
-          <button class="boton"><i class="fa-solid fa-circle-question"></i> Más información</button>
+          <button class="boton" (click)="abrirModalReproducir(movie)">
+            <i class="fa-solid fa-circle-play"></i> Reproducir
+          </button>
+
+          <button class="boton" (click)="goToMovie(movie.id)">
+            <i class="fa-solid fa-circle-question"></i> Más información
+          </button>
         </div>
       </div>
     </div>
@@ -44,7 +52,8 @@
     <div class="arrow right" (click)="nextSlide()">&#10095;</div>
 
     <div class="indicators">
-      <span class="dot"
+      <span
+        class="dot"
         *ngFor="let movie of featuredList; let i = index"
         [class.active]="i === currentIndex"
         (click)="showSlide(i)"
@@ -52,6 +61,7 @@
     </div>
   </section>
 
+  <!-- 🎬 CARRUSEL DE DESTACADAS -->
   <section class="content-section">
     <h2>Destacadas</h2>
     <div class="carrusel">
@@ -74,12 +84,14 @@
     </div>
   </section>
 
+  <!-- 👑 PANEL ADMINISTRADOR -->
   <section *ngIf="isAdmin" class="admin-panel">
     <h2>Panel de Administración</h2>
     <p>Desde aquí puedes agregar nuevas películas a la cartelera.</p>
     <button class="admin-add" (click)="abrirModalAgregar()">➕ Agregar Película</button>
   </section>
 
+  <!-- 🔸 MODAL AGREGAR / EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
 
@@ -93,7 +105,6 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-
         <ion-item>
           <ion-label position="floating">Título</ion-label>
           <ion-input [(ngModel)]="peliculaTemp.title" required></ion-input>
@@ -129,7 +140,44 @@
         <ion-button expand="block" color="warning" (click)="guardarPelicula()">
           {{ editando ? 'Guardar Cambios' : 'Agregar Película' }}
         </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
+  <!-- 🎥 MODAL REPRODUCIR -->
+  <ion-modal [isOpen]="modalReproducirAbierto" (didDismiss)="cerrarModalReproducir()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>{{ peliculaReproducir?.title }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalReproducir()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <div class="video-container">
+          <ng-container *ngIf="esYoutubeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl); else videoLocal">
+            <iframe
+              width="100%"
+              height="315"
+              [src]="getSafeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl)"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </ng-container>
+
+          <ng-template #videoLocal>
+            <video
+              *ngIf="peliculaReproducir?.movieUrl"
+              [src]="peliculaReproducir?.movieUrl"
+              controls
+              autoplay
+              width="100%"
+            ></video>
+          </ng-template>
+        </div>
       </ion-content>
     </ng-template>
   </ion-modal>

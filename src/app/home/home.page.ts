@@ -4,6 +4,7 @@ import { ToastController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService } from 'src/app/services/auth';
 import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,6 @@ import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/fir
   standalone: false,
 })
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
-
   featuredList: Movie[] = [];
   currentIndex = 0;
   slideInterval: any;
@@ -22,18 +22,22 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   menuAbierto = false;
   isAdmin = false;
 
-  // Modal
+  // Modal CRUD
   modalAbierto = false;
   editando = false;
-  peliculaTemp: Movie = { 
-    id: '', 
-    title: '', 
-    imageUrl: '', 
-    category: '', 
+  peliculaTemp: Movie = {
+    id: '',
+    title: '',
+    imageUrl: '',
+    category: '',
     description: '',
     trailerUrl: '',
     movieUrl: ''
   };
+
+  // Modal Reproducir
+  modalReproducirAbierto = false;
+  peliculaReproducir: Movie | null = null;
 
   categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
 
@@ -41,16 +45,15 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private toastCtrl: ToastController,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
     this.slideInterval = setInterval(() => this.nextSlide(), 5000);
-
     const user = this.authService.getUser();
     const email = user?.email?.trim().toLowerCase() || '';
     this.isAdmin = email === 'jesulini14@gmail.com';
-
     this.loadMovies();
   }
 
@@ -77,17 +80,41 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  toggleMenu(): void { this.menuAbierto = !this.menuAbierto; }
+  toggleMenu(): void {
+    this.menuAbierto = !this.menuAbierto;
+  }
 
-  showSlide(index: number): void { this.currentIndex = index; this.resetInterval(); }
-  nextSlide(): void { this.currentIndex = (this.currentIndex + 1) % this.featuredList.length; }
-  prevSlide(): void { this.currentIndex = (this.currentIndex - 1 + this.featuredList.length) % this.featuredList.length; }
-  resetInterval(): void { clearInterval(this.slideInterval); this.slideInterval = setInterval(() => this.nextSlide(), 5000); }
+  showSlide(index: number): void {
+    this.currentIndex = index;
+    this.resetInterval();
+  }
 
-  goToMovie(id: string): void { this.router.navigate(['/detalle-pelicula'], { queryParams: { id } }); }
+  nextSlide(): void {
+    this.currentIndex = (this.currentIndex + 1) % this.featuredList.length;
+  }
 
-  nextCarrusel(): void { this.carruselIndex = (this.carruselIndex + 1) % this.featuredList.length; this.updateCarrusel(); }
-  prevCarrusel(): void { this.carruselIndex = (this.carruselIndex - 1 + this.featuredList.length) % this.featuredList.length; this.updateCarrusel(); }
+  prevSlide(): void {
+    this.currentIndex = (this.currentIndex - 1 + this.featuredList.length) % this.featuredList.length;
+  }
+
+  resetInterval(): void {
+    clearInterval(this.slideInterval);
+    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
+  }
+
+  goToMovie(id: string): void {
+    this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
+  }
+
+  nextCarrusel(): void {
+    this.carruselIndex = (this.carruselIndex + 1) % this.featuredList.length;
+    this.updateCarrusel();
+  }
+
+  prevCarrusel(): void {
+    this.carruselIndex = (this.carruselIndex - 1 + this.featuredList.length) % this.featuredList.length;
+    this.updateCarrusel();
+  }
 
   updateCarrusel(): void {
     const container = this.carruselContainer?.nativeElement;
@@ -100,6 +127,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     container.style.transition = 'transform 0.5s ease';
   }
 
+  // 🟨 Modal CRUD
   abrirModalAgregar(): void {
     this.editando = false;
     this.peliculaTemp = { id: '', title: '', imageUrl: '', category: '', description: '', trailerUrl: '', movieUrl: '' };
@@ -112,7 +140,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.modalAbierto = true;
   }
 
-  cerrarModal(): void { this.modalAbierto = false; }
+  cerrarModal(): void {
+    this.modalAbierto = false;
+  }
 
   async guardarPelicula(): Promise<void> {
     const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
@@ -132,14 +162,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         await updateDoc(docRef, { items: this.featuredList });
         this.presentToast('✅ Película actualizada.');
       } else {
-        const nuevaPeli: Movie = { 
-          id: this.generarId(), 
-          title, 
-          imageUrl, 
-          category, 
-          description, 
-          trailerUrl, 
-          movieUrl 
+        const nuevaPeli: Movie = {
+          id: this.generarId(),
+          title,
+          imageUrl,
+          category,
+          description,
+          trailerUrl,
+          movieUrl
         };
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
@@ -147,7 +177,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       }
       this.cerrarModal();
       this.updateCarrusel();
-
     } catch (error) {
       console.error('Error guardando película:', error);
       this.presentToast('❌ Error al guardar la película.');
@@ -177,6 +206,37 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  generarId(): string { return Math.random().toString(36).substring(2, 10); }
+  generarId(): string {
+    return Math.random().toString(36).substring(2, 10);
+  }
 
+  // 🎬 Modal Reproducir
+  abrirModalReproducir(movie: Movie): void {
+    this.peliculaReproducir = movie;
+    this.modalReproducirAbierto = true;
+  }
+
+  cerrarModalReproducir(): void {
+    this.modalReproducirAbierto = false;
+    this.peliculaReproducir = null;
+  }
+
+  esYoutubeUrl(url?: string): boolean {
+    if (!url) return false;
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  }
+
+  getSafeUrl(url?: string): SafeResourceUrl {
+    if (!url) return '';
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.convertirUrlYoutube(url));
+  }
+
+  private convertirUrlYoutube(url: string): string {
+    if (url.includes('watch?v=')) {
+      return url.replace('watch?v=', 'embed/');
+    } else if (url.includes('youtu.be/')) {
+      return url.replace('youtu.be/', 'www.youtube.com/embed/');
+    }
+    return url;
+  }
 }

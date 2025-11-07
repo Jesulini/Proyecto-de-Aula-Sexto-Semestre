@@ -8,8 +8,7 @@
 </ion-header>
 
 <ion-content fullscreen class="detalle-page">
-
-  <!-- NAV SUPERIOR TIPO NETFLIX -->
+  <!-- NAV SUPERIOR -->
   <div class="top-nav">
     <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
     <button class="menu-toggle" (click)="toggleMenu()">&#9776;</button>
@@ -31,42 +30,35 @@
     </ul>
   </aside>
 
-  <!-- DETALLE PELÍCULA -->
+  <!-- DETALLE DE PELÍCULA -->
   <div *ngIf="pelicula" class="detalle-wrapper">
-
-    <!-- Fondo con blur -->
     <div class="bg-blur" [style.background-image]="'url(' + pelicula.imageUrl + ')'"></div>
 
     <div class="detalle-content">
-
       <div class="poster">
-        <img [src]="pelicula.imageUrl" [alt]="pelicula.title"/>
+        <img [src]="pelicula.imageUrl" [alt]="pelicula.title" />
       </div>
 
       <h1>{{ pelicula.title }}</h1>
       <p class="categoria" *ngIf="pelicula.category">{{ pelicula.category }}</p>
       <p class="descripcion" *ngIf="pelicula.description">{{ pelicula.description }}</p>
 
-      <!-- BOTONES -->
       <div class="acciones">
-
-        <ion-button expand="block" class="btn-play" (click)="verPelicula()">
+        <!-- 🎬 Ver película -->
+        <ion-button expand="block" class="btn-play" (click)="abrirPelicula()">
           <ion-icon slot="start" name="play"></ion-icon> Ver ahora
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="btn-trailer"
-          (click)="verTrailer(pelicula?.trailerUrl)">
-          <ion-icon slot="start" name="film"></ion-icon> Ver trailer
+        <!-- 🎥 Ver tráiler -->
+        <ion-button expand="block" fill="outline" class="btn-trailer" (click)="abrirTrailer()">
+          <ion-icon slot="start" name="film"></ion-icon> Ver tráiler
         </ion-button>
 
-        <ion-button expand="block" fill="clear" class="btn-lista"
-          (click)="toggleMiLista()">
+        <ion-button expand="block" fill="clear" class="btn-lista" (click)="toggleMiLista()">
           <ion-icon slot="start" [name]="enMiLista ? 'checkmark' : 'add'"></ion-icon>
           {{ enMiLista ? 'En Mi Lista' : 'Mi Lista' }}
         </ion-button>
-
       </div>
-
     </div>
   </div>
 
@@ -74,4 +66,92 @@
     <p>😢 Película no encontrada.</p>
   </div>
 
+  <!-- 🎬 MODAL PELÍCULA COMPLETA -->
+  <ion-modal [isOpen]="peliculaAbierta" (didDismiss)="cerrarPelicula()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>{{ pelicula?.title }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarPelicula()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding video-content">
+        <div *ngIf="pelicula?.movieUrl; else sinVideo">
+
+          <!-- Archivo local -->
+          <video
+            *ngIf="esVideoArchivo(pelicula?.movieUrl)"
+            width="100%"
+            height="auto"
+            controls
+            autoplay
+          >
+            <source [src]="pelicula?.movieUrl" type="video/mp4" />
+            Tu navegador no soporta la reproducción de video.
+          </video>
+
+          <!-- YouTube o Vimeo -->
+          <iframe
+            *ngIf="!esVideoArchivo(pelicula?.movieUrl)"
+            [src]="getSafeTrailerUrl(pelicula?.movieUrl)"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+          ></iframe>
+
+        </div>
+
+        <ng-template #sinVideo>
+          <p>No hay video disponible.</p>
+        </ng-template>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- 🎥 MODAL TRÁILER -->
+  <ion-modal [isOpen]="trailerAbierto" (didDismiss)="cerrarTrailer()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="dark">
+          <ion-title>Tráiler</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarTrailer()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding trailer-content">
+        <div *ngIf="pelicula?.trailerUrl; else sinTrailer">
+          <video
+            *ngIf="esVideoArchivo(pelicula?.trailerUrl)"
+            width="100%"
+            height="auto"
+            controls
+            autoplay
+          >
+            <source [src]="pelicula?.trailerUrl" type="video/mp4" />
+          </video>
+
+          <iframe
+            *ngIf="!esVideoArchivo(pelicula?.trailerUrl)"
+            [src]="getSafeTrailerUrl(pelicula?.trailerUrl)"
+            width="100%"
+            height="315"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <ng-template #sinTrailer>
+          <p>No hay tráiler disponible.</p>
+        </ng-template>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
