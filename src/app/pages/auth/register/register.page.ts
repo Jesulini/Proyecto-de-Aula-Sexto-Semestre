@@ -20,7 +20,7 @@ export class RegisterPage {
     private router: Router,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController
-  ) {}
+  ) { }
 
   async register() {
     if (this.password !== this.confirmPassword) {
@@ -53,4 +53,15 @@ export class RegisterPage {
   goToLogin() {
     this.router.navigate(['/login']);
   }
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
 }

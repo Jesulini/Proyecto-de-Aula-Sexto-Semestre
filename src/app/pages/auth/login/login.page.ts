@@ -46,4 +46,11 @@ export class LoginPage {
   goToRegister() {
     this.router.navigate(['/register']);
   }
+showPassword: boolean = false;
+
+togglePasswordVisibility() {
+  this.showPassword = !this.showPassword;
+}
+
+
 }

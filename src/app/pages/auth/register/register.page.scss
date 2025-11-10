@@ -1,9 +1,14 @@
+ion-content,
+.custom-register {
+  height: 100%;
+}
+
 .custom-register {
   --background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  padding: 1rem;
   color: #fff;
   font-family: 'Poppins', sans-serif;
 
@@ -16,10 +21,11 @@
     width: 100%;
     max-width: 420px;
     animation: fadeIn 1s ease;
+    margin: auto;
 
     h2 {
       color: #ffd700;
-      font-size: 1.8rem;
+      font-size: clamp(1.5rem, 5vw, 1.8rem);
       font-weight: 700;
       margin-bottom: 1.5rem;
       text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
@@ -61,6 +67,9 @@
       margin-top: 0.5rem;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
       transition: all 0.3s ease;
+      padding: 0.9rem 1rem;
+      min-height: 48px;
+      font-size: 1rem;
 
       &:hover {
         transform: translateY(-2px);
@@ -79,13 +88,14 @@
       p {
         color: #ccc;
         margin-bottom: 0.6rem;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
 
       a {
         color: #ffd700;
         text-decoration: none;
         font-weight: 600;
+        font-size: 0.9rem;
         transition: 0.3s ease;
 
         &:hover {
@@ -95,9 +105,29 @@
       }
     }
   }
+
+  ion-item ion-button[slot="end"] {
+    --background: transparent;
+    --box-shadow: none;
+    --color: #ffd700;
+    padding: 0;
+    min-width: auto;
+    height: auto;
+    border: none;
+    box-shadow: none;
+    background: none;
+
+    ion-icon {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    &:hover {
+      --color: #fff;
+    }
+  }
 }
 
-/* ✨ Animación de entrada */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -109,13 +139,26 @@
   }
 }
 
-/* 📱 Responsivo */
 @media (max-width: 600px) {
   .custom-register .register-container {
-    padding: 1.5rem;
+    padding: 1.2rem;
 
     h2 {
-      font-size: 1.5rem;
+      font-size: clamp(1.3rem, 6vw, 1.5rem);
+    }
+
+    ion-button {
+      font-size: 0.95rem;
+    }
+
+    .extra-links {
+      p {
+        font-size: 0.8rem;
+      }
+
+      a {
+        font-size: 0.85rem;
+      }
     }
   }
 }

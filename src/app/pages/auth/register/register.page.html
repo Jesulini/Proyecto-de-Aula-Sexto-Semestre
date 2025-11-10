@@ -1,5 +1,4 @@
 <ion-content class="ion-padding custom-register">
-
   <div class="register-container">
     <h2>Crear cuenta</h2>
 
@@ -16,15 +15,31 @@
 
       <ion-item>
         <ion-label position="floating">Contraseña</ion-label>
-        <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          name="password"
+          required>
+        </ion-input>
+        <ion-button fill="clear" slot="end" size="small" (click)="togglePasswordVisibility()" type="button">
+          <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+        </ion-button>
       </ion-item>
 
       <ion-item>
         <ion-label position="floating">Confirmar contraseña</ion-label>
-        <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
+        <ion-input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          required>
+        </ion-input>
+        <ion-button fill="clear" slot="end" size="small" (click)="toggleConfirmPasswordVisibility()" type="button">
+          <ion-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></ion-icon>
+        </ion-button>
       </ion-item>
 
-      <ion-button expand="block" color="success" type="submit" [disabled]="!registerForm.valid">
+      <ion-button expand="block" type="submit" [disabled]="!registerForm.valid">
         Registrarse
       </ion-button>
     </form>
@@ -36,5 +51,4 @@
       </p>
     </ion-text>
   </div>
-
 </ion-content>
