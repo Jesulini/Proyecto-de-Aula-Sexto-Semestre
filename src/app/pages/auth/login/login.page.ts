@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth';
+import { AuthService } from 'src/app/services/auth/auth';
 import { ToastController, LoadingController } from '@ionic/angular';
 
 @Component({

@@ -15,52 +15,67 @@
 </ion-header>
 
 <ion-content class="custom-profile">
-  <div class="profile-container" *ngIf="!isEditing; else editForm">
-    <ion-avatar class="profile-avatar">
-      <img [src]="photoURL || 'assets/default-avatar.png'" alt="Foto de perfil">
-    </ion-avatar>
+  <div class="profile-inner">
+    <div class="profile-wrapper">
+      <div class="profile-container" *ngIf="!isEditing; else editForm">
+        <ion-avatar class="profile-avatar">
+          <img [src]="photoURL || 'assets/default-avatar.png'" alt="Foto de perfil">
+        </ion-avatar>
 
-    <h2>{{ displayName || 'Usuario sin nombre' }}</h2>
-    <p>{{ email }}</p>
+        <h2>{{ displayName || 'Usuario sin nombre' }}</h2>
+        <p>{{ email }}</p>
 
-    <ion-button expand="block" class="gold-btn" (click)="editProfile()">
-      Editar perfil
-    </ion-button>
-  </div>
+        <ion-button expand="block" class="gold-btn" (click)="editProfile()">
+          Editar perfil
+        </ion-button>
+      </div>
 
-  <ng-template #editForm>
-    <div class="edit-form">
-      <ion-item>
-        <ion-label position="floating">Nombre de usuario</ion-label>
-        <ion-input [(ngModel)]="displayName"></ion-input>
-      </ion-item>
+      <ng-template #editForm>
+        <div class="edit-form">
+          <ion-avatar class="profile-avatar" style="display:block;margin:0 auto 12px">
+            <img [src]="previewUrl || newPhotoURL || photoURL || 'assets/default-avatar.png'" alt="Foto de perfil">
+          </ion-avatar>
 
-      <ion-item>
-        <ion-label position="floating">Correo electrónico</ion-label>
-        <ion-input type="email" [(ngModel)]="email"></ion-input>
-      </ion-item>
+          <div style="text-align:center;margin-bottom:12px">
+            <input #fileInput id="fileInput" type="file" accept="image/*" (change)="onFileChange($event)" hidden />
+            <ion-button class="gold-btn" (click)="triggerFileInput()">
+              Seleccionar imagen
+            </ion-button>
+          </div>
 
-      <ion-item>
-        <ion-label position="floating">URL de foto de perfil</ion-label>
-        <ion-input [(ngModel)]="newPhotoURL"></ion-input>
-      </ion-item>
+          <ion-item>
+            <ion-label position="floating">Nombre de usuario</ion-label>
+            <ion-input [(ngModel)]="displayName"></ion-input>
+          </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Nueva contraseña</ion-label>
-        <ion-input
-          type="password"
-          [(ngModel)]="newPassword"
-          placeholder="Deja en blanco si no deseas cambiarla">
-        </ion-input>
-      </ion-item>
+          <ion-item>
+            <ion-label position="floating">Correo electrónico</ion-label>
+            <ion-input type="email" [(ngModel)]="email"></ion-input>
+          </ion-item>
 
-      <ion-button expand="block" class="gold-btn" (click)="saveChanges()">
-        Guardar cambios
-      </ion-button>
+          <ion-item>
+            <ion-label position="floating">URL de foto de perfil</ion-label>
+            <ion-input [(ngModel)]="newPhotoURL"></ion-input>
+          </ion-item>
 
-      <ion-button expand="block" fill="clear" class="cancel-btn" (click)="cancelEdit()">
-        Cancelar
-      </ion-button>
+          <ion-item>
+            <ion-label position="floating">Nueva contraseña</ion-label>
+            <ion-input
+              type="password"
+              [(ngModel)]="newPassword"
+              placeholder="Deja en blanco si no deseas cambiarla">
+            </ion-input>
+          </ion-item>
+
+          <ion-button expand="block" class="gold-btn" (click)="saveChanges()">
+            Guardar cambios
+          </ion-button>
+
+          <ion-button expand="block" fill="clear" class="cancel-btn" (click)="cancelEdit()">
+            Cancelar
+          </ion-button>
+        </div>
+      </ng-template>
     </div>
-  </ng-template>
+  </div>
 </ion-content>

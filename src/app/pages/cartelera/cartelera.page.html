@@ -1,5 +1,16 @@
 <ion-content class="custom-cartelera">
-  <!-- 🔹 Encabezado -->
+  <!-- Encabezado fijo con botón de regreso -->
+  <ion-header class="custom-header">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="goHome()">
+          <ion-icon name="home-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Encabezado visual -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
@@ -7,7 +18,7 @@
     <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
   </header>
 
-  <!-- 🔹 Menú lateral -->
+  <!-- Menú lateral a la derecha -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
@@ -19,16 +30,13 @@
       <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
       <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
       <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
-      <li class="logout" (click)="logout()">
-        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-      </li>
+      <li class="logout" (click)="logout()">Cerrar sesión</li>
     </ul>
   </aside>
 
-  <!-- 🔹 Contenedor principal -->
+  <!-- Contenedor principal -->
   <div class="cartelera-container" [class.menu-open]="menuAbierto">
-
-    <!-- 🎬 Categorías -->
+    <!-- Categorías -->
     <aside class="categorias">
       <h3>Categorías</h3>
       <ul>
@@ -41,15 +49,15 @@
         </li>
       </ul>
 
-      <!-- 👑 Botón solo para admin -->
+      <!-- Botón solo para admin -->
       <div *ngIf="esAdmin" class="admin-actions">
-        <button (click)="abrirModalAgregar()" class="add-btn">+ Agregar Película</button>
+        <button (click)="abrirModalAgregar()" class="add-btn">Agregar Película</button>
       </div>
     </aside>
 
-    <!-- 🎥 Contenido principal -->
+    <!-- Contenido principal -->
     <main class="main-content">
-      <!-- 🔎 Barra de búsqueda -->
+      <!-- Barra de búsqueda -->
       <div class="search-bar">
         <input
           type="text"
@@ -59,7 +67,7 @@
         />
       </div>
 
-      <!-- 🧩 Grilla de películas -->
+      <!-- Grilla de películas -->
       <div class="movies-grid">
         <div
           class="movie-card"
@@ -70,32 +78,32 @@
           <h4>{{ movie.title }}</h4>
           <p>{{ movie.category }}</p>
 
-          <!-- 🛠️ Controles de administrador -->
+          <!-- Controles de administrador -->
           <div *ngIf="esAdmin" class="admin-controls">
             <button
               (click)="abrirModalEditar(movie); $event.stopPropagation()"
               class="edit-btn"
               title="Editar"
-            >✏️</button>
+            >Editar</button>
             <button
               (click)="confirmarEliminacion(movie.id); $event.stopPropagation()"
               class="delete-btn"
               title="Eliminar"
-            >🗑️</button>
+            >Eliminar</button>
           </div>
         </div>
       </div>
 
-      <!-- 👑 Panel informativo del admin -->
+      <!-- Panel informativo del admin -->
       <section *ngIf="esAdmin" class="admin-panel">
         <h2>Panel de Administración</h2>
         <p>Desde aquí puedes agregar, editar o eliminar películas de la cartelera.</p>
-        <button class="admin-add" (click)="abrirModalAgregar()">➕ Agregar Película</button>
+        <button class="admin-add" (click)="abrirModalAgregar()">Agregar Película</button>
       </section>
     </main>
   </div>
 
-  <!-- 🔸 MODAL AGREGAR / EDITAR -->
+  <!-- MODAL AGREGAR / EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -126,17 +134,17 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="floating">Descripción (opcional)</ion-label>
+          <ion-label position="floating">Descripción</ion-label>
           <ion-textarea [(ngModel)]="peliculaTemp.description"></ion-textarea>
         </ion-item>
 
         <ion-item>
-          <ion-label position="floating">URL del tráiler (opcional)</ion-label>
+          <ion-label position="floating">URL del tráiler</ion-label>
           <ion-input [(ngModel)]="peliculaTemp.trailerUrl" placeholder="https://youtube.com/..."></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-label position="floating">URL de la película (opcional)</ion-label>
+          <ion-label position="floating">URL de la película</ion-label>
           <ion-input [(ngModel)]="peliculaTemp.movieUrl" placeholder="https://cdn.mi-sitio/..."></ion-input>
         </ion-item>
 

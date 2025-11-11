@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Firestore, doc, getDoc, updateDoc, arrayRemove } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { AuthService, User } from 'src/app/services/auth';
+import { AuthService, User } from 'src/app/services/auth/auth';
 import { Movie } from 'src/app/models/movie.model';
 import { ToastController } from '@ionic/angular';
 

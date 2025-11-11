@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
-import { AuthService } from 'src/app/services/auth';
+import { AuthService } from 'src/app/services/auth/auth';
 import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
 
 @Component({
@@ -24,7 +24,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
   modalAbierto = false;
   editando = false;
 
-  // 🎬 Modelo temporal (solo campos que usas)
   peliculaTemp: Movie = {
     id: '',
     title: '',
@@ -110,7 +109,7 @@ export class CarteleraPage implements OnInit, OnDestroy {
     const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      alert('⚠️ Todos los campos obligatorios deben estar completos.');
+      alert('Todos los campos obligatorios deben estar completos.');
       return;
     }
 
@@ -122,7 +121,7 @@ export class CarteleraPage implements OnInit, OnDestroy {
           p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
         );
         await updateDoc(docRef, { items: this.peliculas });
-        alert('✅ Película actualizada correctamente.');
+        alert('Película actualizada correctamente.');
       } else {
         const nuevaPeli: Movie = {
           id: this.generarId(),
@@ -135,14 +134,14 @@ export class CarteleraPage implements OnInit, OnDestroy {
         };
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
         this.peliculas.push(nuevaPeli);
-        alert('🎬 Película agregada exitosamente.');
+        alert('Película agregada exitosamente.');
       }
 
       this.cerrarModal();
       this.buscarPeliculas();
     } catch (error) {
       console.error('Error guardando película:', error);
-      alert('❌ Error al guardar la película.');
+      alert('Error al guardar la película.');
     }
   }
 
@@ -160,11 +159,11 @@ export class CarteleraPage implements OnInit, OnDestroy {
               this.peliculas = this.peliculas.filter(p => p.id !== id);
               const docRef = doc(this.firestore, 'peliculas/peliculas');
               await updateDoc(docRef, { items: this.peliculas });
-              alert('🗑️ Película eliminada.');
+              alert('Película eliminada.');
               this.buscarPeliculas();
             } catch (error) {
               console.error('Error eliminando película:', error);
-              alert('❌ Error al eliminar la película.');
+              alert('Error al eliminar la película.');
             }
           },
         },
@@ -174,7 +173,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
     await alerta.present();
   }
 
-  // 🟢 Abre detalle de película
   verDetalle(id: string) {
     this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
   }
@@ -182,6 +180,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  goHome() {
+    this.router.navigate(['/home']);
   }
 
   ngOnDestroy() {}

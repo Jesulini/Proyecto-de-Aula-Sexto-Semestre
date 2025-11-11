@@ -3,7 +3,7 @@ import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signO
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 
-// ✅ Exportar la interfaz User
+// Exportar la interfaz User
 export interface User {
   uid: string;
   email: string;

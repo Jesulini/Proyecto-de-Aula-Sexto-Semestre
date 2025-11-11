@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController, LoadingController } from '@ionic/angular';
-import { AuthService } from 'src/app/services/auth';
+import { AuthService } from 'src/app/services/auth/auth';
 
 @Component({
   selector: 'app-forgot-password',

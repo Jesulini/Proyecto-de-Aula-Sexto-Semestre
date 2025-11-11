@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } fr
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
-import { AuthService } from 'src/app/services/auth';
+import { AuthService } from 'src/app/services/auth/auth';
 import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 

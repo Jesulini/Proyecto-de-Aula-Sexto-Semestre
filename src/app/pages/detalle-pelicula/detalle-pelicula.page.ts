@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Firestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
 import { Movie } from 'src/app/models/movie.model';
-import { AuthService, User } from 'src/app/services/auth';
+import { AuthService, User } from 'src/app/services/auth/auth';
 import { ToastController } from '@ionic/angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 

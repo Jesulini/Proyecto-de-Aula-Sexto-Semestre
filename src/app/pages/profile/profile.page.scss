@@ -24,105 +24,177 @@
   }
 }
 
+/* ===== PROFILE =====
+   Estructura esperada en el HTML:
+   <ion-content class="custom-profile">
+     <div class="profile-inner">
+       <div class="profile-wrapper">
+         <!-- .profile-container o .edit-form -->
+       </div>
+     </div>
+   </ion-content>
+*/
 .custom-profile {
   --background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
+
+  /* layout en columna para permitir que profile-inner ocupe el área visible */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem;
+  box-sizing: border-box;
   color: #fff;
   font-family: 'Poppins', sans-serif;
-  min-height: 100vh;
+}
+
+/* Área que ocupa el espacio disponible y centra el contenido */
+.profile-inner {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;      /* centra verticalmente dentro del área */
+  justify-content: center;  /* centra horizontalmente */
+  padding: 1.25rem;
+  background: var(--background);
+  box-sizing: border-box;
   text-align: center;
+}
 
-  .profile-container {
-    background: rgba(20, 20, 20, 0.8);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
-    width: 100%;
-    max-width: 420px;
-    animation: fadeIn 1s ease;
+/* Wrapper que contiene cualquiera de los dos cards */
+.profile-wrapper {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
 
-    .profile-avatar {
-      margin: 0 auto 1rem;
-      width: 120px;
-      height: 120px;
-      border: 3px solid #ffd700;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    }
+/* Ambos cards usan la misma caja centrada */
+.profile-container,
+.edit-form {
+  width: 100%;
+  background: rgba(20, 20, 20, 0.85);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+  animation: fadeIn 0.8s ease;
+  box-sizing: border-box;
+  margin: 0;
+}
 
-    h2 {
-      color: #ffd700;
-      font-weight: 700;
-      margin: 0.5rem 0;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-    }
-
-    p {
-      color: #ccc;
-      margin-bottom: 1.5rem;
-    }
-
-    .gold-btn {
-      --background: linear-gradient(90deg, #ffd700, #c5a100);
-      --color: #000;
-      font-weight: bold;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-      transition: all 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
-      }
-    }
+/* Contenido del card (resumen) */
+.profile-container {
+  .profile-avatar {
+    margin: 0 auto 1rem;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    display: block;
   }
 
-  .edit-form {
-    background: rgba(20, 20, 20, 0.85);
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+  h2 {
+    color: #ffd700;
+    font-weight: 700;
+    margin: 0.5rem 0;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  }
+
+  p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Botón dorado reutilizable (aplicable a ion-button y botones nativos) */
+  .gold-btn,
+  ion-button.gold-btn {
+    /* Ionic variables override for ion-button */
+    --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-activated: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-focused: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-hover: linear-gradient(90deg, #fff, #fff) !important;
+    --color: #000 !important;
+    --box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+
+    /* Fallback for native button rendering */
+    background: linear-gradient(90deg, #ffd700, #c5a100);
+    color: #000;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: inline-block;
     width: 100%;
-    max-width: 420px;
-    animation: fadeIn 0.8s ease;
+    text-align: center;
+    border: none;
+    padding: 12px 0;
+    cursor: pointer;
+  }
 
-    ion-item {
-      --background: rgba(255, 255, 255, 0.05);
-      --border-color: rgba(255, 215, 0, 0.3);
-      --color: #fff;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      margin-bottom: 1rem;
+  .gold-btn:hover,
+  ion-button.gold-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  }
+}
 
-      ion-label {
-        color: #ffd700;
-        font-weight: 500;
-      }
+/* Contenido del formulario de edición */
+.edit-form {
+  ion-item {
+    --background: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(255, 215, 0, 0.3);
+    --color: #fff;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+  }
 
-      ion-input {
-        color: #fff;
-      }
+  ion-label {
+    color: #ffd700;
+    font-weight: 500;
+  }
 
-      &:focus-within {
-        --background: rgba(255, 215, 0, 0.1);
-        transform: scale(1.02);
-      }
-    }
+  ion-input {
+    color: #fff;
+  }
 
-    .cancel-btn {
-      color: #ccc;
-      font-weight: 600;
+  /* Aplicar la misma clase .gold-btn al botón Guardar cambios */
+  .gold-btn,
+  ion-button.gold-btn {
+    --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-activated: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-focused: linear-gradient(90deg, #ffd700, #c5a100) !important;
+    --background-hover: linear-gradient(90deg, #fff, #fff) !important;
+    --color: #000 !important;
+    background: linear-gradient(90deg, #ffd700, #c5a100);
+    color: #000;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    border: none;
+    padding: 12px 0;
+    cursor: pointer;
+  }
 
-      &:hover {
-        color: #ffd700;
-      }
+  .cancel-btn {
+    color: #ccc;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+
+    &:hover {
+      color: #ffd700;
     }
   }
 }
 
-/* ✨ Animación */
+/* Animación */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -134,11 +206,20 @@
   }
 }
 
-/* 📱 Responsivo */
+/* Responsive */
 @media (max-width: 600px) {
-  .custom-profile .profile-container,
-  .custom-profile .edit-form {
-    padding: 1.5rem;
+  .profile-inner {
+    padding: 1rem;
+  }
+
+  .profile-wrapper {
+    max-width: 360px;
+  }
+
+  .profile-container,
+  .edit-form {
+    padding: 1.25rem;
+    border-radius: 14px;
   }
 
   .profile-avatar {
