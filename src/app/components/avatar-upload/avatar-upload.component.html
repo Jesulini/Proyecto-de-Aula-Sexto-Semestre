@@ -1,0 +1,19 @@
+<ion-avatar class="profile-avatar">
+  <img [src]="previewUrl || newPhotoURL || photoURL || 'assets/default-avatar.png'" alt="Foto de perfil" />
+</ion-avatar>
+
+<div class="drop-zone" [class.dragover]="dragOver" (drop)="handleDrop($event)" (dragover)="handleDragOver($event)" (dragleave)="handleDragLeave($event)">
+  <p>Arrastra una imagen aquí o usa el botón</p>
+</div>
+
+<div class="upload-controls">
+  <input #fileInput type="file" accept="image/*" (change)="onFileChange($event)" hidden />
+  <ion-button class="gold-btn" (click)="triggerFileInput()">
+    <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+    Seleccionar imagen
+  </ion-button>
+  <ion-button fill="clear" class="revert-btn" *ngIf="previewUrl" (click)="revertImage()">
+    <ion-icon slot="start" name="reload-outline"></ion-icon>
+    Revertir imagen
+  </ion-button>
+</div>

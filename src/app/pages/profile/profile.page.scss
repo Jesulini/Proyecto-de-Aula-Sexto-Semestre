@@ -16,6 +16,7 @@
   .logout-btn {
     color: #ffd700;
     font-weight: 600;
+
     &:hover {
       color: #fff;
       text-shadow: 0 0 10px #ffd700;
@@ -64,82 +65,76 @@
   animation: fadeIn 0.8s ease;
   box-sizing: border-box;
   margin: 0;
-}
 
-.profile-container {
-  .profile-avatar {
-    margin: 0 auto 1rem;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid #ffd700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    display: block;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+  ion-button {
+    margin-top: 1rem;
+    height: 48px;
+    font-size: 15px;
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+
+    ion-icon {
+      margin-right: 10px;
+      font-size: 18px;
     }
   }
 
-  h2 {
-    color: #ffd700;
+  .gold-btn {
+    --background: linear-gradient(90deg, #ffd700, #c5a100);
+    --color: #000;
     font-weight: 700;
-    margin: 0.5rem 0;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-    font-size: 1.25rem;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+
+    &:hover {
+      --background: linear-gradient(90deg, #fff, #fff);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
   }
 
-  p {
-    color: #ccc;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-  }
-
-  .gold-btn,
-  ion-button.gold-btn {
-    --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-hover: linear-gradient(90deg, #fff, #fff) !important;
-    --color: #000 !important;
-    background: linear-gradient(90deg, #ffd700, #c5a100);
-    color: #000;
-    font-weight: 700;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-    border: none;
-    padding: 12px 0;
-    cursor: pointer;
-  }
-
-  .gold-btn:hover,
-  ion-button.gold-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
-  }
-
-  .subscription-btn,
-  .payment-btn,
-  .language-btn,
-  .delete-btn {
-    margin-top: 0.75rem;
-    border-radius: 12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    padding: 10px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
+  .subtle-btn {
+    --background: #111;
+    --color: #ffd700;
     font-weight: 600;
-    text-align: left;
-    border: 1px solid rgba(255,215,0,0.06);
-    color: #ddd;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    border: none;
+    box-shadow: none;
+
+    &:hover {
+      --background: #222;
+    }
+  }
+
+  .danger-btn {
+    --background: #2e1e1e;
+    --color: #ff6b6b;
+    font-weight: 600;
+    border: none;
+    box-shadow: none;
+
+    &:hover {
+      --background: #3a1f1f;
+      --color: #ff8787;
+    }
+  }
+}
+
+.profile-avatar {
+  margin: 0 auto 1.5rem;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 }
 
@@ -162,167 +157,12 @@
     color: #fff;
   }
 
-  .gold-btn,
-  ion-button.gold-btn {
-    --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-hover: linear-gradient(90deg, #fff, #fff) !important;
-    --color: #000 !important;
-    background: linear-gradient(90deg, #ffd700, #c5a100);
-    color: #000;
-    font-weight: 700;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-    border: none;
-    padding: 12px 0;
-    cursor: pointer;
-  }
-
   .cancel-btn {
     color: #ccc;
     font-weight: 600;
     display: block;
     width: 100%;
-    &:hover {
-      color: #ffd700;
-    }
-  }
 
-  .revert-btn {
-    color: #ccc;
-    font-weight: 600;
-    display: block;
-    width: 100%;
-    margin-top: 0.5rem;
-    &:hover {
-      color: #ffd700;
-    }
-  }
-
-  .drop-zone {
-    border: 2px dashed rgba(255, 215, 0, 0.4);
-    border-radius: 12px;
-    padding: 1rem;
-    text-align: center;
-    color: #ccc;
-    margin-bottom: 1rem;
-    transition: background 0.3s ease;
-    &.dragover {
-      background: rgba(255, 215, 0, 0.05);
-      color: #ffd700;
-    }
-    p {
-      margin: 0;
-      font-size: 0.95rem;
-    }
-  }
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffd700;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-align: center;
-  padding: 1rem;
-}
-
-.subscription-btn {
-  color: #dff6ff;
-  background-image: linear-gradient(90deg, rgba(0,195,255,0.08), rgba(255,215,0,0.02));
-  border: 1px solid rgba(0,195,255,0.08);
-}
-.payment-btn {
-  color: #dfffe6;
-  background-image: linear-gradient(90deg, rgba(0,255,136,0.06), rgba(255,215,0,0.02));
-  border: 1px solid rgba(0,255,136,0.06);
-}
-.language-btn {
-  color: #fff3db;
-  background-image: linear-gradient(90deg, rgba(255,170,0,0.06), rgba(255,215,0,0.02));
-  border: 1px solid rgba(255,170,0,0.06);
-}
-.delete-btn {
-  color: #ff6b6b;
-  background-image: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
-  border: 1px solid rgba(255,77,77,0.06);
-}
-
-.subscription-btn:hover,
-.payment-btn:hover,
-.language-btn:hover,
-.delete-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 0 18px rgba(255,215,0,0.08);
-  color: #fff;
-  border-color: rgba(255,215,0,0.12);
-}
-
-ion-button.delete-btn {
-  --color: #ff4d4d !important;
-  color: #ff4d4d !important;
-  --background: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
-  border: 1px solid rgba(255,77,77,0.06);
-  box-shadow: none;
-}
-
-.profile-container .delete-btn,
-.edit-form .delete-btn {
-  color: #ff4d4d !important;
-  border: 1px solid rgba(255,77,77,0.06);
-  background-image: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
-}
-
-.profile-container .delete-btn *,
-.edit-form .delete-btn * {
-  color: inherit !important;
-}
-
-.profile-container .delete-btn:hover,
-.edit-form .delete-btn:hover,
-ion-button.delete-btn:hover {
-  color: #fff !important;
-  background-image: linear-gradient(90deg, rgba(255,77,77,0.12), rgba(255,215,0,0.03));
-  border-color: rgba(255,215,0,0.12);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 0 18px rgba(255,77,77,0.08);
-}
-
-.dark-theme {
-  .custom-header ion-toolbar {
-    --background: rgba(10, 10, 10, 0.9);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-  }
-
-  .custom-profile {
-    --background: linear-gradient(135deg, #000, #111);
-  }
-
-  .profile-container,
-  .edit-form {
-    background: rgba(10, 10, 10, 0.85);
-  }
-
-  ion-item {
-    --background: rgba(255, 255, 255, 0.03);
-  }
-
-  .cancel-btn,
-  .revert-btn {
-    color: #999;
     &:hover {
       color: #ffd700;
     }
@@ -358,5 +198,10 @@ ion-button.delete-btn:hover {
   .profile-avatar {
     width: 100px !important;
     height: 100px !important;
+  }
+
+  ion-button {
+    font-size: 14px;
+    height: 44px;
   }
 }

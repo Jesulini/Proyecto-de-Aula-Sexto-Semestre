@@ -1,0 +1,4 @@
+<div *ngIf="messageService.showMessageFlag" class="message-box" [ngClass]="messageService.messageType">
+  <ion-icon class="icon" [name]="getIcon()"></ion-icon>
+  <span class="text">{{ messageService.messageText }}</span>
+</div>

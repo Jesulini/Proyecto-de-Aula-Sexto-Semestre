@@ -1,9 +1,10 @@
-import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth, updateProfile, updateEmail, updatePassword, User } from '@angular/fire/auth';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
-import { environment } from '../../../environments/environment';
-import imageCompression from 'browser-image-compression';
+import { StorageService } from '../../services/storage.service';
+import { MessageService } from '../../services/message.service';
+import { ProfileService } from '../../services/profile.service';
+import { mapFirebaseError } from '../../utils/error-utils';
 
 @Component({
   selector: 'app-profile',
@@ -14,9 +15,9 @@ import imageCompression from 'browser-image-compression';
 export class ProfilePage implements OnInit {
   private auth = inject(Auth);
   private router = inject(Router);
-  private firestore = inject(Firestore);
-
-  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+  private storageService = inject(StorageService);
+  private messageService = inject(MessageService);
+  private profileService = inject(ProfileService);
 
   user: User | null = null;
   displayName = '';
@@ -27,9 +28,7 @@ export class ProfilePage implements OnInit {
   newPassword = '';
   selectedFile: File | null = null;
   previewUrl: string | null = null;
-
-  isLoading = false;
-  dragOver = false;
+  canSaveChanges = false;
 
   ngOnInit() {
     this.loadUserData();
@@ -42,167 +41,46 @@ export class ProfilePage implements OnInit {
       this.email = this.user.email || '';
       this.photoURL = this.user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg';
     }
+    this.updateCanSaveChanges();
   }
 
-  async onFileChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) {
-      this.selectedFile = null;
-      this.previewUrl = null;
+  updateCanSaveChanges() {
+    if (!this.user) {
+      this.canSaveChanges = false;
       return;
     }
-
-    const file = input.files[0];
-    const maxSize = 10 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-      alert('El archivo debe ser menor a 10MB');
-      this.selectedFile = null;
-      this.previewUrl = null;
-      return;
-    }
-
-    if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten archivos de imagen');
-      this.selectedFile = null;
-      this.previewUrl = null;
-      return;
-    }
-
-    try {
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true
-      };
-      const compressed = await imageCompression(file, options);
-      this.selectedFile = compressed;
-
-      const reader = new FileReader();
-      reader.onload = () => (this.previewUrl = reader.result as string);
-      reader.readAsDataURL(compressed);
-    } catch (error) {
-      alert('Error al comprimir la imagen');
-      console.error(error);
-      this.selectedFile = null;
-      this.previewUrl = null;
-    }
-  }
-
-  triggerFileInput() {
-    this.fileInput?.nativeElement?.click();
-  }
-
-  revertImage() {
-    this.selectedFile = null;
-    this.previewUrl = null;
-  }
-
-  handleDrop(event: DragEvent) {
-    event.preventDefault();
-    this.dragOver = false;
-    if (event.dataTransfer?.files?.length) {
-      const fileList = event.dataTransfer.files;
-      const fakeEvent = { target: { files: fileList } } as unknown as Event;
-      this.onFileChange(fakeEvent);
-    }
-  }
-
-  handleDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.dragOver = true;
-  }
-
-  handleDragLeave(event: DragEvent) {
-    event.preventDefault();
-    this.dragOver = false;
-  }
-
-  private getBase() {
-    return environment.supabaseUrl.replace(/\/$/, '');
-  }
-
-  private extractPathFromUrl(url: string): string | null {
-    const base = this.getBase();
-    const prefix = `${base}/storage/v1/object/public/`;
-    if (!url.startsWith(prefix)) return null;
-    return url.slice(prefix.length);
-  }
-
-  private async deletePreviousImage() {
-    const path = this.extractPathFromUrl(this.photoURL);
-    if (!path) return;
-    const base = this.getBase();
-    const url = `${base}/storage/v1/object/${path}`;
-    const res = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${environment.supabaseAnonKey}`,
-        apikey: environment.supabaseAnonKey
-      }
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      console.warn('No se pudo eliminar la imagen anterior:', res.status, text);
-    }
-  }
-
-  private async uploadDirectPut(): Promise<string> {
-    if (!this.user || !this.selectedFile) throw new Error('No user or file');
-    const base = this.getBase();
-    const bucket = 'avatars';
-    const timestamp = Date.now();
-    const safe = this.selectedFile.name.replace(/\s+/g, '-');
-    const pathInBucket = `${this.user.uid}/${timestamp}-${safe}`;
-    const url = `${base}/storage/v1/object/${bucket}/${encodeURIComponent(pathInBucket)}`;
-    const res = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${environment.supabaseAnonKey}`,
-        apikey: environment.supabaseAnonKey,
-        'x-upsert': 'true'
-      },
-      body: this.selectedFile
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`PUT failed ${res.status}: ${text}`);
-    }
-    return `${base}/storage/v1/object/public/${bucket}/${pathInBucket}`;
-  }
-
-  private async updateFirestoreProfile(uid: string, nombre: string, email: string, foto: string) {
-    const ref = doc(this.firestore, `usuarios/${uid}`);
-    await setDoc(ref, { nombre, email, foto }, { merge: true });
-    const usuario = { uid, nombre, email, foto };
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-  }
-
-  async saveChanges() {
-    if (!this.user) return;
 
     const hasNameChange = this.displayName !== this.user.displayName;
     const hasEmailChange = this.email !== this.user.email;
     const hasPasswordChange = this.newPassword.trim() !== '';
     const hasImageChange = !!this.selectedFile;
 
-    if (!hasNameChange && !hasEmailChange && !hasPasswordChange && !hasImageChange) {
-      alert('No hay cambios para guardar');
+    this.canSaveChanges = hasNameChange || hasEmailChange || hasPasswordChange || hasImageChange;
+  }
+
+  async saveChanges() {
+    if (!this.user) {
+      this.messageService.showMessage('No estás autenticado. Inicia sesión para guardar cambios.', 'error');
       return;
     }
 
-    this.isLoading = true;
+    if (!this.canSaveChanges) {
+      this.messageService.showMessage('No hay cambios para guardar', 'info');
+      return;
+    }
+
     let finalPhoto = this.photoURL;
 
-    if (hasImageChange) {
+    if (this.selectedFile) {
+      const previousPhoto = this.photoURL;
+
       try {
-        const newUrl = await this.uploadDirectPut();
-        await this.deletePreviousImage();
+        const newUrl = await this.storageService.uploadDirectPut(this.user.uid, this.selectedFile);
+        await this.storageService.deletePreviousImage(previousPhoto);
         finalPhoto = newUrl;
+        this.messageService.showMessage('Imagen subida correctamente', 'success');
       } catch (err: any) {
-        alert('Error subiendo imagen: ' + (err?.message || String(err)));
-        console.error(err);
-        this.isLoading = false;
+        this.messageService.showMessage(mapFirebaseError(err), 'error');
         return;
       }
     }
@@ -213,28 +91,48 @@ export class ProfilePage implements OnInit {
         photoURL: finalPhoto
       });
 
-      if (hasEmailChange) {
+      if (this.email !== this.user.email) {
         await updateEmail(this.user, this.email);
       }
 
-      if (hasPasswordChange) {
+      if (this.newPassword.trim() !== '') {
         await updatePassword(this.user, this.newPassword);
         this.newPassword = '';
       }
 
-      await this.updateFirestoreProfile(this.user.uid, this.displayName, this.email, finalPhoto);
+      await this.profileService.updateFirestoreProfile(this.user.uid, this.displayName, this.email, finalPhoto);
 
       this.photoURL = finalPhoto;
       this.selectedFile = null;
       this.previewUrl = null;
       this.isEditing = false;
       this.loadUserData();
+      this.messageService.showMessage('Perfil actualizado correctamente', 'success');
     } catch (err: any) {
-      alert('Error al actualizar el perfil: ' + (err?.message || String(err)));
-      console.error(err);
-    } finally {
-      this.isLoading = false;
+      this.messageService.showMessage(mapFirebaseError(err), 'error');
     }
+  }
+
+  editProfile() {
+    this.isEditing = true;
+    this.newPhotoURL = this.photoURL;
+    this.updateCanSaveChanges();
+  }
+
+  cancelEdit() {
+    this.isEditing = false;
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.newPassword = '';
+    this.loadUserData();
+  }
+
+  revertImage() {
+    this.previewUrl = null;
+    this.selectedFile = null;
+    this.newPhotoURL = this.photoURL;
+    this.messageService.showMessage('Imagen revertida a la original', 'info');
+    this.updateCanSaveChanges();
   }
 
   goHome() {
@@ -246,14 +144,44 @@ export class ProfilePage implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  editProfile() {
-    this.isEditing = true;
-    this.newPhotoURL = this.photoURL;
+  goToSubscription() {
+    this.router.navigate(['/subscription']);
   }
 
-  cancelEdit() {
-    this.isEditing = false;
-    this.selectedFile = null;
-    this.previewUrl = null;
+  goToPayments() {
+    this.router.navigate(['/payments']);
+  }
+
+  confirmDeleteAccount() {
+    this.router.navigate(['/delete-account']);
+  }
+
+  handleUploadError(msg: string) {
+    this.messageService.showMessage(msg, 'error');
+  }
+
+  handleUploadSuccess(msg: string) {
+    this.messageService.showMessage(msg, 'success');
+    this.updateCanSaveChanges();
+  }
+
+  set selectedFileSetter(file: File | null) {
+    this.selectedFile = file;
+    this.updateCanSaveChanges();
+  }
+
+  set displayNameSetter(name: string) {
+    this.displayName = name;
+    this.updateCanSaveChanges();
+  }
+
+  set emailSetter(email: string) {
+    this.email = email;
+    this.updateCanSaveChanges();
+  }
+
+  set newPasswordSetter(pass: string) {
+    this.newPassword = pass;
+    this.updateCanSaveChanges();
   }
 }
