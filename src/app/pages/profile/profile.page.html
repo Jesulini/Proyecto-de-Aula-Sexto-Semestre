@@ -5,9 +5,7 @@
         <ion-icon name="home-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-
     <ion-title>Mi Perfil</ion-title>
-
     <ion-buttons slot="end">
       <ion-button class="logout-btn" (click)="logout()">Cerrar sesión</ion-button>
     </ion-buttons>
@@ -19,27 +17,62 @@
     <div class="profile-wrapper">
       <div class="profile-container" *ngIf="!isEditing; else editForm">
         <ion-avatar class="profile-avatar">
-          <img [src]="photoURL || 'assets/default-avatar.png'" alt="Foto de perfil">
+          <img [src]="photoURL || 'assets/default-avatar.png'" alt="Foto de perfil" />
         </ion-avatar>
-
         <h2>{{ displayName || 'Usuario sin nombre' }}</h2>
         <p>{{ email }}</p>
 
         <ion-button expand="block" class="gold-btn" (click)="editProfile()">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
           Editar perfil
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" class="subscription-btn" aria-label="Suscripciones">
+          <ion-icon slot="start" name="receipt-outline"></ion-icon>
+          Suscripciones
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" class="payment-btn" aria-label="Añadir método de pago">
+          <ion-icon slot="start" name="card-outline"></ion-icon>
+          Añadir método de pago
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" class="language-btn" aria-label="Cambiar de idioma">
+          <ion-icon slot="start" name="language-outline"></ion-icon>
+          Cambiar de idioma
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" class="delete-btn" aria-label="Eliminar cuenta">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Eliminar cuenta
         </ion-button>
       </div>
 
       <ng-template #editForm>
         <div class="edit-form">
           <ion-avatar class="profile-avatar" style="display:block;margin:0 auto 12px">
-            <img [src]="previewUrl || newPhotoURL || photoURL || 'assets/default-avatar.png'" alt="Foto de perfil">
+            <img [src]="previewUrl || newPhotoURL || photoURL || 'assets/default-avatar.png'" alt="Foto de perfil" />
           </ion-avatar>
+
+          <div
+            class="drop-zone"
+            [class.dragover]="dragOver"
+            (drop)="handleDrop($event)"
+            (dragover)="handleDragOver($event)"
+            (dragleave)="handleDragLeave($event)"
+          >
+            <p>Arrastra una imagen aquí o usa el botón</p>
+          </div>
 
           <div style="text-align:center;margin-bottom:12px">
             <input #fileInput id="fileInput" type="file" accept="image/*" (change)="onFileChange($event)" hidden />
             <ion-button class="gold-btn" (click)="triggerFileInput()">
+              <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
               Seleccionar imagen
+            </ion-button>
+            <ion-button fill="clear" class="revert-btn" *ngIf="previewUrl" (click)="revertImage()">
+              <ion-icon slot="start" name="reload-outline"></ion-icon>
+              Revertir imagen
             </ion-button>
           </div>
 
@@ -60,22 +93,23 @@
 
           <ion-item>
             <ion-label position="floating">Nueva contraseña</ion-label>
-            <ion-input
-              type="password"
-              [(ngModel)]="newPassword"
-              placeholder="Deja en blanco si no deseas cambiarla">
-            </ion-input>
+            <ion-input type="password" [(ngModel)]="newPassword" placeholder="Deja en blanco si no deseas cambiarla"></ion-input>
           </ion-item>
 
           <ion-button expand="block" class="gold-btn" (click)="saveChanges()">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
             Guardar cambios
           </ion-button>
-
           <ion-button expand="block" fill="clear" class="cancel-btn" (click)="cancelEdit()">
+            <ion-icon slot="start" name="close-outline"></ion-icon>
             Cancelar
           </ion-button>
         </div>
       </ng-template>
     </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="isLoading">
+    Procesando cambios, por favor espera...
   </div>
 </ion-content>

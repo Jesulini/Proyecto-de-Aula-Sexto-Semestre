@@ -16,7 +16,6 @@
   .logout-btn {
     color: #ffd700;
     font-weight: 600;
-
     &:hover {
       color: #fff;
       text-shadow: 0 0 10px #ffd700;
@@ -24,20 +23,8 @@
   }
 }
 
-/* ===== PROFILE =====
-   Estructura esperada en el HTML:
-   <ion-content class="custom-profile">
-     <div class="profile-inner">
-       <div class="profile-wrapper">
-         <!-- .profile-container o .edit-form -->
-       </div>
-     </div>
-   </ion-content>
-*/
 .custom-profile {
   --background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
-
-  /* layout en columna para permitir que profile-inner ocupe el área visible */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -46,19 +33,17 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* Área que ocupa el espacio disponible y centra el contenido */
 .profile-inner {
   flex: 1 1 auto;
   display: flex;
-  align-items: center;      /* centra verticalmente dentro del área */
-  justify-content: center;  /* centra horizontalmente */
+  align-items: center;
+  justify-content: center;
   padding: 1.25rem;
   background: var(--background);
   box-sizing: border-box;
   text-align: center;
 }
 
-/* Wrapper que contiene cualquiera de los dos cards */
 .profile-wrapper {
   width: 100%;
   max-width: 420px;
@@ -69,7 +54,6 @@
   box-sizing: border-box;
 }
 
-/* Ambos cards usan la misma caja centrada */
 .profile-container,
 .edit-form {
   width: 100%;
@@ -82,7 +66,6 @@
   margin: 0;
 }
 
-/* Contenido del card (resumen) */
 .profile-container {
   .profile-avatar {
     margin: 0 auto 1rem;
@@ -93,6 +76,12 @@
     border: 3px solid #ffd700;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     display: block;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
   }
 
   h2 {
@@ -100,25 +89,20 @@
     font-weight: 700;
     margin: 0.5rem 0;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    font-size: 1.25rem;
   }
 
   p {
     color: #ccc;
     margin-bottom: 1.5rem;
+    font-size: 0.95rem;
   }
 
-  /* Botón dorado reutilizable (aplicable a ion-button y botones nativos) */
   .gold-btn,
   ion-button.gold-btn {
-    /* Ionic variables override for ion-button */
     --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-activated: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-focused: linear-gradient(90deg, #ffd700, #c5a100) !important;
     --background-hover: linear-gradient(90deg, #fff, #fff) !important;
     --color: #000 !important;
-    --box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-
-    /* Fallback for native button rendering */
     background: linear-gradient(90deg, #ffd700, #c5a100);
     color: #000;
     font-weight: 700;
@@ -138,9 +122,27 @@
     transform: translateY(-2px);
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
   }
+
+  .subscription-btn,
+  .payment-btn,
+  .language-btn,
+  .delete-btn {
+    margin-top: 0.75rem;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    font-weight: 600;
+    text-align: left;
+    border: 1px solid rgba(255,215,0,0.06);
+    color: #ddd;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  }
 }
 
-/* Contenido del formulario de edición */
 .edit-form {
   ion-item {
     --background: rgba(255, 255, 255, 0.05);
@@ -160,12 +162,9 @@
     color: #fff;
   }
 
-  /* Aplicar la misma clase .gold-btn al botón Guardar cambios */
   .gold-btn,
   ion-button.gold-btn {
     --background: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-activated: linear-gradient(90deg, #ffd700, #c5a100) !important;
-    --background-focused: linear-gradient(90deg, #ffd700, #c5a100) !important;
     --background-hover: linear-gradient(90deg, #fff, #fff) !important;
     --color: #000 !important;
     background: linear-gradient(90deg, #ffd700, #c5a100);
@@ -187,14 +186,149 @@
     font-weight: 600;
     display: block;
     width: 100%;
+    &:hover {
+      color: #ffd700;
+    }
+  }
 
+  .revert-btn {
+    color: #ccc;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    &:hover {
+      color: #ffd700;
+    }
+  }
+
+  .drop-zone {
+    border: 2px dashed rgba(255, 215, 0, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 1rem;
+    transition: background 0.3s ease;
+    &.dragover {
+      background: rgba(255, 215, 0, 0.05);
+      color: #ffd700;
+    }
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 1rem;
+}
+
+.subscription-btn {
+  color: #dff6ff;
+  background-image: linear-gradient(90deg, rgba(0,195,255,0.08), rgba(255,215,0,0.02));
+  border: 1px solid rgba(0,195,255,0.08);
+}
+.payment-btn {
+  color: #dfffe6;
+  background-image: linear-gradient(90deg, rgba(0,255,136,0.06), rgba(255,215,0,0.02));
+  border: 1px solid rgba(0,255,136,0.06);
+}
+.language-btn {
+  color: #fff3db;
+  background-image: linear-gradient(90deg, rgba(255,170,0,0.06), rgba(255,215,0,0.02));
+  border: 1px solid rgba(255,170,0,0.06);
+}
+.delete-btn {
+  color: #ff6b6b;
+  background-image: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
+  border: 1px solid rgba(255,77,77,0.06);
+}
+
+.subscription-btn:hover,
+.payment-btn:hover,
+.language-btn:hover,
+.delete-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 0 18px rgba(255,215,0,0.08);
+  color: #fff;
+  border-color: rgba(255,215,0,0.12);
+}
+
+ion-button.delete-btn {
+  --color: #ff4d4d !important;
+  color: #ff4d4d !important;
+  --background: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
+  border: 1px solid rgba(255,77,77,0.06);
+  box-shadow: none;
+}
+
+.profile-container .delete-btn,
+.edit-form .delete-btn {
+  color: #ff4d4d !important;
+  border: 1px solid rgba(255,77,77,0.06);
+  background-image: linear-gradient(90deg, rgba(255,77,77,0.04), rgba(255,215,0,0.01));
+}
+
+.profile-container .delete-btn *,
+.edit-form .delete-btn * {
+  color: inherit !important;
+}
+
+.profile-container .delete-btn:hover,
+.edit-form .delete-btn:hover,
+ion-button.delete-btn:hover {
+  color: #fff !important;
+  background-image: linear-gradient(90deg, rgba(255,77,77,0.12), rgba(255,215,0,0.03));
+  border-color: rgba(255,215,0,0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 0 18px rgba(255,77,77,0.08);
+}
+
+.dark-theme {
+  .custom-header ion-toolbar {
+    --background: rgba(10, 10, 10, 0.9);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  }
+
+  .custom-profile {
+    --background: linear-gradient(135deg, #000, #111);
+  }
+
+  .profile-container,
+  .edit-form {
+    background: rgba(10, 10, 10, 0.85);
+  }
+
+  ion-item {
+    --background: rgba(255, 255, 255, 0.03);
+  }
+
+  .cancel-btn,
+  .revert-btn {
+    color: #999;
     &:hover {
       color: #ffd700;
     }
   }
 }
 
-/* Animación */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -206,7 +340,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .profile-inner {
     padding: 1rem;

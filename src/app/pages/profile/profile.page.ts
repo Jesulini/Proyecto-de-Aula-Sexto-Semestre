@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Auth, updateProfile, updateEmail, updatePassword, User } from '@angular/fire/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { environment } from '../../../environments/environment';
+import imageCompression from 'browser-image-compression';
 
 @Component({
   selector: 'app-profile',
@@ -27,6 +28,9 @@ export class ProfilePage implements OnInit {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
+  isLoading = false;
+  dragOver = false;
+
   ngOnInit() {
     this.loadUserData();
   }
@@ -40,7 +44,7 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  onFileChange(event: Event) {
+  async onFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
       this.selectedFile = null;
@@ -65,14 +69,53 @@ export class ProfilePage implements OnInit {
       return;
     }
 
-    this.selectedFile = file;
-    const reader = new FileReader();
-    reader.onload = () => (this.previewUrl = reader.result as string);
-    reader.readAsDataURL(file);
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true
+      };
+      const compressed = await imageCompression(file, options);
+      this.selectedFile = compressed;
+
+      const reader = new FileReader();
+      reader.onload = () => (this.previewUrl = reader.result as string);
+      reader.readAsDataURL(compressed);
+    } catch (error) {
+      alert('Error al comprimir la imagen');
+      console.error(error);
+      this.selectedFile = null;
+      this.previewUrl = null;
+    }
   }
 
   triggerFileInput() {
     this.fileInput?.nativeElement?.click();
+  }
+
+  revertImage() {
+    this.selectedFile = null;
+    this.previewUrl = null;
+  }
+
+  handleDrop(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver = false;
+    if (event.dataTransfer?.files?.length) {
+      const fileList = event.dataTransfer.files;
+      const fakeEvent = { target: { files: fileList } } as unknown as Event;
+      this.onFileChange(fakeEvent);
+    }
+  }
+
+  handleDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver = true;
+  }
+
+  handleDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver = false;
   }
 
   private getBase() {
@@ -148,6 +191,7 @@ export class ProfilePage implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     let finalPhoto = this.photoURL;
 
     if (hasImageChange) {
@@ -158,6 +202,7 @@ export class ProfilePage implements OnInit {
       } catch (err: any) {
         alert('Error subiendo imagen: ' + (err?.message || String(err)));
         console.error(err);
+        this.isLoading = false;
         return;
       }
     }
@@ -187,6 +232,8 @@ export class ProfilePage implements OnInit {
     } catch (err: any) {
       alert('Error al actualizar el perfil: ' + (err?.message || String(err)));
       console.error(err);
+    } finally {
+      this.isLoading = false;
     }
   }
 
