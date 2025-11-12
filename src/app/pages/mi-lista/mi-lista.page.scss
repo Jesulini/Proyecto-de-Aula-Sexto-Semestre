@@ -9,10 +9,8 @@
 
   $neon-gold: #ffb703;
   $neon-red: #ff0054;
-  $neon-blue: #00f5ff;
   $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
 
-  /* ===== LISTA ===== */
   .mi-lista-section {
     padding: 30px;
 
@@ -36,6 +34,8 @@
       overflow: hidden;
       box-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
       transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
 
       &:hover {
         transform: scale(1.05);
@@ -49,6 +49,10 @@
       }
 
       .movie-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         padding: 10px;
         text-align: center;
 
@@ -70,31 +74,59 @@
         }
 
         .buttons {
-          margin-top: 10px;
+          margin-top: auto;
+          display: flex;
+          justify-content: center;
+          gap: 8px;
 
-          .boton {
-            background: $neon-gold;
-            color: #000;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-right: 5px;
-            cursor: pointer;
-            transition: 0.3s;
+          ion-button {
+            height: 40px;
+            font-size: 14px;
+            --border-radius: 12px;
+            --padding-start: 12px;
+            --padding-end: 12px;
+            --background: transparent;
+            --box-shadow: none;
+            --border: none;
+            margin: 0;
+
+            ion-icon {
+              font-size: 18px;
+            }
+          }
+
+          .gold-btn {
+            --background: linear-gradient(90deg, #ffd700, #c5a100);
+            --color: #000;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 
             &:hover {
-              background: #fff;
-              box-shadow: 0 0 12px $neon-gold;
+              --background: linear-gradient(90deg, #fff, #fff);
+              box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+          }
+
+          .danger-btn {
+            --background: #2e1e1e;
+            --color: #ff6b6b;
+            font-weight: 600;
+            width: 40px;
+            min-width: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            ion-icon {
+              font-size: 20px;
+              margin: 0;
+              color: #ff6b6b;
             }
 
-            &.eliminar {
-              background: $neon-red;
-              color: #fff;
-
-              &:hover {
-                background: #ff3366;
-              }
+            &:hover {
+              --background: #3a1f1f;
+              --color: #ff8787;
             }
           }
         }

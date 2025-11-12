@@ -6,54 +6,62 @@
   <section class="mi-lista-section">
     <h2 class="section-title">Mi Lista</h2>
 
-    <div *ngIf="cargando" class="loading">
+    <div *ngIf="cargandoLista" class="loading">
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando tus películas...</p>
     </div>
 
-    <div *ngIf="!cargando && peliculas.length === 0" class="vacio">
+    <div *ngIf="!cargandoLista && peliculas.length === 0" class="vacio">
       <p>No tienes películas guardadas</p>
     </div>
 
-    <div class="lista-grid">
+    <div class="lista-grid" *ngIf="!cargandoLista && peliculas.length > 0">
       <div *ngFor="let pelicula of peliculas" class="movie-card">
         <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
         <div class="movie-info">
           <h3>{{ pelicula.title }}</h3>
           <p>{{ pelicula.category || 'Sin categoría' }}</p>
           <div class="buttons">
-            <button class="boton" (click)="verDetalles(pelicula)">
-              <i class="fa-solid fa-play"></i> Ver Detalles
-            </button>
-            <button class="boton eliminar" (click)="eliminarPelicula(pelicula)">
-              <i class="fa-solid fa-trash"></i> Quitar
-            </button>
+            <ion-button expand="block" class="gold-btn" (click)="verDetalles(pelicula)">
+              <ion-icon name="play-outline" slot="start"></ion-icon>
+              Ver Detalles
+            </ion-button>
+            <ion-button expand="block" class="danger-btn" (click)="eliminarPelicula(pelicula)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
           </div>
         </div>
       </div>
     </div>
+  </section>
 
+  <section class="mi-lista-section">
     <h2 class="section-title">Historial</h2>
 
-    <div *ngIf="historial.length === 0" class="vacio">
+    <div *ngIf="cargandoHistorial" class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando tu historial...</p>
+    </div>
+
+    <div *ngIf="!cargandoHistorial && historial.length === 0" class="vacio">
       <p>No has visto ninguna película aún.</p>
     </div>
 
-    <div class="lista-grid">
+    <div class="lista-grid" *ngIf="!cargandoHistorial && historial.length > 0">
       <div *ngFor="let pelicula of historial" class="movie-card">
         <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
         <div class="movie-info">
           <h3>{{ pelicula.title }}</h3>
           <p>{{ pelicula.category }}</p>
           <small *ngIf="pelicula.vistoEn">Visto el {{ pelicula.vistoEn | date:'medium' }}</small>
-
           <div class="buttons">
-            <button class="boton" (click)="verDetalles(pelicula)">
-              <i class="fa-solid fa-play"></i> Continuar viendo
-            </button>
-            <button class="boton eliminar" (click)="eliminarDelHistorial(pelicula)">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+            <ion-button expand="block" class="gold-btn" (click)="verDetalles(pelicula)">
+              <ion-icon name="play-outline" slot="start"></ion-icon>
+              Continuar viendo
+            </ion-button>
+            <ion-button expand="block" class="danger-btn" (click)="eliminarDelHistorial(pelicula)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
           </div>
         </div>
       </div>

@@ -5,11 +5,12 @@
 
   <div class="home-container" [class.menu-open]="menu.menuAbierto">
 
+    <!-- Slider automático -->
     <section class="slider">
       <div
         class="slide"
         *ngFor="let movie of featuredList; let i = index"
-        [class.active]="i === currentIndex"
+        [class.active]="i === sliderIndex"
         [style.backgroundImage]="'url(' + movie.imageUrl + ')'"
       >
         <div class="content">
@@ -17,11 +18,11 @@
           <p *ngIf="movie.description">{{ movie.description }}</p>
 
           <div class="buttons">
-            <button class="boton" (click)="abrirModalReproducir(movie)">
+            <button class="boton" (click)="abrirModalReproducirActual()">
               <i class="fa-solid fa-circle-play"></i> Reproducir
             </button>
 
-            <button class="boton" (click)="goToMovie(movie.id)">
+            <button class="boton" (click)="goToCurrentSliderMovie()">
               <i class="fa-solid fa-circle-question"></i> Más información
             </button>
           </div>
@@ -35,12 +36,13 @@
         <span
           class="dot"
           *ngFor="let movie of featuredList; let i = index"
-          [class.active]="i === currentIndex"
+          [class.active]="i === sliderIndex"
           (click)="showSlide(i)"
         ></span>
       </div>
     </section>
 
+    <!-- Carrusel manual -->
     <section class="content-section">
       <h2>Destacadas</h2>
       <div class="carrusel">
@@ -63,12 +65,14 @@
       </div>
     </section>
 
+    <!-- Panel de administración -->
     <section *ngIf="isAdmin" class="admin-panel">
       <h2>Panel de Administración</h2>
       <p>Desde aquí puedes agregar nuevas películas a la cartelera.</p>
       <button class="admin-add" (click)="abrirModalAgregar()">Agregar Película</button>
     </section>
 
+    <!-- Modal agregar/editar -->
     <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
       <ng-template>
         <ion-header>
@@ -120,6 +124,7 @@
       </ng-template>
     </ion-modal>
 
+    <!-- Modal reproducir -->
     <ion-modal [isOpen]="modalReproducirAbierto" (didDismiss)="cerrarModalReproducir()">
       <ng-template>
         <ion-header>

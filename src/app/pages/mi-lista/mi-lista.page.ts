@@ -12,24 +12,33 @@ import { MovieForStore, MovieViewed } from 'src/app/models/movie-extended.model'
 export class MiListaPage implements OnInit {
   peliculas: MovieForStore[] = [];
   historial: MovieViewed[] = [];
-  cargando = true;
+  cargandoLista = true;
+  cargandoHistorial = true;
 
   constructor(private moviesService: MoviesService, private router: Router) {}
 
   async ngOnInit() {
     const uid = this.moviesService.getCurrentUid();
     if (!uid) return;
+
     try {
       this.peliculas = await this.moviesService.getMyList(uid);
+    } catch (err) {
+      console.error('Error cargando Mi Lista', err);
+    } finally {
+      this.cargandoLista = false;
+    }
+
+    try {
       this.historial = await this.moviesService.getHistory(uid);
     } catch (err) {
-      console.error('Error cargando datos de Mi Lista/Historial', err);
+      console.error('Error cargando Historial', err);
     } finally {
-      this.cargando = false;
+      this.cargandoHistorial = false;
     }
   }
 
-  verDetalles(pelicula: MovieForStore) {
+  verDetalles(pelicula: MovieForStore | MovieViewed) {
     this.router.navigate(['/detalle-pelicula'], { queryParams: { id: pelicula.id } });
   }
 

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { DetallePeliculaPageRoutingModule } from './detalle-pelicula-routing.module';
-import { SharedModule} from 'src/app/shared/shared.module';
+import {SharedModule} from "../../shared/shared.module";
 
 import { DetallePeliculaPage } from './detalle-pelicula.page';
 

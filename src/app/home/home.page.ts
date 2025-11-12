@@ -9,9 +9,10 @@ import {
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
-import { AuthService } from 'src/app/services/auth/auth';
+import { AuthService, User } from 'src/app/services/auth/auth';
 import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MoviesService } from 'src/app/services/movies/movies.service';
 
 @Component({
   selector: 'app-home',
@@ -21,10 +22,10 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   featuredList: Movie[] = [];
-  currentIndex = 0;
+  sliderIndex = 0;
+  carruselIndex = 0;
   slideInterval: any;
   @ViewChild('carruselContainer') carruselContainer!: ElementRef;
-  carruselIndex = 0;
 
   isAdmin = false;
 
@@ -50,7 +51,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     private toastCtrl: ToastController,
     private firestore: Firestore,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private moviesService: MoviesService
   ) {}
 
   ngOnInit(): void {
@@ -84,17 +86,20 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  showSlide(index: number): void {
-    this.currentIndex = index;
-    this.resetInterval();
-  }
-
+  // Slider automático
   nextSlide(): void {
-    this.currentIndex = (this.currentIndex + 1) % this.featuredList.length;
+    if (this.featuredList.length === 0) return;
+    this.sliderIndex = (this.sliderIndex + 1) % this.featuredList.length;
   }
 
   prevSlide(): void {
-    this.currentIndex = (this.currentIndex - 1 + this.featuredList.length) % this.featuredList.length;
+    if (this.featuredList.length === 0) return;
+    this.sliderIndex = (this.sliderIndex - 1 + this.featuredList.length) % this.featuredList.length;
+  }
+
+  showSlide(index: number): void {
+    this.sliderIndex = index;
+    this.resetInterval();
   }
 
   resetInterval(): void {
@@ -102,16 +107,37 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.slideInterval = setInterval(() => this.nextSlide(), 5000);
   }
 
-  goToMovie(id: string): void {
-    this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
+  goToCurrentSliderMovie(): void {
+    if (!this.featuredList.length) return;
+    const movie = this.featuredList[this.sliderIndex];
+    if (movie?.id) {
+      this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
+    }
   }
 
+  async abrirModalReproducirActual(): Promise<void> {
+    if (!this.featuredList.length) return;
+    this.peliculaReproducir = this.featuredList[this.sliderIndex] || null;
+    this.modalReproducirAbierto = !!this.peliculaReproducir;
+
+    const usuario: User | null = this.authService.getUsuarioActual();
+    if (usuario && this.peliculaReproducir) {
+      try {
+        await this.moviesService.registerHistory(usuario.uid, this.peliculaReproducir);
+      } catch (e) {
+        console.error('Error registrando en historial', e);
+      }
+    }
+  }
+  // Carrusel manual
   nextCarrusel(): void {
+    if (this.featuredList.length === 0) return;
     this.carruselIndex = (this.carruselIndex + 1) % this.featuredList.length;
     this.updateCarrusel();
   }
 
   prevCarrusel(): void {
+    if (this.featuredList.length === 0) return;
     this.carruselIndex = (this.carruselIndex - 1 + this.featuredList.length) % this.featuredList.length;
     this.updateCarrusel();
   }
@@ -125,6 +151,30 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     const itemWidth = item.offsetWidth + parseInt(style.marginLeft) + parseInt(style.marginRight);
     container.style.transform = `translateX(-${this.carruselIndex * itemWidth}px)`;
     container.style.transition = 'transform 0.5s ease';
+  }
+
+  // Comunes
+  goToMovie(id: string): void {
+    this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
+  }
+
+  async abrirModalReproducir(movie: Movie): Promise<void> {
+    this.peliculaReproducir = movie;
+    this.modalReproducirAbierto = true;
+
+    const usuario: User | null = this.authService.getUsuarioActual();
+    if (usuario && movie) {
+      try {
+        await this.moviesService.registerHistory(usuario.uid, movie);
+      } catch (e) {
+        console.error('Error registrando en historial', e);
+      }
+    }
+  }
+
+  cerrarModalReproducir(): void {
+    this.modalReproducirAbierto = false;
+    this.peliculaReproducir = null;
   }
 
   abrirModalAgregar(): void {
@@ -219,16 +269,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   generarId(): string {
     return Math.random().toString(36).substring(2, 10);
-  }
-
-  abrirModalReproducir(movie: Movie): void {
-    this.peliculaReproducir = movie;
-    this.modalReproducirAbierto = true;
-  }
-
-  cerrarModalReproducir(): void {
-    this.modalReproducirAbierto = false;
-    this.peliculaReproducir = null;
   }
 
   esYoutubeUrl(url?: string): boolean {

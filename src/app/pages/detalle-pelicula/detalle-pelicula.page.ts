@@ -15,6 +15,8 @@ import { MoviesService } from 'src/app/services/movies/movies.service';
 export class DetallePeliculaPage implements OnInit {
   pelicula: Movie | null = null;
   peliculaId: string | null = null;
+  menuAbierto = false;
+  activeRoute = '';
   enMiLista = false;
   trailerAbierto = false;
   peliculaAbierta = false;
@@ -30,6 +32,7 @@ export class DetallePeliculaPage implements OnInit {
 
   async ngOnInit() {
     this.peliculaId = this.route.snapshot.queryParamMap.get('id');
+    this.activeRoute = this.router.url || '';
     if (this.peliculaId) {
       await this.loadPelicula(this.peliculaId);
       const usuario = this.authService.getUsuarioActual();
@@ -91,13 +94,8 @@ export class DetallePeliculaPage implements OnInit {
     toast.present();
   }
 
-  abrirTrailer() {
-    this.trailerAbierto = true;
-  }
-
-  cerrarTrailer() {
-    this.trailerAbierto = false;
-  }
+  abrirTrailer() { this.trailerAbierto = true; }
+  cerrarTrailer() { this.trailerAbierto = false; }
 
   async abrirPelicula() {
     this.peliculaAbierta = true;
@@ -111,9 +109,7 @@ export class DetallePeliculaPage implements OnInit {
     }
   }
 
-  cerrarPelicula() {
-    this.peliculaAbierta = false;
-  }
+  cerrarPelicula() { this.peliculaAbierta = false; }
 
   esVideoArchivo(url?: string | null): boolean {
     if (!url) return false;
@@ -124,21 +120,37 @@ export class DetallePeliculaPage implements OnInit {
     if (!url) return this.sanitizer.bypassSecurityTrustResourceUrl('');
     if (url.includes('youtube.com/watch?v=')) {
       const id = url.split('v=')[1].split('&')[0];
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${id}?autoplay=1`
-      );
+      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}?autoplay=1`);
     } else if (url.includes('youtu.be/')) {
       const id = url.split('youtu.be/')[1].split('?')[0];
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${id}?autoplay=1`
-      );
+      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}?autoplay=1`);
     } else if (url.includes('vimeo.com')) {
       const id = url.split('vimeo.com/')[1];
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://player.vimeo.com/video/${id}?autoplay=1`
-      );
+      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${id}?autoplay=1`);
     }
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  openMenu(routeName?: string) {
+    this.menuAbierto = true;
+    if (routeName) this.activeRoute = routeName;
+  }
+
+  closeMenu() {
+    this.menuAbierto = false;
+  }
+
+  toggleMenu(routeName?: string) {
+    this.menuAbierto = !this.menuAbierto;
+    if (routeName) this.activeRoute = routeName;
+  }
+
+  setActiveRoute(routeName: string) {
+    this.activeRoute = routeName;
+  }
+
+  isActiveRoute(routeName: string): boolean {
+    return this.activeRoute === routeName;
   }
 
   logout() {
