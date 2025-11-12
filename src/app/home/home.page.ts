@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  AfterViewInit
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
@@ -10,7 +17,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  standalone: false,
+  standalone: false
 })
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   featuredList: Movie[] = [];
@@ -19,10 +26,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('carruselContainer') carruselContainer!: ElementRef;
   carruselIndex = 0;
 
-  menuAbierto = false;
   isAdmin = false;
 
-  // Modal CRUD
   modalAbierto = false;
   editando = false;
   peliculaTemp: Movie = {
@@ -35,7 +40,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     movieUrl: ''
   };
 
-  // Modal Reproducir
   modalReproducirAbierto = false;
   peliculaReproducir: Movie | null = null;
 
@@ -78,10 +82,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     } catch (error) {
       console.error('Error cargando películas:', error);
     }
-  }
-
-  toggleMenu(): void {
-    this.menuAbierto = !this.menuAbierto;
   }
 
   showSlide(index: number): void {
@@ -127,10 +127,17 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     container.style.transition = 'transform 0.5s ease';
   }
 
-  // 🟨 Modal CRUD
   abrirModalAgregar(): void {
     this.editando = false;
-    this.peliculaTemp = { id: '', title: '', imageUrl: '', category: '', description: '', trailerUrl: '', movieUrl: '' };
+    this.peliculaTemp = {
+      id: '',
+      title: '',
+      imageUrl: '',
+      category: '',
+      description: '',
+      trailerUrl: '',
+      movieUrl: ''
+    };
     this.modalAbierto = true;
   }
 
@@ -148,7 +155,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      this.presentToast('⚠️ Todos los campos obligatorios deben estar llenos.');
+      this.presentToast('Todos los campos obligatorios deben estar llenos.');
       return;
     }
 
@@ -160,7 +167,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
         );
         await updateDoc(docRef, { items: this.featuredList });
-        this.presentToast('✅ Película actualizada.');
+        this.presentToast('Película actualizada.');
       } else {
         const nuevaPeli: Movie = {
           id: this.generarId(),
@@ -173,13 +180,13 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         };
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
-        this.presentToast('✅ Película agregada.');
+        this.presentToast('Película agregada.');
       }
       this.cerrarModal();
       this.updateCarrusel();
     } catch (error) {
       console.error('Error guardando película:', error);
-      this.presentToast('❌ Error al guardar la película.');
+      this.presentToast('Error al guardar la película.');
     }
   }
 
@@ -188,16 +195,20 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       await updateDoc(docRef, { items: this.featuredList });
-      this.presentToast('🗑️ Película eliminada.');
+      this.presentToast('Película eliminada.');
       this.updateCarrusel();
     } catch (error) {
       console.error('Error eliminando película:', error);
-      this.presentToast('❌ Error al eliminar.');
+      this.presentToast('Error al eliminar.');
     }
   }
 
   async presentToast(message: string): Promise<void> {
-    const toast = await this.toastCtrl.create({ message, duration: 2000, position: 'bottom' });
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      position: 'bottom'
+    });
     await toast.present();
   }
 
@@ -210,7 +221,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     return Math.random().toString(36).substring(2, 10);
   }
 
-  // 🎬 Modal Reproducir
   abrirModalReproducir(movie: Movie): void {
     this.peliculaReproducir = movie;
     this.modalReproducirAbierto = true;

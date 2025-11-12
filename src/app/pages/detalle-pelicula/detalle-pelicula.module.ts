@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { DetallePeliculaPageRoutingModule } from './detalle-pelicula-routing.module';
+import { SharedModule} from 'src/app/shared/shared.module';
 
 import { DetallePeliculaPage } from './detalle-pelicula.page';
 
@@ -14,6 +15,7 @@ import { DetallePeliculaPage } from './detalle-pelicula.page';
     FormsModule,
     IonicModule,
     DetallePeliculaPageRoutingModule
+    ,SharedModule
   ],
   declarations: [DetallePeliculaPage]
 })

@@ -9,136 +9,6 @@
   $neon-red: #ff0054;
   $shadow: 0 0 15px rgba(255, 183, 3, 0.5);
 
-  .top-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 18px;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(10px);
-    border-bottom: 2px solid $neon-gold;
-    z-index: 10;
-    position: sticky;
-    top: 0;
-
-    .back-btn {
-      background: none;
-      border: none;
-      color: $neon-gold;
-      font-size: 30px;
-      padding: 8px 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-button {
-      background: none;
-      border: none;
-      padding: 0;
-      margin: 0;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-      .logo-img {
-        height: 42px;
-        filter: drop-shadow(0 0 8px $neon-gold);
-        transition: transform .25s;
-      }
-    }
-
-    .page-title-inline {
-      flex: 1 1 auto;
-      display: flex;
-      align-items: center;
-      padding-left: 12px;
-      .page-title {
-        margin: 0;
-        font-size: 1.15rem;
-        color: $neon-gold;
-        text-shadow: 0 0 8px rgba(255, 183, 3, .6);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    .menu-toggle {
-      font-size: 22px;
-      background: none;
-      border: none;
-      color: $neon-gold;
-      cursor: pointer;
-      padding: 6px 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      .hamburger {
-        font-size: 22px;
-        line-height: 1;
-      }
-    }
-  }
-
-  .sidebar {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 260px;
-    height: 100vh;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(12px);
-    border-left: 2px solid $neon-gold;
-    transition: right .28s ease;
-    z-index: 999;
-    padding: 20px;
-    box-sizing: border-box;
-
-    &.active { right: 0; }
-
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-
-      h3 {
-        color: $neon-gold;
-        text-shadow: 0 0 6px $neon-gold;
-        margin: 0;
-        font-size: 1.05rem;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 34px;
-        color: $neon-gold;
-        padding: 8px 12px;
-        cursor: pointer;
-      }
-    }
-
-    ul {
-      margin-top: 30px;
-      padding: 0;
-      list-style: none;
-
-      li {
-        padding: 12px 6px;
-        cursor: pointer;
-        color: #fff;
-        transition: color .2s, transform .08s;
-        display: block;
-        &:hover { color: $neon-gold; transform: translateX(-4px); }
-        &.logout { margin-top: 22px; color: $neon-red; font-weight: bold; }
-        a { text-decoration: none; color: inherit; display: block; }
-        &.active { color: $neon-gold; }
-      }
-    }
-  }
-
   .bg-blur {
     position: fixed;
     inset: 0;
@@ -242,18 +112,15 @@
       align-items: center;
       padding: 18px;
       .poster img { max-width: 220px; max-height: 360px; }
-      .detalle-content { align-items: center; text-align: center; .acciones ion-button { width: 85%; } }
+      .detalle-content {
+        align-items: center;
+        text-align: center;
+        .acciones ion-button { width: 85%; }
+      }
     }
-    .top-nav { padding: 10px 12px; .page-title-inline { display: none; } }
   }
 
   @media (max-width: 420px) {
-    .top-nav {
-      gap: 8px;
-      .logo-img { height: 36px; }
-      .back-btn { font-size: 26px; padding: 6px 8px; }
-      .menu-toggle { font-size: 20px; padding: 4px 6px; }
-    }
     .detalle-wrapper {
       padding: 12px;
       .poster img { max-width: 180px; max-height: 300px; border-radius: 12px; }
@@ -262,6 +129,5 @@
         .acciones ion-button { width: 95%; font-size: 0.98rem; }
       }
     }
-    .sidebar .sidebar-header .close-btn { font-size: 30px; }
   }
 }

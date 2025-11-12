@@ -9,7 +9,7 @@ import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/fir
   selector: 'app-cartelera',
   templateUrl: './cartelera.page.html',
   styleUrls: ['./cartelera.page.scss'],
-  standalone: false,
+  standalone: false
 })
 export class CarteleraPage implements OnInit, OnDestroy {
 
@@ -18,7 +18,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
   categorias: string[] = ['Todos', 'Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
   categoriaSeleccionada = 'Todos';
   terminoBusqueda = '';
-  menuAbierto = false;
 
   esAdmin = false;
   modalAbierto = false;
@@ -75,10 +74,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
   filtrarPorCategoria(categoria: string) {
     this.categoriaSeleccionada = categoria;
     this.buscarPeliculas();
-  }
-
-  toggleMenu() {
-    this.menuAbierto = !this.menuAbierto;
   }
 
   abrirModalAgregar() {
@@ -165,9 +160,9 @@ export class CarteleraPage implements OnInit, OnDestroy {
               console.error('Error eliminando película:', error);
               alert('Error al eliminar la película.');
             }
-          },
-        },
-      ],
+          }
+        }
+      ]
     });
 
     await alerta.present();
@@ -175,11 +170,6 @@ export class CarteleraPage implements OnInit, OnDestroy {
 
   verDetalle(id: string) {
     this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
   goHome() {

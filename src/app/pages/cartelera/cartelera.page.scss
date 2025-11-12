@@ -23,13 +23,6 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
   flex-direction: column;
   overflow-x: hidden;
 
-  /* ==== GLOW PRESETS ==== */
-  $neon-gold: #ffb703;
-  $neon-red: #ff0054;
-  $neon-blue: #00f5ff;
-  $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
-
-  /* ==== HEADER ==== */
   header {
     display: flex;
     justify-content: space-between;
@@ -65,259 +58,7 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
       }
     }
   }
-
 }
-
-/* ===== SIDEBAR ===== */
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 250px;
-  height: 100%;
-  background: rgba(20, 20, 20, 0.95);
-  backdrop-filter: blur(12px);
-  border-left: 2px solid $neon-gold;
-  box-shadow: -2px 0 15px rgba(255, 183, 3, 0.3);
-  transition: right 0.4s ease;
-  z-index: 2000;
-  padding: 20px;
-
-  &.active {
-    right: 0;
-  }
-
-  .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h3 {
-      color: $neon-gold;
-      text-shadow: 0 0 8px $neon-gold;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: $neon-gold;
-      font-size: 22px;
-      cursor: pointer;
-
-      &:hover {
-        color: $neon-red;
-        text-shadow: 0 0 12px $neon-red;
-      }
-    }
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 30px;
-
-    li {
-      padding: 12px 10px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.3s;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      &:hover {
-        color: $neon-gold;
-        text-shadow: 0 0 8px $neon-gold;
-      }
-
-      &.logout {
-        margin-top: 20px;
-        color: $neon-red;
-        font-weight: bold;
-
-        &:hover {
-          text-shadow: 0 0 10px $neon-red;
-        }
-      }
-
-      a {
-        text-decoration: none;
-        color: inherit;
-        width: 100%;
-
-        &.active {
-          color: $neon-gold;
-          text-shadow: 0 0 8px $neon-gold;
-        }
-      }
-    }
-  }
-}
-
-/* ===== SLIDER ===== */
-.slider {
-  position: relative;
-  height: 70vh;
-  overflow: hidden;
-  border-bottom: 2px solid $neon-gold;
-
-  .slide {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transition: opacity 0.6s ease-in-out;
-    display: flex;
-    align-items: flex-end;
-
-    &.active {
-      opacity: 1;
-    }
-
-    .content {
-      background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-      padding: 40px;
-      width: 100%;
-
-      h2 {
-        font-size: 2.2rem;
-        color: $neon-gold;
-        text-shadow: $neon-shadow;
-      }
-
-      p {
-        color: #ccc;
-        font-size: 1rem;
-        max-width: 600px;
-        margin-top: 10px;
-      }
-
-      .buttons {
-        margin-top: 20px;
-
-        .boton {
-          background: $neon-gold;
-          color: #000;
-          border: none;
-          padding: 10px 20px;
-          margin-right: 10px;
-          border-radius: 25px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: 0.3s;
-
-          &:hover {
-            background: #fff;
-            box-shadow: 0 0 15px $neon-gold;
-          }
-
-          i {
-            margin-right: 8px;
-          }
-        }
-      }
-    }
-  }
-
-  .arrow {
-    position: absolute;
-    top: 50%;
-    font-size: 2rem;
-    color: $neon-gold;
-    cursor: pointer;
-    padding: 10px;
-    transition: 0.3s;
-
-    &:hover {
-      color: $neon-blue;
-      text-shadow: 0 0 12px $neon-blue;
-    }
-
-    &.left {
-      left: 20px;
-    }
-
-    &.right {
-      right: 20px;
-    }
-  }
-
-  .indicators {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-
-    .dot {
-      height: 12px;
-      width: 12px;
-      margin: 0 5px;
-      display: inline-block;
-      border-radius: 50%;
-      background: #555;
-      cursor: pointer;
-      transition: background 0.3s;
-
-      &.active {
-        background: $neon-gold;
-        box-shadow: $neon-shadow;
-      }
-    }
-  }
-
-}
-
-
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  li {
-    padding: 14px 20px;
-    border-bottom: 1px solid #222;
-    color: #eee;
-    transition: 0.3s;
-    text-shadow: 0 0 5px rgba(255, 183, 3, 0.3);
-
-    a {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      font-weight: 500;
-
-      &.active {
-        color: $neon-gold;
-        text-shadow: $neon-shadow;
-      }
-    }
-
-    &:hover {
-      background-color: rgba(255, 183, 3, 0.1);
-      color: $neon-blue;
-      text-shadow: 0 0 10px $neon-blue;
-      transform: translateX(-4px);
-    }
-
-    &.logout {
-      color: $neon-red;
-      font-weight: 600;
-      text-align: center;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba(255, 0, 84, 0.1);
-        text-shadow: 0 0 10px $neon-red;
-      }
-    }
-  }
-}
-
-
-/* ==== CONTENEDOR PRINCIPAL ==== */
 .cartelera-container {
   display: flex;
   flex: 1;
@@ -327,7 +68,6 @@ ul {
     margin-right: 240px;
   }
 
-  /* ==== CATEGORÍAS ==== */
   .categorias {
     width: 220px;
     background-color: #101010;
@@ -390,7 +130,6 @@ ul {
     }
   }
 
-  /* ==== CONTENIDO PRINCIPAL ==== */
   .main-content {
     flex: 1;
     padding: 25px;
@@ -519,7 +258,6 @@ ul {
   }
 }
 
-/* ==== MEDIA QUERIES ==== */
 @media (max-width: 1024px) {
   .cartelera-container {
     flex-direction: column;
@@ -552,16 +290,6 @@ ul {
       .movies-grid {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       }
-    }
-  }
-
-  .sidebar {
-    width: 100%;
-    right: -100%;
-    left: auto;
-
-    &.active {
-      right: 0;
     }
   }
 }

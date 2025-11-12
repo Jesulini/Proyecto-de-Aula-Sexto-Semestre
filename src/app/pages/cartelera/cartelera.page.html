@@ -1,100 +1,42 @@
 <ion-content class="custom-cartelera">
-  <!-- Encabezado fijo con botón de regreso -->
-  <ion-header class="custom-header">
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button (click)="goHome()">
-          <ion-icon name="home-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+  <app-header [pageTitle]="'Cartelera Peliculas'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+  <app-sidebar-menu #menu [esAdmin]="esAdmin"></app-sidebar-menu>
 
-  <!-- Encabezado visual -->
-  <header>
-    <div class="page-title">
-      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    </div>
-    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
-  </header>
-
-  <!-- Menú lateral a la derecha -->
-  <aside class="sidebar" [class.active]="menuAbierto">
-    <div class="sidebar-header">
-      <h3>Menú</h3>
-      <button class="close-btn" (click)="toggleMenu()">✕</button>
-    </div>
-    <ul>
-      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
-      <li><a routerLink="/cartelera" class="active" (click)="toggleMenu()">Películas</a></li>
-      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
-      <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
-      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
-      <li class="logout" (click)="logout()">Cerrar sesión</li>
-    </ul>
-  </aside>
-
-  <!-- Contenedor principal -->
-  <div class="cartelera-container" [class.menu-open]="menuAbierto">
-    <!-- Categorías -->
+  <div class="cartelera-container" [class.menu-open]="menu.menuAbierto">
     <aside class="categorias">
       <h3>Categorías</h3>
       <ul>
-        <li
-          *ngFor="let categoria of categorias"
-          (click)="filtrarPorCategoria(categoria)"
-          [class.active]="categoriaSeleccionada === categoria"
-        >
+        <li *ngFor="let categoria of categorias" (click)="filtrarPorCategoria(categoria)"
+          [class.active]="categoriaSeleccionada === categoria">
           {{ categoria }}
         </li>
       </ul>
 
-      <!-- Botón solo para admin -->
       <div *ngIf="esAdmin" class="admin-actions">
         <button (click)="abrirModalAgregar()" class="add-btn">Agregar Película</button>
       </div>
     </aside>
 
-    <!-- Contenido principal -->
     <main class="main-content">
-      <!-- Barra de búsqueda -->
       <div class="search-bar">
-        <input
-          type="text"
-          placeholder="Buscar película..."
-          [(ngModel)]="terminoBusqueda"
-          (input)="buscarPeliculas()"
-        />
+        <input type="text" placeholder="Buscar película..." [(ngModel)]="terminoBusqueda" (input)="buscarPeliculas()" />
       </div>
 
-      <!-- Grilla de películas -->
       <div class="movies-grid">
-        <div
-          class="movie-card"
-          *ngFor="let movie of peliculasFiltradas"
-          (click)="verDetalle(movie.id)"
-        >
+        <div class="movie-card" *ngFor="let movie of peliculasFiltradas" (click)="verDetalle(movie.id)">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h4>{{ movie.title }}</h4>
           <p>{{ movie.category }}</p>
 
-          <!-- Controles de administrador -->
           <div *ngIf="esAdmin" class="admin-controls">
-            <button
-              (click)="abrirModalEditar(movie); $event.stopPropagation()"
-              class="edit-btn"
-              title="Editar"
-            >Editar</button>
-            <button
-              (click)="confirmarEliminacion(movie.id); $event.stopPropagation()"
-              class="delete-btn"
-              title="Eliminar"
-            >Eliminar</button>
+            <button (click)="abrirModalEditar(movie); $event.stopPropagation()" class="edit-btn"
+              title="Editar">Editar</button>
+            <button (click)="confirmarEliminacion(movie.id); $event.stopPropagation()" class="delete-btn"
+              title="Eliminar">Eliminar</button>
           </div>
         </div>
       </div>
 
-      <!-- Panel informativo del admin -->
       <section *ngIf="esAdmin" class="admin-panel">
         <h2>Panel de Administración</h2>
         <p>Desde aquí puedes agregar, editar o eliminar películas de la cartelera.</p>
@@ -103,7 +45,6 @@
     </main>
   </div>
 
-  <!-- MODAL AGREGAR / EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>

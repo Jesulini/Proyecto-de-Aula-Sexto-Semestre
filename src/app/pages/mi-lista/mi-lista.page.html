@@ -1,25 +1,7 @@
 <ion-content class="custom-home">
-  <header>
-    <div class="page-title">
-      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    </div>
-    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">Menú</button>
-  </header>
 
-  <aside class="sidebar" [class.active]="menuAbierto">
-    <div class="sidebar-header">
-      <h3>Menú</h3>
-      <button class="close-btn" (click)="toggleMenu()">Cerrar</button>
-    </div>
-    <ul>
-      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
-      <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
-      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
-      <li><a routerLink="/mi-lista" class="active" (click)="toggleMenu()">Mi lista</a></li>
-      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
-      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
-    </ul>
-  </aside>
+  <app-header [pageTitle]="'Mi lista'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+  <app-sidebar-menu #menu></app-sidebar-menu>
 
   <section class="mi-lista-section">
     <h2 class="section-title">Mi Lista</h2>

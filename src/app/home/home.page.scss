@@ -11,130 +11,14 @@
   $neon-blue: #00f5ff;
   $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
 
-  /* ===== HEADER ===== */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 25px;
-    position: sticky;
-    top: 0;
-    z-index: 1001;
-    backdrop-filter: blur(12px);
-    background: rgba(20, 20, 20, 0.85);
-    border-bottom: 2px solid $neon-gold;
-    box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+  /* ===== CONTENEDOR PRINCIPAL ===== */
+  .home-container {
+    padding-top: 16px;
 
-    .logo-img {
-      height: 45px;
-      filter: drop-shadow(0 0 6px $neon-gold);
-      transition: 0.3s;
-
-      &:hover {
-        transform: scale(1.08);
-        filter: drop-shadow(0 0 12px $neon-gold);
-      }
-    }
-
-    .menu-toggle {
-      font-size: 28px;
-      background: none;
-      border: none;
-      color: $neon-gold;
-      cursor: pointer;
-      transition: 0.3s;
-
-      &:hover {
-        color: $neon-blue;
-        text-shadow: 0 0 12px $neon-blue;
-      }
-    }
-  }
-
-  /* ===== SIDEBAR ===== */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 250px;
-    height: 100%;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(12px);
-    border-left: 2px solid $neon-gold;
-    box-shadow: -2px 0 15px rgba(255, 183, 3, 0.3);
-    transition: right 0.4s ease;
-    z-index: 2000;
-    padding: 20px;
-
-    &.active {
-      right: 0;
-    }
-
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      h3 {
-        color: $neon-gold;
-        text-shadow: 0 0 8px $neon-gold;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        color: $neon-gold;
-        font-size: 22px;
-        cursor: pointer;
-
-        &:hover {
-          color: $neon-red;
-          text-shadow: 0 0 12px $neon-red;
-        }
-      }
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 30px;
-
-      li {
-        padding: 12px 10px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: 0.3s;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        &:hover {
-          color: $neon-gold;
-          text-shadow: 0 0 8px $neon-gold;
-        }
-
-        &.logout {
-          margin-top: 20px;
-          color: $neon-red;
-          font-weight: bold;
-
-          &:hover {
-            text-shadow: 0 0 10px $neon-red;
-          }
-        }
-
-        a {
-          text-decoration: none;
-          color: inherit;
-          width: 100%;
-
-          &.active {
-            color: $neon-gold;
-            text-shadow: 0 0 8px $neon-gold;
-          }
-        }
-      }
+    &.menu-open {
+      transform: none;
+      margin-left: 0;
+      margin-right: 0;
     }
   }
 
@@ -254,7 +138,9 @@
 
   /* ===== DESTACADAS / CARRUSEL ===== */
   .content-section {
+
     padding: 40px;
+    margin-top: 24px;
 
     h2 {
       color: $neon-gold;
@@ -267,6 +153,7 @@
       display: flex;
       align-items: center;
       position: relative;
+      gap: 12px; 
 
       .btn {
         background: none;
@@ -288,6 +175,13 @@
         scroll-behavior: smooth;
         gap: 20px;
         padding: 20px 10px;
+        width: 100%;            /* ocupa todo el ancho disponible */
+        max-width: 1400px;      /* limita expansión en desktop amplio */
+        margin: 0 auto;         /* centra el carrusel dentro de la sección */
+
+        /* Mejora experiencia de scroll */
+        scrollbar-width: thin;
+        scrollbar-color: #555 #1e1e1e;
 
         .movie {
           background-color: #1e1e1e;
@@ -368,28 +262,30 @@
 
   /* ===== PANEL ADMIN ===== */
   .admin-panel {
-    text-align: center;
-    padding: 30px;
-    border-top: 2px solid $neon-gold;
-    background: #1e1e1e;
+    padding: 24px 40px;
+    margin-top: 16px;
 
     h2 {
       color: $neon-gold;
-      margin-bottom: 10px;
       text-shadow: $neon-shadow;
+      text-align: center;
+      margin-bottom: 10px;
     }
 
     p {
       color: #ccc;
-      margin-bottom: 20px;
+      text-align: center;
+      margin-bottom: 16px;
     }
 
     .admin-add {
+      display: block;
+      margin: 0 auto;
       background: $neon-gold;
       color: #000;
       border: none;
+      border-radius: 8px;
       padding: 10px 20px;
-      border-radius: 25px;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
@@ -400,17 +296,4 @@
       }
     }
   }
-}
-
-.video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-iframe,
-video {
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
 }

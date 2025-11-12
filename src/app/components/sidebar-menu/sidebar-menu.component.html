@@ -1,0 +1,24 @@
+<aside class="sidebar" [class.active]="menuAbierto">
+  <div class="sidebar-header">
+    <h3>Menú</h3>
+    <button class="close-btn" (click)="toggleMenu()">✕</button>
+  </div>
+  <ul>
+    <li>
+      <a routerLink="/home" routerLinkActive="active" (click)="toggleMenu()">Inicio</a>
+    </li>
+    <li>
+      <a routerLink="/cartelera" routerLinkActive="active" (click)="toggleMenu()">Películas</a>
+    </li>
+    <li>
+      <a routerLink="/series" routerLinkActive="active" (click)="toggleMenu()">Series</a>
+    </li>
+    <li>
+      <a routerLink="/mi-lista" routerLinkActive="active" (click)="toggleMenu()">Mi lista</a>
+    </li>
+    <li>
+      <a routerLink="/profile" routerLinkActive="active" (click)="toggleMenu()">Perfil</a>
+    </li>
+    <li class="logout" (click)="logout()">Cerrar sesión</li>
+  </ul>
+</aside>

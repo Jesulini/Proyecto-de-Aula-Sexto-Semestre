@@ -1,49 +1,7 @@
 <ion-content fullscreen class="detalle-page">
-  <div class="top-nav">
-    <button class="back-btn" routerLink="/home" aria-label="Volver al inicio">
-      ←
-    </button>
 
-    <button class="logo-button" routerLink="/home" aria-label="Ir al inicio">
-      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    </button>
-
-    <div class="page-title-inline">
-      <h1 class="page-title">{{ pelicula?.title }}</h1>
-    </div>
-
-    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Abrir menú">
-      <span class="hamburger">&#9776;</span>
-    </button>
-  </div>
-
-  <aside class="sidebar" [class.active]="menuAbierto">
-    <div class="sidebar-header">
-      <h3>Menú</h3>
-      <button class="close-btn" (click)="closeMenu()" aria-label="Cerrar menú">
-        &times;
-      </button>
-    </div>
-
-    <ul>
-      <li [class.active]="isActiveRoute('/home')">
-        <a (click)="setActiveRoute('/home'); toggleMenu()">Inicio</a>
-      </li>
-      <li [class.active]="isActiveRoute('/cartelera')">
-        <a (click)="setActiveRoute('/cartelera'); toggleMenu()">Películas</a>
-      </li>
-      <li [class.active]="isActiveRoute('/series')">
-        <a (click)="setActiveRoute('/series'); toggleMenu()">Series</a>
-      </li>
-      <li [class.active]="isActiveRoute('/mi-lista')">
-        <a (click)="setActiveRoute('/mi-lista'); toggleMenu()">Mi lista</a>
-      </li>
-      <li [class.active]="isActiveRoute('/profile')">
-        <a (click)="setActiveRoute('/profile'); toggleMenu()">Perfil</a>
-      </li>
-      <li class="logout" (click)="logout()">Cerrar sesión</li>
-    </ul>
-  </aside>
+  <app-header [pageTitle]="pelicula?.title || ''" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+  <app-sidebar-menu #menu></app-sidebar-menu>
 
   <div *ngIf="pelicula" class="detalle-wrapper">
     <div class="bg-blur" [style.background-image]="'url(' + pelicula.imageUrl + ')'"></div>

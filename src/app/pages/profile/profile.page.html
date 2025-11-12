@@ -1,20 +1,8 @@
-<ion-header class="custom-header">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="goHome()">
-        <ion-icon name="home-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-
-    <ion-title>Mi Perfil</ion-title>
-
-    <ion-buttons slot="end">
-      <ion-button class="logout-btn" (click)="logout()">Cerrar sesión</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="custom-profile">
+
+  <app-header [pageTitle]="'Mi Perfil'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+  <app-sidebar-menu #menu></app-sidebar-menu>
+
   <app-message-box></app-message-box>
 
   <div class="profile-inner">

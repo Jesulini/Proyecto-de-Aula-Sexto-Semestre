@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { MiListaPageRoutingModule } from './mi-lista-routing.module';
-
+import { SharedModule } from 'src/app/shared/shared.module';
 import { MiListaPage } from './mi-lista.page';
 
 @NgModule({
@@ -14,7 +14,8 @@ import { MiListaPage } from './mi-lista.page';
     FormsModule,
     IonicModule,
     MiListaPageRoutingModule
+    , SharedModule
   ],
   declarations: [MiListaPage]
 })
-export class MiListaPageModule {}
+export class MiListaPageModule { }

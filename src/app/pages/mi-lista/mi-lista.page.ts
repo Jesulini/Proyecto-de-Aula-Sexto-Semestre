@@ -13,8 +13,6 @@ export class MiListaPage implements OnInit {
   peliculas: MovieForStore[] = [];
   historial: MovieViewed[] = [];
   cargando = true;
-  menuAbierto = false;
-  activeRoute = '';
 
   constructor(private moviesService: MoviesService, private router: Router) {}
 
@@ -55,28 +53,6 @@ export class MiListaPage implements OnInit {
     } catch (err) {
       console.error('Error al eliminar del historial', err);
     }
-  }
-
-  openMenu(routeName?: string) {
-    this.menuAbierto = true;
-    if (routeName) this.activeRoute = routeName;
-  }
-
-  closeMenu() {
-    this.menuAbierto = false;
-  }
-
-  toggleMenu(routeName?: string) {
-    this.menuAbierto = !this.menuAbierto;
-    if (routeName) this.activeRoute = routeName;
-  }
-
-  setActiveRoute(routeName: string) {
-    this.activeRoute = routeName;
-  }
-
-  isActiveRoute(routeName: string): boolean {
-    return this.activeRoute === routeName;
   }
 
   logout() {

@@ -139,11 +139,6 @@ export class ProfilePage implements OnInit {
     this.router.navigate(['/home']);
   }
 
-  logout() {
-    this.auth.signOut();
-    this.router.navigate(['/login']);
-  }
-
   goToSubscription() {
     this.router.navigate(['/subscription']);
   }

@@ -1,0 +1,10 @@
+<header class="custom-header">
+  <div class="page-title">
+    <ion-button (click)="goHome()" class="home-btn">
+      <ion-icon name="home-outline"></ion-icon>
+    </ion-button>
+    <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" (click)="goHome()" />
+    <span class="page-title-text">{{ pageTitle }}</span>
+  </div>
+  <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+</header>
