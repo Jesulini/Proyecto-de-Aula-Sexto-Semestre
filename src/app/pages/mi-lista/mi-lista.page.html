@@ -1,17 +1,15 @@
 <ion-content class="custom-home">
-  <!-- 🔹 ENCABEZADO -->
   <header>
     <div class="page-title">
       <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
     </div>
-    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+    <button class="menu-toggle" id="menu-toggle" (click)="toggleMenu()">Menú</button>
   </header>
 
-  <!-- 🔹 MENÚ LATERAL -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
-      <button class="close-btn" (click)="toggleMenu()">✕</button>
+      <button class="close-btn" (click)="toggleMenu()">Cerrar</button>
     </div>
     <ul>
       <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
@@ -23,9 +21,8 @@
     </ul>
   </aside>
 
-  <!-- 🔹 CONTENIDO -->
   <section class="mi-lista-section">
-    <h2 class="section-title">🎞️ Mi Lista</h2>
+    <h2 class="section-title">Mi Lista</h2>
 
     <div *ngIf="cargando" class="loading">
       <ion-spinner name="crescent"></ion-spinner>
@@ -33,7 +30,7 @@
     </div>
 
     <div *ngIf="!cargando && peliculas.length === 0" class="vacio">
-      <p>No tienes películas guardadas 😢</p>
+      <p>No tienes películas guardadas</p>
     </div>
 
     <div class="lista-grid">
@@ -54,7 +51,7 @@
       </div>
     </div>
 
-    <h2 class="section-title">📜 Historial</h2>
+    <h2 class="section-title">Historial</h2>
 
     <div *ngIf="historial.length === 0" class="vacio">
       <p>No has visto ninguna película aún.</p>
@@ -66,7 +63,16 @@
         <div class="movie-info">
           <h3>{{ pelicula.title }}</h3>
           <p>{{ pelicula.category }}</p>
-          <small>Visto el {{ pelicula.vistoEn | date:'medium' }}</small>
+          <small *ngIf="pelicula.vistoEn">Visto el {{ pelicula.vistoEn | date:'medium' }}</small>
+
+          <div class="buttons">
+            <button class="boton" (click)="verDetalles(pelicula)">
+              <i class="fa-solid fa-play"></i> Continuar viendo
+            </button>
+            <button class="boton eliminar" (click)="eliminarDelHistorial(pelicula)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -9,37 +9,78 @@
   $neon-red: #ff0054;
   $shadow: 0 0 15px rgba(255, 183, 3, 0.5);
 
-  /* === NAV SUPERIOR ESTILO NETFLIX === */
   .top-nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 14px 18px;
-    background: rgba(0,0,0,0.65);
+    gap: 12px;
+    padding: 10px 18px;
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(10px);
     border-bottom: 2px solid $neon-gold;
-    z-index: 5;
+    z-index: 10;
     position: sticky;
     top: 0;
 
-    .logo-img {
-      height: 42px;
-      filter: drop-shadow(0 0 8px $neon-gold);
-      transition: .3s;
-      &:hover { transform: scale(1.08); }
+    .back-btn {
+      background: none;
+      border: none;
+      color: $neon-gold;
+      font-size: 30px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      .logo-img {
+        height: 42px;
+        filter: drop-shadow(0 0 8px $neon-gold);
+        transition: transform .25s;
+      }
+    }
+
+    .page-title-inline {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      .page-title {
+        margin: 0;
+        font-size: 1.15rem;
+        color: $neon-gold;
+        text-shadow: 0 0 8px rgba(255, 183, 3, .6);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .menu-toggle {
-      font-size: 28px;
+      font-size: 22px;
       background: none;
       border: none;
       color: $neon-gold;
       cursor: pointer;
-      &:hover { color: $neon-blue; }
+      padding: 6px 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      .hamburger {
+        font-size: 22px;
+        line-height: 1;
+      }
     }
   }
 
-  /* === MENU LATERAL === */
   .sidebar {
     position: fixed;
     top: 0;
@@ -49,9 +90,10 @@
     background: rgba(10,10,10,0.95);
     backdrop-filter: blur(12px);
     border-left: 2px solid $neon-gold;
-    transition: .35s;
+    transition: right .28s ease;
     z-index: 999;
     padding: 20px;
+    box-sizing: border-box;
 
     &.active { right: 0; }
 
@@ -59,18 +101,22 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
 
       h3 {
         color: $neon-gold;
         text-shadow: 0 0 6px $neon-gold;
+        margin: 0;
+        font-size: 1.05rem;
       }
 
       .close-btn {
         background: none;
         border: none;
-        font-size: 22px;
+        font-size: 34px;
         color: $neon-gold;
-        &:hover { color: $neon-red; }
+        padding: 8px 12px;
+        cursor: pointer;
       }
     }
 
@@ -80,30 +126,19 @@
       list-style: none;
 
       li {
-        padding: 12px;
+        padding: 12px 6px;
         cursor: pointer;
         color: #fff;
-        transition: .25s;
+        transition: color .2s, transform .08s;
         display: block;
-
-        &:hover { color: $neon-gold; }
-
-        &.logout {
-          margin-top: 22px;
-          color: $neon-red;
-          font-weight: bold;
-        }
-
-        a {
-          text-decoration: none;
-          color: inherit;
-          display: block;
-        }
+        &:hover { color: $neon-gold; transform: translateX(-4px); }
+        &.logout { margin-top: 22px; color: $neon-red; font-weight: bold; }
+        a { text-decoration: none; color: inherit; display: block; }
+        &.active { color: $neon-gold; }
       }
     }
   }
 
-  /* === FONDO BLUR ESTILO NETFLIX === */
   .bg-blur {
     position: fixed;
     inset: 0;
@@ -113,71 +148,85 @@
     z-index: -1;
   }
 
-  /* === CONTENIDO CENTRAL === */
   .detalle-wrapper {
-    text-align: center;
-    padding: 40px 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 24px;
     display: flex;
-    justify-content: center;
     flex-direction: column;
     align-items: center;
+    gap: 28px;
+    box-sizing: border-box;
+    text-align: center;
 
-    .poster img {
-      width: 260px;
-      max-width: 80%;
-      border-radius: 14px;
-      box-shadow: $shadow;
-      margin-bottom: 22px;
-      transition: .3s;
-      &:hover { transform: scale(1.04); box-shadow: 0 0 25px $neon-gold; }
+    .poster {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      img {
+        width: 100%;
+        max-width: 260px;
+        height: auto;
+        max-height: 420px;
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: $shadow;
+        transition: transform .25s, box-shadow .25s;
+      }
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
-      color: $neon-gold;
-      text-shadow: 0 0 8px rgba(255, 183, 3, .7);
-    }
-
-    .categoria {
-      font-size: 1rem;
-      color: #ccc;
-    }
-
-    .descripcion {
-      font-size: 1rem;
-      margin-top: 12px;
-      max-width: 600px;
+    .detalle-content {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       color: #ddd;
-      line-height: 1.6;
-      margin-bottom: 25px;
-      padding: 0 10px;
-    }
+      margin: 0 auto;
 
-    /* === BOTONES === */
-    .acciones ion-button {
-      width: 85%;
-      margin-bottom: 12px;
-      font-size: 1.1rem;
-      border-radius: 10px;
-    }
+      h1 {
+        font-size: 2rem;
+        margin: 0 0 8px 0;
+        color: $neon-gold;
+        text-shadow: 0 0 8px rgba(255, 183, 3, .7);
+        word-break: break-word;
+      }
 
-    .btn-play {
-      --background: $neon-gold;
-      color: #000;
-      font-weight: bold;
-      &:hover { box-shadow: 0 0 16px $neon-gold; }
-    }
+      .categoria {
+        font-size: 1rem;
+        color: #ccc;
+        margin-bottom: 8px;
+      }
 
-    .btn-trailer {
-      border: 2px solid $neon-gold;
-      color: $neon-gold;
-      &:hover { background: rgba(255,183,3,.1); box-shadow: $shadow; }
-    }
+      .descripcion {
+        font-size: 1rem;
+        margin-top: 0;
+        max-width: 720px;
+        color: #ddd;
+        line-height: 1.6;
+        margin-bottom: 18px;
+        padding: 0 10px;
+      }
 
-    .btn-lista {
-      color: $neon-blue;
-      &:hover { text-shadow: 0 0 12px $neon-blue; }
+      .acciones {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+
+        ion-button {
+          width: 320px;
+          max-width: 100%;
+          border-radius: 10px;
+          font-size: 1.05rem;
+        }
+
+        .btn-play { --background: $neon-gold; color: #000; font-weight: 700; }
+        .btn-trailer { border: 2px solid $neon-gold; color: $neon-gold; }
+        .btn-lista { color: $neon-blue; }
+      }
     }
   }
 
@@ -185,5 +234,34 @@
     text-align: center;
     margin-top: 60px;
     color: #ccc;
+  }
+
+  @media (max-width: 900px) {
+    .detalle-wrapper {
+      flex-direction: column;
+      align-items: center;
+      padding: 18px;
+      .poster img { max-width: 220px; max-height: 360px; }
+      .detalle-content { align-items: center; text-align: center; .acciones ion-button { width: 85%; } }
+    }
+    .top-nav { padding: 10px 12px; .page-title-inline { display: none; } }
+  }
+
+  @media (max-width: 420px) {
+    .top-nav {
+      gap: 8px;
+      .logo-img { height: 36px; }
+      .back-btn { font-size: 26px; padding: 6px 8px; }
+      .menu-toggle { font-size: 20px; padding: 4px 6px; }
+    }
+    .detalle-wrapper {
+      padding: 12px;
+      .poster img { max-width: 180px; max-height: 300px; border-radius: 12px; }
+      .detalle-content {
+        h1 { font-size: 1.4rem; }
+        .acciones ion-button { width: 95%; font-size: 0.98rem; }
+      }
+    }
+    .sidebar .sidebar-header .close-btn { font-size: 30px; }
   }
 }

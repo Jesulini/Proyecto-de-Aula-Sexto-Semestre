@@ -1,36 +1,50 @@
-<ion-header translucent="true">
-  <ion-toolbar color="dark">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ pelicula?.title }}</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content fullscreen class="detalle-page">
-  <!-- NAV SUPERIOR -->
   <div class="top-nav">
-    <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
-    <button class="menu-toggle" (click)="toggleMenu()">&#9776;</button>
+    <button class="back-btn" routerLink="/home" aria-label="Volver al inicio">
+      ←
+    </button>
+
+    <button class="logo-button" routerLink="/home" aria-label="Ir al inicio">
+      <img src="assets/logo-light-transparent.png" alt="Logo" class="logo-img" />
+    </button>
+
+    <div class="page-title-inline">
+      <h1 class="page-title">{{ pelicula?.title }}</h1>
+    </div>
+
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Abrir menú">
+      <span class="hamburger">&#9776;</span>
+    </button>
   </div>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" [class.active]="menuAbierto">
     <div class="sidebar-header">
       <h3>Menú</h3>
-      <button class="close-btn" (click)="toggleMenu()">✕</button>
+      <button class="close-btn" (click)="closeMenu()" aria-label="Cerrar menú">
+        &times;
+      </button>
     </div>
+
     <ul>
-      <li><a routerLink="/home" (click)="toggleMenu()">Inicio</a></li>
-      <li><a routerLink="/cartelera" (click)="toggleMenu()">Películas</a></li>
-      <li><a routerLink="/series" (click)="toggleMenu()">Series</a></li>
-      <li><a routerLink="/mi-lista" (click)="toggleMenu()">Mi lista</a></li>
-      <li><a routerLink="/profile" (click)="toggleMenu()">Perfil</a></li>
-      <li class="logout" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</li>
+      <li [class.active]="isActiveRoute('/home')">
+        <a (click)="setActiveRoute('/home'); toggleMenu()">Inicio</a>
+      </li>
+      <li [class.active]="isActiveRoute('/cartelera')">
+        <a (click)="setActiveRoute('/cartelera'); toggleMenu()">Películas</a>
+      </li>
+      <li [class.active]="isActiveRoute('/series')">
+        <a (click)="setActiveRoute('/series'); toggleMenu()">Series</a>
+      </li>
+      <li [class.active]="isActiveRoute('/mi-lista')">
+        <a (click)="setActiveRoute('/mi-lista'); toggleMenu()">Mi lista</a>
+      </li>
+      <li [class.active]="isActiveRoute('/profile')">
+        <a (click)="setActiveRoute('/profile'); toggleMenu()">Perfil</a>
+      </li>
+      <li class="logout" (click)="logout()">Cerrar sesión</li>
     </ul>
   </aside>
 
-  <!-- DETALLE DE PELÍCULA -->
   <div *ngIf="pelicula" class="detalle-wrapper">
     <div class="bg-blur" [style.background-image]="'url(' + pelicula.imageUrl + ')'"></div>
 
@@ -44,14 +58,14 @@
       <p class="descripcion" *ngIf="pelicula.description">{{ pelicula.description }}</p>
 
       <div class="acciones">
-        <!-- 🎬 Ver película -->
         <ion-button expand="block" class="btn-play" (click)="abrirPelicula()">
-          <ion-icon slot="start" name="play"></ion-icon> Ver ahora
+          <ion-icon slot="start" name="play"></ion-icon>
+          Ver ahora
         </ion-button>
 
-        <!-- 🎥 Ver tráiler -->
         <ion-button expand="block" fill="outline" class="btn-trailer" (click)="abrirTrailer()">
-          <ion-icon slot="start" name="film"></ion-icon> Ver tráiler
+          <ion-icon slot="start" name="film"></ion-icon>
+          Ver tráiler
         </ion-button>
 
         <ion-button expand="block" fill="clear" class="btn-lista" (click)="toggleMiLista()">
@@ -63,10 +77,9 @@
   </div>
 
   <div *ngIf="!pelicula" class="sin-info">
-    <p>😢 Película no encontrada.</p>
+    <p>Película no encontrada.</p>
   </div>
 
-  <!-- 🎬 MODAL PELÍCULA COMPLETA -->
   <ion-modal [isOpen]="peliculaAbierta" (didDismiss)="cerrarPelicula()">
     <ng-template>
       <ion-header>
@@ -80,8 +93,6 @@
 
       <ion-content class="ion-padding video-content">
         <div *ngIf="pelicula?.movieUrl; else sinVideo">
-
-          <!-- Archivo local -->
           <video
             *ngIf="esVideoArchivo(pelicula?.movieUrl)"
             width="100%"
@@ -93,7 +104,6 @@
             Tu navegador no soporta la reproducción de video.
           </video>
 
-          <!-- YouTube o Vimeo -->
           <iframe
             *ngIf="!esVideoArchivo(pelicula?.movieUrl)"
             [src]="getSafeTrailerUrl(pelicula?.movieUrl)"
@@ -103,7 +113,6 @@
             allow="autoplay; fullscreen"
             allowfullscreen
           ></iframe>
-
         </div>
 
         <ng-template #sinVideo>
@@ -113,7 +122,6 @@
     </ng-template>
   </ion-modal>
 
-  <!-- 🎥 MODAL TRÁILER -->
   <ion-modal [isOpen]="trailerAbierto" (didDismiss)="cerrarTrailer()">
     <ng-template>
       <ion-header>

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Firestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService, User } from 'src/app/services/auth/auth';
 import { ToastController } from '@ionic/angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MoviesService } from 'src/app/services/movies/movies.service';
 
 @Component({
   selector: 'app-detalle-pelicula',
@@ -13,19 +13,17 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   standalone: false,
 })
 export class DetallePeliculaPage implements OnInit {
-
   pelicula: Movie | null = null;
   peliculaId: string | null = null;
   menuAbierto = false;
+  activeRoute = '';
   enMiLista = false;
-
-  // Modales
   trailerAbierto = false;
   peliculaAbierta = false;
 
   constructor(
     private route: ActivatedRoute,
-    private firestore: Firestore,
+    private moviesService: MoviesService,
     private authService: AuthService,
     private router: Router,
     private toastController: ToastController,
@@ -34,101 +32,92 @@ export class DetallePeliculaPage implements OnInit {
 
   async ngOnInit() {
     this.peliculaId = this.route.snapshot.queryParamMap.get('id');
+    this.activeRoute = this.router.url || '';
     if (this.peliculaId) {
-      await this.cargarPelicula(this.peliculaId);
-      await this.checkMiLista();
-
-      // ✅ Registrar película en el historial cuando el usuario entra al detalle
-      if (this.pelicula) {
-        await this.registrarEnHistorial(this.pelicula);
+      await this.loadPelicula(this.peliculaId);
+      const usuario = this.authService.getUsuarioActual();
+      if (usuario && this.pelicula) {
+        await this.checkMiLista(usuario.uid);
       }
     }
   }
 
-  // 🔹 Cargar película desde Firestore
-  async cargarPelicula(id: string) {
+  private async loadPelicula(id: string) {
     try {
-      const ref = doc(this.firestore, 'peliculas/peliculas');
-      const snap = await getDoc(ref);
-
-      if (snap.exists()) {
-        const data = snap.data() as { items: Movie[] };
-        this.pelicula = data.items.find(p => p.id === id) || null;
-      }
+      this.pelicula = await this.moviesService.cargarMovieById(id);
     } catch (e) {
       console.error('Error cargando película', e);
     }
   }
 
-  // 🔹 Registrar película vista en el historial del usuario
-  private async registrarEnHistorial(pelicula: Movie) {
+  private async checkMiLista(uid: string) {
+    try {
+      if (!this.pelicula) {
+        this.enMiLista = false;
+        return;
+      }
+      this.enMiLista = await this.moviesService.isInMyList(uid, this.pelicula.id);
+    } catch (e) {
+      console.error('Error verificando Mi Lista', e);
+      this.enMiLista = false;
+    }
+  }
+
+  async toggleMiLista() {
     const usuario: User | null = this.authService.getUsuarioActual();
-    if (!usuario) return;
-
+    if (!usuario || !this.pelicula) {
+      this.router.navigate(['/login']);
+      return;
+    }
     try {
-      const historialRef = doc(this.firestore, `usuarios/${usuario.uid}/historial/vistas`);
-      const snap = await getDoc(historialRef);
-
-      // Añadimos fecha de visualización
-      const peliculaVista = { ...pelicula, vistoEn: new Date() };
-
-      if (snap.exists()) {
-        const data = snap.data() as { items: Movie[] };
-        const yaExiste = data.items.some(p => p.id === pelicula.id);
-        if (!yaExiste) {
-          await updateDoc(historialRef, { items: arrayUnion(peliculaVista) });
-          console.log('✅ Película agregada al historial:', pelicula.title);
-        }
+      if (this.enMiLista) {
+        await this.moviesService.removeFromMyList(usuario.uid, this.pelicula);
+        this.enMiLista = false;
+        this.showToast('Película removida de Mi Lista');
       } else {
-        await setDoc(historialRef, { items: [peliculaVista] });
-        console.log('✅ Historial creado con la primera película:', pelicula.title);
+        await this.moviesService.addToMyList(usuario.uid, this.pelicula);
+        this.enMiLista = true;
+        this.showToast('Película agregada a Mi Lista');
       }
-
-      // 👇 Reflejar el historial también en la colección "mi-lista/historial"
-      await this.actualizarHistorialEnMiLista(usuario.uid, peliculaVista);
-
     } catch (e) {
-      console.error('Error registrando en historial', e);
+      console.error('Error modificando Mi Lista', e);
+      this.showToast('Error al modificar Mi Lista');
     }
   }
 
-  // 🔹 Reflejar el historial en la colección "mi-lista/historial"
-  private async actualizarHistorialEnMiLista(uid: string, peliculaVista: any) {
-    try {
-      const historialMiListaRef = doc(this.firestore, `usuarios/${uid}/mi-lista/historial`);
-      const snap = await getDoc(historialMiListaRef);
-
-      if (snap.exists()) {
-        const data = snap.data() as { items: Movie[] };
-        const yaExiste = data.items.some(p => p.id === peliculaVista.id);
-        if (!yaExiste) {
-          await updateDoc(historialMiListaRef, { items: arrayUnion(peliculaVista) });
-        }
-      } else {
-        await setDoc(historialMiListaRef, { items: [peliculaVista] });
-      }
-    } catch (e) {
-      console.error('Error sincronizando historial con Mi Lista', e);
-    }
+  private async showToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+    });
+    toast.present();
   }
 
-  // 🔹 Abrir y cerrar modales
   abrirTrailer() { this.trailerAbierto = true; }
   cerrarTrailer() { this.trailerAbierto = false; }
 
-  abrirPelicula() { this.peliculaAbierta = true; }
+  async abrirPelicula() {
+    this.peliculaAbierta = true;
+    const usuario: User | null = this.authService.getUsuarioActual();
+    if (usuario && this.pelicula) {
+      try {
+        await this.moviesService.registerHistory(usuario.uid, this.pelicula);
+      } catch (e) {
+        console.error('Error registrando en historial', e);
+      }
+    }
+  }
+
   cerrarPelicula() { this.peliculaAbierta = false; }
 
-  // 🔹 Detecta si es archivo de video local
   esVideoArchivo(url?: string | null): boolean {
     if (!url) return false;
     return /\.(mp4|webm|ogg)$/i.test(url);
   }
 
-  // 🔹 Convierte URLs a formato embed seguro
   getSafeTrailerUrl(url?: string | null): SafeResourceUrl {
     if (!url) return this.sanitizer.bypassSecurityTrustResourceUrl('');
-
     if (url.includes('youtube.com/watch?v=')) {
       const id = url.split('v=')[1].split('&')[0];
       return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}?autoplay=1`);
@@ -139,73 +128,29 @@ export class DetallePeliculaPage implements OnInit {
       const id = url.split('vimeo.com/')[1];
       return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${id}?autoplay=1`);
     }
-
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  // 🔹 Verifica si está en Mi Lista
-  private async checkMiLista() {
-    const usuario: User | null = this.authService.getUsuarioActual();
-    if (!usuario || !this.pelicula) return;
-
-    try {
-      const miListaDocRef = doc(this.firestore, `usuarios/${usuario.uid}/mi-lista/lista`);
-      const docSnap = await getDoc(miListaDocRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data() as { items: Movie[] };
-        this.enMiLista = data.items.some(p => p.id === this.pelicula?.id);
-      } else {
-        this.enMiLista = false;
-      }
-    } catch (e) {
-      console.error('Error verificando Mi Lista', e);
-    }
+  openMenu(routeName?: string) {
+    this.menuAbierto = true;
+    if (routeName) this.activeRoute = routeName;
   }
 
-  // 🔹 Agregar o quitar de Mi Lista
-  async toggleMiLista() {
-    const usuario: User | null = this.authService.getUsuarioActual();
-    if (!usuario || !this.pelicula) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    const miListaDocRef = doc(this.firestore, `usuarios/${usuario.uid}/mi-lista/lista`);
-    try {
-      const docSnap = await getDoc(miListaDocRef);
-
-      if (this.enMiLista) {
-        await updateDoc(miListaDocRef, { items: arrayRemove(this.pelicula) });
-        this.enMiLista = false;
-        this.showToast('Película removida de Mi Lista');
-      } else {
-        if (docSnap.exists()) {
-          await updateDoc(miListaDocRef, { items: arrayUnion(this.pelicula) });
-        } else {
-          await setDoc(miListaDocRef, { items: [this.pelicula] });
-        }
-        this.enMiLista = true;
-        this.showToast('Película agregada a Mi Lista ✅');
-      }
-    } catch (e) {
-      console.error('Error modificando Mi Lista', e);
-      this.showToast('Error al modificar Mi Lista 😢');
-    }
+  closeMenu() {
+    this.menuAbierto = false;
   }
 
-  // 🔹 Mostrar notificación
-  private async showToast(message: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      position: 'bottom',
-    });
-    toast.present();
-  }
-
-  toggleMenu() {
+  toggleMenu(routeName?: string) {
     this.menuAbierto = !this.menuAbierto;
+    if (routeName) this.activeRoute = routeName;
+  }
+
+  setActiveRoute(routeName: string) {
+    this.activeRoute = routeName;
+  }
+
+  isActiveRoute(routeName: string): boolean {
+    return this.activeRoute === routeName;
   }
 
   logout() {
