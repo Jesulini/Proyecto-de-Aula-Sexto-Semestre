@@ -49,12 +49,10 @@ export class ProfilePage implements OnInit {
       this.canSaveChanges = false;
       return;
     }
-
     const hasNameChange = this.displayName !== this.user.displayName;
     const hasEmailChange = this.email !== this.user.email;
     const hasPasswordChange = this.newPassword.trim() !== '';
     const hasImageChange = !!this.selectedFile;
-
     this.canSaveChanges = hasNameChange || hasEmailChange || hasPasswordChange || hasImageChange;
   }
 
@@ -63,17 +61,57 @@ export class ProfilePage implements OnInit {
       this.messageService.showMessage('No estás autenticado. Inicia sesión para guardar cambios.', 'error');
       return;
     }
-
     if (!this.canSaveChanges) {
       this.messageService.showMessage('No hay cambios para guardar', 'info');
       return;
     }
 
-    let finalPhoto = this.photoURL;
+    // ===== Validaciones =====
+    if (!this.displayName.trim() || this.displayName.length < 3) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/invalid-display-name' }), 'error');
+      return;
+    }
+    if (this.displayName.length > 30) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/display-name-too-long' }), 'error');
+      return;
+    }
+    if (!/^[a-zA-Z0-9\s]+$/.test(this.displayName)) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/display-name-invalid-chars' }), 'error');
+      return;
+    }
 
+    if (!this.email.trim()) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-email' }), 'error');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/invalid-email' }), 'error');
+      return;
+    }
+    if (this.email.length > 100) {
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/email-too-long' }), 'error');
+      return;
+    }
+
+    if (this.newPassword.trim() !== '') {
+      if (this.newPassword.length < 6) {
+        this.messageService.showMessage(mapFirebaseError({ code: 'auth/weak-password' }), 'error');
+        return;
+      }
+      if (this.newPassword.length > 50) {
+        this.messageService.showMessage(mapFirebaseError({ code: 'auth/password-too-long' }), 'error');
+        return;
+      }
+      const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/;
+      if (!strongRegex.test(this.newPassword)) {
+        this.messageService.showMessage(mapFirebaseError({ code: 'auth/password-not-strong' }), 'error');
+        return;
+      }
+    }
+
+    let finalPhoto = this.photoURL;
     if (this.selectedFile) {
       const previousPhoto = this.photoURL;
-
       try {
         const newUrl = await this.storageService.uploadDirectPut(this.user.uid, this.selectedFile);
         await this.storageService.deletePreviousImage(previousPhoto);
@@ -90,18 +128,14 @@ export class ProfilePage implements OnInit {
         displayName: this.displayName,
         photoURL: finalPhoto
       });
-
       if (this.email !== this.user.email) {
         await updateEmail(this.user, this.email);
       }
-
       if (this.newPassword.trim() !== '') {
         await updatePassword(this.user, this.newPassword);
         this.newPassword = '';
       }
-
       await this.profileService.updateFirestoreProfile(this.user.uid, this.displayName, this.email, finalPhoto);
-
       this.photoURL = finalPhoto;
       this.selectedFile = null;
       this.previewUrl = null;

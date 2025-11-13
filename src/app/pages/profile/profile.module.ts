@@ -9,7 +9,6 @@ import { ProfilePageRoutingModule } from './profile-routing.module';
 import { ProfilePage } from './profile.page';
 
 import { AvatarUploadComponent } from 'src/app/components/avatar-upload/avatar-upload.component';
-import { MessageBoxComponent } from 'src/app/components/message-box/message-box.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
@@ -20,6 +19,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
     ProfilePageRoutingModule
     , SharedModule
   ],
-  declarations: [ProfilePage, AvatarUploadComponent, MessageBoxComponent]
+  declarations: [ProfilePage, AvatarUploadComponent]
 })
 export class ProfilePageModule {}

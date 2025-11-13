@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth';
+import { MessageService } from 'src/app/services/message.service';
+import { mapFirebaseError } from 'src/app/utils/error-utils';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,13 +17,14 @@ export class ForgotPasswordPage {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toastCtrl: ToastController,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private messageService: MessageService
   ) {}
 
   async resetPassword() {
-    if (!this.email) {
-      this.showToast('Por favor, ingresa tu correo electrónico.');
+    const validationError = this.validateForm();
+    if (validationError) {
+      this.messageService.showMessage(mapFirebaseError({ code: validationError }), 'error');
       return;
     }
 
@@ -31,23 +34,33 @@ export class ForgotPasswordPage {
     await loading.present();
 
     try {
-      await this.authService.resetPassword(this.email);
+      await this.authService.resetPassword(this.email.trim().toLowerCase());
       await loading.dismiss();
-      this.showToast('Te hemos enviado un correo para restablecer tu contraseña.');
+      this.messageService.showMessage(
+        'Te hemos enviado un correo para restablecer tu contraseña.',
+        'success'
+      );
       this.router.navigate(['/login']);
     } catch (err: any) {
       await loading.dismiss();
-      this.showToast(err.message || 'Error al enviar el correo.');
+      const msg = mapFirebaseError(err);
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
-  async showToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      position: 'bottom',
-    });
-    toast.present();
+
+  validateForm(): string | null {
+    if (!this.email || this.email.trim().length === 0) return 'auth/missing-email';
+
+    this.email = this.email.trim().toLowerCase();
+
+    if (this.email.length < 5) return 'auth/invalid-email';
+    if (this.email.length > 100) return 'auth/email-too-long';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) return 'auth/invalid-email';
+
+    return null;
   }
 
   goToLogin() {

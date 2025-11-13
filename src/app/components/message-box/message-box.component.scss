@@ -1,11 +1,15 @@
 .message-box {
+  position: fixed;          // se fija en la ventana
+  top: 20px;                // distancia desde arriba
+  left: 50%;                // centrado horizontal
+  transform: translateX(-50%);
+  z-index: 9999;            // por encima de todo
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  width: 100%;
   padding: 14px 18px;
-  margin: 16px auto;
   border-radius: 10px;
   font-size: 15px;
   font-weight: 500;
@@ -27,12 +31,12 @@
   }
 
   &.info {
-    background-color: #222;
-    color: #f0c674;
-    border-color: #f0c674;
+    background-color: #1b1b1b;
+    color: #ffd700;
+    border-color: #ffd700;
 
     .icon {
-      color: #f0c674;
+      color: #ffd700;
     }
   }
 
@@ -60,10 +64,10 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translate(-50%, -10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, 0);
   }
 }

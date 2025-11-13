@@ -1,0 +1,21 @@
+<section class="movie-carousel">
+  <h2>{{ title }}</h2>
+  <div class="carrusel">
+    <button class="btn prev" (click)="prevCarrusel()">&#10094;</button>
+
+    <div class="contenedor-carrusel" #carruselContainer>
+      <div class="movie" *ngFor="let movie of movies">
+        <img [src]="movie.imageUrl" alt="{{ movie.title }}" (click)="onSelect(movie)" />
+        <h3>{{ movie.title }}</h3>
+        <p *ngIf="movie.category" class="category">{{ movie.category }}</p>
+
+        <div *ngIf="isAdmin" class="admin-actions">
+          <button class="edit-btn" (click)="onEdit(movie)">Editar</button>
+          <button class="delete-btn" (click)="onDelete(movie)">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn next" (click)="nextCarrusel()">&#10095;</button>
+  </div>
+</section>

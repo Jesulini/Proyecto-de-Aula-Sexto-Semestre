@@ -1,20 +1,26 @@
 <ion-content class="custom-home">
 
+  <app-message-box></app-message-box>
+
   <app-header [pageTitle]="'Mi lista'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
   <app-sidebar-menu #menu></app-sidebar-menu>
 
+  <!-- Sección Mi Lista -->
   <section class="mi-lista-section">
     <h2 class="section-title">Mi Lista</h2>
 
+    <!-- Estado de carga -->
     <div *ngIf="cargandoLista" class="loading">
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando tus películas...</p>
     </div>
 
+    <!-- Estado vacío -->
     <div *ngIf="!cargandoLista && peliculas.length === 0" class="vacio">
       <p>No tienes películas guardadas</p>
     </div>
 
+    <!-- Grid de películas -->
     <div class="lista-grid" *ngIf="!cargandoLista && peliculas.length > 0">
       <div *ngFor="let pelicula of peliculas" class="movie-card">
         <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
@@ -35,18 +41,22 @@
     </div>
   </section>
 
+  <!-- Sección Historial -->
   <section class="mi-lista-section">
     <h2 class="section-title">Historial</h2>
 
+    <!-- Estado de carga -->
     <div *ngIf="cargandoHistorial" class="loading">
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando tu historial...</p>
     </div>
 
+    <!-- Estado vacío -->
     <div *ngIf="!cargandoHistorial && historial.length === 0" class="vacio">
       <p>No has visto ninguna película aún.</p>
     </div>
 
+    <!-- Grid de historial -->
     <div class="lista-grid" *ngIf="!cargandoHistorial && historial.length > 0">
       <div *ngFor="let pelicula of historial" class="movie-card">
         <img [src]="pelicula.imageUrl" alt="{{ pelicula.title }}" />
@@ -67,4 +77,5 @@
       </div>
     </div>
   </section>
+
 </ion-content>

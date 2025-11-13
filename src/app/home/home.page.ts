@@ -2,17 +2,16 @@ import {
   Component,
   OnInit,
   OnDestroy,
-  ViewChild,
-  ElementRef,
   AfterViewInit
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService, User } from 'src/app/services/auth/auth';
 import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MoviesService } from 'src/app/services/movies/movies.service';
+import { MessageService } from 'src/app/services/message.service';
+import { mapFirebaseError } from 'src/app/utils/error-utils';
 
 @Component({
   selector: 'app-home',
@@ -21,11 +20,14 @@ import { MoviesService } from 'src/app/services/movies/movies.service';
   standalone: false
 })
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
+  //Aqui tienes que declarar una lista para la categoria
   featuredList: Movie[] = [];
+  moviesAccion: Movie[] = [];
+  moviesRomance: Movie[] = [];
+  moviesTerror: Movie[] = [];
+
   sliderIndex = 0;
-  carruselIndex = 0;
   slideInterval: any;
-  @ViewChild('carruselContainer') carruselContainer!: ElementRef;
 
   isAdmin = false;
 
@@ -49,11 +51,11 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private toastCtrl: ToastController,
     private firestore: Firestore,
     private sanitizer: DomSanitizer,
-    private moviesService: MoviesService
-  ) {}
+    private moviesService: MoviesService,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
     this.slideInterval = setInterval(() => this.nextSlide(), 5000);
@@ -63,10 +65,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.loadMovies();
   }
 
-  ngAfterViewInit(): void {
-    this.updateCarrusel();
-    window.addEventListener('resize', () => this.updateCarrusel());
-  }
+  ngAfterViewInit(): void { }
 
   ngOnDestroy(): void {
     if (this.slideInterval) clearInterval(this.slideInterval);
@@ -78,11 +77,16 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data() as { items: Movie[] };
-        this.featuredList = data.items || [];
-        this.updateCarrusel();
+        const allMovies = data.items || [];
+        //Aqui tambien filtrar por categoria para añadir la lista correspondiente
+        this.featuredList = allMovies;
+        this.moviesAccion = allMovies.filter(m => m.category === 'Acción');
+        this.moviesRomance = allMovies.filter(m => m.category === 'Romance');
+        this.moviesTerror = allMovies.filter(m => m.category === 'Terror');
       }
-    } catch (error) {
-      console.error('Error cargando películas:', error);
+    } catch (error: any) {
+      const msg = mapFirebaseError(error);
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
@@ -115,47 +119,10 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async abrirModalReproducirActual(): Promise<void> {
-    if (!this.featuredList.length) return;
-    this.peliculaReproducir = this.featuredList[this.sliderIndex] || null;
-    this.modalReproducirAbierto = !!this.peliculaReproducir;
-
-    const usuario: User | null = this.authService.getUsuarioActual();
-    if (usuario && this.peliculaReproducir) {
-      try {
-        await this.moviesService.registerHistory(usuario.uid, this.peliculaReproducir);
-      } catch (e) {
-        console.error('Error registrando en historial', e);
-      }
+  goToMovie(movie: Movie): void {
+    if (movie?.id) {
+      this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
     }
-  }
-  // Carrusel manual
-  nextCarrusel(): void {
-    if (this.featuredList.length === 0) return;
-    this.carruselIndex = (this.carruselIndex + 1) % this.featuredList.length;
-    this.updateCarrusel();
-  }
-
-  prevCarrusel(): void {
-    if (this.featuredList.length === 0) return;
-    this.carruselIndex = (this.carruselIndex - 1 + this.featuredList.length) % this.featuredList.length;
-    this.updateCarrusel();
-  }
-
-  updateCarrusel(): void {
-    const container = this.carruselContainer?.nativeElement;
-    if (!container) return;
-    const item = container.querySelector('.movie');
-    if (!item) return;
-    const style = getComputedStyle(item);
-    const itemWidth = item.offsetWidth + parseInt(style.marginLeft) + parseInt(style.marginRight);
-    container.style.transform = `translateX(-${this.carruselIndex * itemWidth}px)`;
-    container.style.transition = 'transform 0.5s ease';
-  }
-
-  // Comunes
-  goToMovie(id: string): void {
-    this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
   }
 
   async abrirModalReproducir(movie: Movie): Promise<void> {
@@ -166,8 +133,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     if (usuario && movie) {
       try {
         await this.moviesService.registerHistory(usuario.uid, movie);
-      } catch (e) {
-        console.error('Error registrando en historial', e);
+      } catch (error: any) {
+        const msg = mapFirebaseError(error);
+        this.messageService.showMessage(msg, 'error');
       }
     }
   }
@@ -205,7 +173,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      this.presentToast('Todos los campos obligatorios deben estar llenos.');
+      this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-fields' }), 'error');
       return;
     }
 
@@ -217,7 +185,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
         );
         await updateDoc(docRef, { items: this.featuredList });
-        this.presentToast('Película actualizada.');
+        this.messageService.showMessage('Película actualizada.', 'success');
       } else {
         const nuevaPeli: Movie = {
           id: this.generarId(),
@@ -230,13 +198,12 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         };
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
-        this.presentToast('Película agregada.');
+        this.messageService.showMessage('Película agregada.', 'success');
       }
       this.cerrarModal();
-      this.updateCarrusel();
-    } catch (error) {
-      console.error('Error guardando película:', error);
-      this.presentToast('Error al guardar la película.');
+    } catch (error: any) {
+      const msg = mapFirebaseError(error);
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
@@ -245,26 +212,17 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       await updateDoc(docRef, { items: this.featuredList });
-      this.presentToast('Película eliminada.');
-      this.updateCarrusel();
-    } catch (error) {
-      console.error('Error eliminando película:', error);
-      this.presentToast('Error al eliminar.');
+      this.messageService.showMessage('Película eliminada.', 'success');
+    } catch (error: any) {
+      const msg = mapFirebaseError(error);
+      this.messageService.showMessage(msg, 'error');
     }
-  }
-
-  async presentToast(message: string): Promise<void> {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      position: 'bottom'
-    });
-    await toast.present();
   }
 
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+    this.messageService.showMessage('Sesión cerrada correctamente.', 'info');
   }
 
   generarId(): string {

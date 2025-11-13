@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MoviesService } from 'src/app/services/movies/movies.service';
 import { MovieForStore, MovieViewed } from 'src/app/models/movie-extended.model';
+import { MessageService } from 'src/app/services/message.service';
+import { mapFirebaseError } from 'src/app/utils/error-utils';
 
 @Component({
   selector: 'app-mi-lista',
@@ -15,25 +17,29 @@ export class MiListaPage implements OnInit {
   cargandoLista = true;
   cargandoHistorial = true;
 
-  constructor(private moviesService: MoviesService, private router: Router) {}
+  constructor(
+    private moviesService: MoviesService,
+    private router: Router,
+    private messageService: MessageService
+  ) {}
 
   async ngOnInit() {
     const uid = this.moviesService.getCurrentUid();
     if (!uid) return;
 
     try {
-      this.peliculas = await this.moviesService.getMyList(uid);
+      const [lista, historial] = await Promise.all([
+        this.moviesService.getMyList(uid),
+        this.moviesService.getHistory(uid)
+      ]);
+
+      this.peliculas = lista;
+      this.historial = historial;
     } catch (err) {
-      console.error('Error cargando Mi Lista', err);
+      const msg = mapFirebaseError(err || { code: 'cargar-mi-lista' });
+      this.messageService.showMessage(msg, 'error');
     } finally {
       this.cargandoLista = false;
-    }
-
-    try {
-      this.historial = await this.moviesService.getHistory(uid);
-    } catch (err) {
-      console.error('Error cargando Historial', err);
-    } finally {
       this.cargandoHistorial = false;
     }
   }
@@ -48,8 +54,10 @@ export class MiListaPage implements OnInit {
     try {
       await this.moviesService.removeFromMyList(uid, pelicula);
       this.peliculas = this.peliculas.filter(p => p.id !== pelicula.id);
+      this.messageService.showMessage('Película eliminada de Mi Lista.', 'success');
     } catch (err) {
-      console.error('Error al eliminar de Mi Lista', err);
+      const msg = mapFirebaseError(err || { code: 'eliminar-mi-lista' });
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
@@ -59,12 +67,19 @@ export class MiListaPage implements OnInit {
     try {
       await this.moviesService.removeFromHistory(uid, pelicula);
       this.historial = this.historial.filter(p => p.id !== pelicula.id);
+      this.messageService.showMessage('Película eliminada del historial.', 'success');
     } catch (err) {
-      console.error('Error al eliminar del historial', err);
+      const msg = mapFirebaseError(err || { code: 'eliminar-historial' });
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
   logout() {
     this.router.navigate(['/login']);
+    this.messageService.showMessage('Sesión cerrada correctamente.', 'info');
+  }
+
+  trackById(index: number, item: MovieForStore | MovieViewed) {
+    return item.id;
   }
 }

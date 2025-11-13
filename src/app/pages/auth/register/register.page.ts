@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
+import { MessageService } from 'src/app/services/message.service';
+import { mapFirebaseError } from 'src/app/utils/error-utils';
 
 @Component({
   selector: 'app-register',
@@ -14,17 +16,20 @@ export class RegisterPage {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toastCtrl: ToastController,
-    private loadingCtrl: LoadingController
-  ) { }
+    private loadingCtrl: LoadingController,
+    private messageService: MessageService
+  ) {}
 
   async register() {
-    if (this.password !== this.confirmPassword) {
-      this.showToast('Las contraseñas no coinciden');
+    const validationError = this.validateForm();
+    if (validationError) {
+      this.messageService.showMessage(mapFirebaseError({ code: validationError }), 'error');
       return;
     }
 
@@ -32,29 +37,46 @@ export class RegisterPage {
     await loading.present();
 
     try {
-      await this.authService.register(this.nombre, this.email, this.password);
+      await this.authService.register(this.nombre.trim(), this.email.trim().toLowerCase(), this.password);
       await loading.dismiss();
+      this.messageService.showMessage('Cuenta creada exitosamente', 'success');
       this.router.navigate(['/login']);
     } catch (err: any) {
       await loading.dismiss();
-      this.showToast(err.message || 'Error al registrarse');
+      const msg = mapFirebaseError(err);
+      this.messageService.showMessage(msg, 'error');
     }
   }
 
-  async showToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      position: 'bottom'
-    });
-    toast.present();
+
+  validateForm(): string | null {
+    if (!this.nombre.trim() || !this.email.trim() || !this.password || !this.confirmPassword) {
+      return 'auth/missing-fields';
+    }
+
+    const nameRegex = /^[a-zA-Z0-9_ ]+$/;
+    if (this.nombre.trim().length < 3) return 'auth/invalid-display-name';
+    if (this.nombre.trim().length > 30) return 'auth/display-name-too-long';
+    if (!nameRegex.test(this.nombre.trim())) return 'auth/display-name-invalid-chars';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email.trim())) return 'auth/invalid-email';
+    if (this.email.length > 100) return 'auth/email-too-long';
+
+    if (this.password.trim().length < 6) return 'auth/weak-password';
+    if (this.password.length > 50) return 'auth/password-too-long';
+
+    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+    if (!strongPasswordRegex.test(this.password)) return 'auth/password-not-strong';
+
+    if (this.password !== this.confirmPassword) return 'auth/password-mismatch';
+
+    return null;
   }
 
   goToLogin() {
     this.router.navigate(['/login']);
   }
-  showPassword: boolean = false;
-  showConfirmPassword: boolean = false;
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -63,5 +85,4 @@ export class RegisterPage {
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
-
 }

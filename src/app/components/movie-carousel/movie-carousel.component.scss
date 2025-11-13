@@ -1,0 +1,126 @@
+.movie-carousel {
+  $neon-gold: #ffb703;
+  $neon-red: #ff0054;
+  $neon-blue: #00f5ff;
+  $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
+
+  padding: 40px;
+  margin-top: 24px;
+
+  h2 {
+    color: $neon-gold;
+    margin-bottom: 20px;
+    text-shadow: $neon-shadow;
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .carrusel {
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 12px;
+
+    .btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: $neon-gold;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        color: $neon-blue;
+        text-shadow: 0 0 12px $neon-blue;
+      }
+    }
+
+    .contenedor-carrusel {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      gap: 20px;
+      padding: 20px 10px;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+
+      scrollbar-width: thin;
+      scrollbar-color: #555 #1e1e1e;
+
+      .movie {
+        background-color: #1e1e1e;
+        border-radius: 12px;
+        overflow: hidden;
+        min-width: 200px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+        transition: 0.3s;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 25px rgba(255, 183, 3, 0.5);
+        }
+
+        img {
+          width: 100%;
+          height: 280px;
+          object-fit: cover;
+          filter: brightness(0.9);
+          transition: 0.3s;
+
+          &:hover {
+            filter: brightness(1.1);
+          }
+        }
+
+        h3 {
+          color: $neon-gold;
+          margin-top: 10px;
+          font-size: 18px;
+        }
+
+        p.category {
+          color: #ccc;
+          font-size: 14px;
+          margin-bottom: 10px;
+        }
+
+        .admin-actions {
+          display: flex;
+          justify-content: center;
+          gap: 6px;
+          margin-bottom: 6px;
+
+          .edit-btn {
+            background: $neon-blue;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+
+          .delete-btn {
+            background: $neon-red;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+    }
+  }
+}

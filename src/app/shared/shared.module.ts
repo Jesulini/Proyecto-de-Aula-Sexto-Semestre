@@ -5,20 +5,26 @@ import { RouterModule } from '@angular/router';
 
 import { HeaderComponent } from 'src/app/components/header-component/header.component';
 import { SidebarMenuComponent } from 'src/app/components/sidebar-menu/sidebar-menu.component';
+import { MessageBoxComponent } from 'src/app/components/message-box/message-box.component';
+import { MovieCarouselComponent } from 'src/app/components/movie-carousel/movie-carousel.component';
 
 @NgModule({
   declarations: [
     HeaderComponent,
-    SidebarMenuComponent
+    SidebarMenuComponent,
+    MessageBoxComponent,
+    MovieCarouselComponent
   ],
   imports: [
     CommonModule,
     IonicModule,
-    RouterModule   
+    RouterModule
   ],
   exports: [
     HeaderComponent,
-    SidebarMenuComponent
+    SidebarMenuComponent,
+    MessageBoxComponent,
+    MovieCarouselComponent
   ]
 })
 export class SharedModule {}

@@ -1,24 +1,21 @@
 <ion-content class="custom-home">
 
+  <app-message-box></app-message-box>
+
   <app-header [pageTitle]="'Inicio'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
   <app-sidebar-menu #menu [esAdmin]="isAdmin"></app-sidebar-menu>
 
   <div class="home-container" [class.menu-open]="menu.menuAbierto">
 
-    <!-- Slider automático -->
     <section class="slider">
-      <div
-        class="slide"
-        *ngFor="let movie of featuredList; let i = index"
-        [class.active]="i === sliderIndex"
-        [style.backgroundImage]="'url(' + movie.imageUrl + ')'"
-      >
+      <div class="slide" *ngFor="let movie of featuredList; let i = index" [class.active]="i === sliderIndex"
+        [style.backgroundImage]="'url(' + movie.imageUrl + ')'">
         <div class="content">
           <h2>{{ movie.title }}</h2>
           <p *ngIf="movie.description">{{ movie.description }}</p>
 
           <div class="buttons">
-            <button class="boton" (click)="abrirModalReproducirActual()">
+            <button class="boton" (click)="abrirModalReproducir(featuredList[sliderIndex])">
               <i class="fa-solid fa-circle-play"></i> Reproducir
             </button>
 
@@ -33,46 +30,38 @@
       <div class="arrow right" (click)="nextSlide()">&#10095;</div>
 
       <div class="indicators">
-        <span
-          class="dot"
-          *ngFor="let movie of featuredList; let i = index"
-          [class.active]="i === sliderIndex"
-          (click)="showSlide(i)"
-        ></span>
+        <span class="dot" *ngFor="let movie of featuredList; let i = index" [class.active]="i === sliderIndex"
+          (click)="showSlide(i)"></span>
       </div>
     </section>
 
-    <!-- Carrusel manual -->
-    <section class="content-section">
-      <h2>Destacadas</h2>
-      <div class="carrusel">
-        <button class="btn prev" (click)="prevCarrusel()">&#10094;</button>
+    <!-- Carrusel Destacadas -->
+    <app-movie-carousel [title]="'Destacadas'" [movies]="featuredList" [isAdmin]="isAdmin" (select)="goToMovie($event)"
+      (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+    </app-movie-carousel>
 
-        <div class="contenedor-carrusel" #carruselContainer>
-          <div class="movie" *ngFor="let movie of featuredList">
-            <img [src]="movie.imageUrl" alt="{{ movie.title }}" (click)="goToMovie(movie.id)" />
-            <h3>{{ movie.title }}</h3>
-            <p *ngIf="movie.category" class="category">{{ movie.category }}</p>
+    <!-- Carrusel Acción -->
+    <app-movie-carousel [title]="'Acción'" [movies]="moviesAccion" [isAdmin]="isAdmin" (select)="goToMovie($event)"
+      (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+    </app-movie-carousel>
 
-            <div *ngIf="isAdmin" class="admin-actions">
-              <button class="edit-btn" (click)="abrirModalEditar(movie)">Editar</button>
-              <button class="delete-btn" (click)="deleteMovie(movie)">Eliminar</button>
-            </div>
-          </div>
-        </div>
+    <!-- Carrusel Romance -->
+    <app-movie-carousel [title]="'Romance'" [movies]="moviesRomance" [isAdmin]="isAdmin" (select)="goToMovie($event)"
+      (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+    </app-movie-carousel>
 
-        <button class="btn next" (click)="nextCarrusel()">&#10095;</button>
-      </div>
-    </section>
+    <!-- Carrusel Terror -->
+    <app-movie-carousel [title]="'Terror'" [movies]="moviesTerror" [isAdmin]="isAdmin" (select)="goToMovie($event)"
+      (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+    </app-movie-carousel>
 
-    <!-- Panel de administración -->
+
     <section *ngIf="isAdmin" class="admin-panel">
       <h2>Panel de Administración</h2>
       <p>Desde aquí puedes agregar nuevas películas a la cartelera.</p>
       <button class="admin-add" (click)="abrirModalAgregar()">Agregar Película</button>
     </section>
 
-    <!-- Modal agregar/editar -->
     <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
       <ng-template>
         <ion-header>
@@ -124,7 +113,6 @@
       </ng-template>
     </ion-modal>
 
-    <!-- Modal reproducir -->
     <ion-modal [isOpen]="modalReproducirAbierto" (didDismiss)="cerrarModalReproducir()">
       <ng-template>
         <ion-header>
@@ -138,24 +126,16 @@
 
         <ion-content class="ion-padding">
           <div class="video-container">
-            <ng-container *ngIf="esYoutubeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl); else videoLocal">
-              <iframe
-                width="100%"
-                height="315"
-                [src]="getSafeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl)"
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
+            <ng-container
+              *ngIf="esYoutubeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl); else videoLocal">
+              <iframe width="100%" height="315"
+                [src]="getSafeUrl(peliculaReproducir?.trailerUrl || peliculaReproducir?.movieUrl)" frameborder="0"
+                allowfullscreen></iframe>
             </ng-container>
 
             <ng-template #videoLocal>
-              <video
-                *ngIf="peliculaReproducir?.movieUrl"
-                [src]="peliculaReproducir?.movieUrl"
-                controls
-                autoplay
-                width="100%"
-              ></video>
+              <video *ngIf="peliculaReproducir?.movieUrl" [src]="peliculaReproducir?.movieUrl" controls autoplay
+                width="100%"></video>
             </ng-template>
           </div>
         </ion-content>
