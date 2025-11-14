@@ -1,4 +1,6 @@
 <aside class="sidebar" [class.active]="menuAbierto">
+  <app-loading *ngIf="isLoading" message="Cerrando sesión..." />
+
   <div class="sidebar-header">
     <h3>Menú</h3>
     <button class="close-btn" (click)="toggleMenu()">✕</button>

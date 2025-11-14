@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth';
-import { LoadingController } from '@ionic/angular';
 import { MessageService } from 'src/app/services/message.service';
 import { mapFirebaseError } from 'src/app/utils/error-utils';
 
@@ -18,11 +17,11 @@ export class RegisterPage {
   confirmPassword: string = '';
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loadingCtrl: LoadingController,
     private messageService: MessageService
   ) {}
 
@@ -33,21 +32,19 @@ export class RegisterPage {
       return;
     }
 
-    const loading = await this.loadingCtrl.create({ message: 'Creando cuenta...' });
-    await loading.present();
+    this.isLoading = true;
 
     try {
       await this.authService.register(this.nombre.trim(), this.email.trim().toLowerCase(), this.password);
-      await loading.dismiss();
+      this.isLoading = false;
       this.messageService.showMessage('Cuenta creada exitosamente', 'success');
       this.router.navigate(['/login']);
     } catch (err: any) {
-      await loading.dismiss();
+      this.isLoading = false;
       const msg = mapFirebaseError(err);
       this.messageService.showMessage(msg, 'error');
     }
   }
-
 
   validateForm(): string | null {
     if (!this.nombre.trim() || !this.email.trim() || !this.password || !this.confirmPassword) {
@@ -65,9 +62,6 @@ export class RegisterPage {
 
     if (this.password.trim().length < 6) return 'auth/weak-password';
     if (this.password.length > 50) return 'auth/password-too-long';
-
-    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
-    if (!strongPasswordRegex.test(this.password)) return 'auth/password-not-strong';
 
     if (this.password !== this.confirmPassword) return 'auth/password-mismatch';
 

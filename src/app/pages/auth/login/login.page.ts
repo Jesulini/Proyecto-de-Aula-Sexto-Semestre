@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth';
-import { LoadingController } from '@ionic/angular';
 import { MessageService } from 'src/app/services/message.service';
 import { mapFirebaseError } from 'src/app/utils/error-utils';
 
@@ -15,11 +14,11 @@ export class LoginPage {
   email: string = '';
   password: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loadingCtrl: LoadingController,
     private messageService: MessageService
   ) {}
 
@@ -30,24 +29,21 @@ export class LoginPage {
       return;
     }
 
-    const loading = await this.loadingCtrl.create({ message: 'Iniciando sesión...' });
-    await loading.present();
+    this.isLoading = true;
 
     try {
       await this.authService.login(this.email.trim().toLowerCase(), this.password);
-      await loading.dismiss();
+      this.isLoading = false;
 
       this.messageService.showMessage('Inicio de sesión exitoso', 'success');
-
       this.router.navigate(['/home']);
     } catch (err: any) {
-      await loading.dismiss();
+      this.isLoading = false;
       const msg = mapFirebaseError(err);
       this.messageService.showMessage(msg, 'error');
     }
   }
 
- 
   validateForm(): string | null {
     if (!this.email || this.email.trim().length === 0 || !this.password || this.password.trim().length === 0) {
       return 'auth/missing-fields';

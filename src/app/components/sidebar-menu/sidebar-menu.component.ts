@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/services/auth/auth';
 export class SidebarMenuComponent {
   @Input() esAdmin = false;
   menuAbierto = false;
+  isLoading: boolean = false;
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -18,8 +19,15 @@ export class SidebarMenuComponent {
     this.menuAbierto = !this.menuAbierto;
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  async logout() {
+    this.isLoading = true;
+    try {
+      await this.authService.logout();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error al cerrar sesión', error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 }

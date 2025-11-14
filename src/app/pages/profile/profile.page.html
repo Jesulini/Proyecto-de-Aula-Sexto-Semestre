@@ -1,5 +1,7 @@
 <ion-content class="custom-profile">
 
+  <app-loading *ngIf="isLoading" message="Guardando cambios..." />
+
   <app-header [pageTitle]="'Mi Perfil'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
   <app-sidebar-menu #menu></app-sidebar-menu>
 
@@ -42,7 +44,7 @@
             [photoURL]="photoURL"
             [newPhotoURL]="newPhotoURL"
             [previewUrl]="previewUrl"
-            (fileSelected)="selectedFile = $event"
+            (fileSelected)="selectedFileSetter = $event"
             (previewGenerated)="previewUrl = $event"
             (revert)="revertImage()"
             (error)="handleUploadError($event)"
@@ -51,24 +53,25 @@
 
           <ion-item>
             <ion-label position="floating">Nombre de usuario</ion-label>
-            <ion-input [(ngModel)]="displayName"></ion-input>
+            <ion-input [ngModel]="displayName" (ngModelChange)="displayNameSetter = $event"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="floating">Correo electrónico</ion-label>
-            <ion-input type="email" [(ngModel)]="email"></ion-input>
+            <ion-input type="email" [ngModel]="email" (ngModelChange)="emailSetter = $event"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="floating">URL de foto de perfil</ion-label>
-            <ion-input [(ngModel)]="newPhotoURL"></ion-input>
+            <ion-input [ngModel]="newPhotoURL" (ngModelChange)="newPhotoURL = $event"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="floating">Nueva contraseña</ion-label>
             <ion-input
               type="password"
-              [(ngModel)]="newPassword"
+              [ngModel]="newPassword"
+              (ngModelChange)="newPasswordSetter = $event"
               placeholder="Deja en blanco si no deseas cambiarla">
             </ion-input>
           </ion-item>

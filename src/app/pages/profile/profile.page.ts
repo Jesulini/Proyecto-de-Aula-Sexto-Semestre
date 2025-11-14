@@ -30,11 +30,14 @@ export class ProfilePage implements OnInit {
   previewUrl: string | null = null;
   canSaveChanges = false;
 
+  isLoading: boolean = false;
+
   ngOnInit() {
     this.loadUserData();
   }
 
   loadUserData() {
+    this.isLoading = true;
     this.user = this.auth.currentUser;
     if (this.user) {
       this.displayName = this.user.displayName || '';
@@ -42,6 +45,7 @@ export class ProfilePage implements OnInit {
       this.photoURL = this.user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg';
     }
     this.updateCanSaveChanges();
+    this.isLoading = false;
   }
 
   updateCanSaveChanges() {
@@ -66,45 +70,49 @@ export class ProfilePage implements OnInit {
       return;
     }
 
-    // ===== Validaciones =====
+    this.isLoading = true;
+
     if (!this.displayName.trim() || this.displayName.length < 3) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/invalid-display-name' }), 'error');
+      this.isLoading = false;
       return;
     }
     if (this.displayName.length > 30) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/display-name-too-long' }), 'error');
+      this.isLoading = false;
       return;
     }
     if (!/^[a-zA-Z0-9\s]+$/.test(this.displayName)) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/display-name-invalid-chars' }), 'error');
+      this.isLoading = false;
       return;
     }
 
     if (!this.email.trim()) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-email' }), 'error');
+      this.isLoading = false;
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/invalid-email' }), 'error');
+      this.isLoading = false;
       return;
     }
     if (this.email.length > 100) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/email-too-long' }), 'error');
+      this.isLoading = false;
       return;
     }
 
     if (this.newPassword.trim() !== '') {
       if (this.newPassword.length < 6) {
         this.messageService.showMessage(mapFirebaseError({ code: 'auth/weak-password' }), 'error');
+        this.isLoading = false;
         return;
       }
       if (this.newPassword.length > 50) {
         this.messageService.showMessage(mapFirebaseError({ code: 'auth/password-too-long' }), 'error');
-        return;
-      }
-      const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/;
-      if (!strongRegex.test(this.newPassword)) {
-        this.messageService.showMessage(mapFirebaseError({ code: 'auth/password-not-strong' }), 'error');
+        this.isLoading = false;
         return;
       }
     }
@@ -119,6 +127,7 @@ export class ProfilePage implements OnInit {
         this.messageService.showMessage('Imagen subida correctamente', 'success');
       } catch (err: any) {
         this.messageService.showMessage(mapFirebaseError(err), 'error');
+        this.isLoading = false;
         return;
       }
     }
@@ -144,6 +153,8 @@ export class ProfilePage implements OnInit {
       this.messageService.showMessage('Perfil actualizado correctamente', 'success');
     } catch (err: any) {
       this.messageService.showMessage(mapFirebaseError(err), 'error');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -187,11 +198,13 @@ export class ProfilePage implements OnInit {
 
   handleUploadError(msg: string) {
     this.messageService.showMessage(msg, 'error');
+    this.isLoading = false;
   }
 
   handleUploadSuccess(msg: string) {
     this.messageService.showMessage(msg, 'success');
     this.updateCanSaveChanges();
+    this.isLoading = false;
   }
 
   set selectedFileSetter(file: File | null) {

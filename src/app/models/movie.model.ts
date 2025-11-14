@@ -6,4 +6,5 @@ export interface Movie {
   trailerUrl?: string;
   category?: string;
   description?: string;
+  isLoading?: boolean;
 }

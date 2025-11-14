@@ -1,5 +1,7 @@
 <ion-content class="ion-padding custom-register">
 
+  <app-loading *ngIf="isLoading" message="Creando cuenta..." />
+
   <app-message-box></app-message-box>
 
   <div class="register-container">

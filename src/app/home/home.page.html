@@ -38,23 +38,58 @@
     <!-- Carrusel Destacadas -->
     <app-movie-carousel [title]="'Destacadas'" [movies]="featuredList" [isAdmin]="isAdmin" (select)="goToMovie($event)"
       (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+      <ng-template let-movie>
+        <ng-container *ngIf="!movie.isLoading; else loadingMovie">
+          <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+          <h3>{{ movie.title }}</h3>
+        </ng-container>
+        <ng-template #loadingMovie>
+          <app-movie-loading message="Cargando película..." />
+        </ng-template>
+      </ng-template>
     </app-movie-carousel>
 
     <!-- Carrusel Acción -->
     <app-movie-carousel [title]="'Acción'" [movies]="moviesAccion" [isAdmin]="isAdmin" (select)="goToMovie($event)"
       (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+      <ng-template let-movie>
+        <ng-container *ngIf="!movie.isLoading; else loadingMovieAccion">
+          <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+          <h3>{{ movie.title }}</h3>
+        </ng-container>
+        <ng-template #loadingMovieAccion>
+          <app-movie-loading message="Cargando película..." />
+        </ng-template>
+      </ng-template>
     </app-movie-carousel>
 
     <!-- Carrusel Romance -->
     <app-movie-carousel [title]="'Romance'" [movies]="moviesRomance" [isAdmin]="isAdmin" (select)="goToMovie($event)"
       (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+      <ng-template let-movie>
+        <ng-container *ngIf="!movie.isLoading; else loadingMovieRomance">
+          <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+          <h3>{{ movie.title }}</h3>
+        </ng-container>
+        <ng-template #loadingMovieRomance>
+          <app-movie-loading message="Cargando película..." />
+        </ng-template>
+      </ng-template>
     </app-movie-carousel>
 
     <!-- Carrusel Terror -->
     <app-movie-carousel [title]="'Terror'" [movies]="moviesTerror" [isAdmin]="isAdmin" (select)="goToMovie($event)"
       (edit)="abrirModalEditar($event)" (delete)="deleteMovie($event)">
+      <ng-template let-movie>
+        <ng-container *ngIf="!movie.isLoading; else loadingMovieTerror">
+          <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+          <h3>{{ movie.title }}</h3>
+        </ng-container>
+        <ng-template #loadingMovieTerror>
+          <app-movie-loading message="Cargando película..." />
+        </ng-template>
+      </ng-template>
     </app-movie-carousel>
-
 
     <section *ngIf="isAdmin" class="admin-panel">
       <h2>Panel de Administración</h2>

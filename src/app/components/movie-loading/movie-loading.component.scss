@@ -1,0 +1,50 @@
+.movie-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: #ffd700;
+  font-family: 'Poppins', sans-serif;
+}
+
+.spinner {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 0.8rem;
+}
+
+.reel {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.reel:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.reel:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.loading-message {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}

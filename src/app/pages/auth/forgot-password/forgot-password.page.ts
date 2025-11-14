@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth/auth';
 import { MessageService } from 'src/app/services/message.service';
 import { mapFirebaseError } from 'src/app/utils/error-utils';
@@ -13,11 +12,11 @@ import { mapFirebaseError } from 'src/app/utils/error-utils';
 })
 export class ForgotPasswordPage {
   email: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loadingCtrl: LoadingController,
     private messageService: MessageService
   ) {}
 
@@ -28,26 +27,22 @@ export class ForgotPasswordPage {
       return;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Enviando enlace de recuperación...',
-    });
-    await loading.present();
+    this.isLoading = true;
 
     try {
       await this.authService.resetPassword(this.email.trim().toLowerCase());
-      await loading.dismiss();
+      this.isLoading = false;
       this.messageService.showMessage(
         'Te hemos enviado un correo para restablecer tu contraseña.',
         'success'
       );
       this.router.navigate(['/login']);
     } catch (err: any) {
-      await loading.dismiss();
+      this.isLoading = false;
       const msg = mapFirebaseError(err);
       this.messageService.showMessage(msg, 'error');
     }
   }
-
 
   validateForm(): string | null {
     if (!this.email || this.email.trim().length === 0) return 'auth/missing-email';

@@ -20,7 +20,6 @@ import { mapFirebaseError } from 'src/app/utils/error-utils';
   standalone: false
 })
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
-  //Aqui tienes que declarar una lista para la categoria
   featuredList: Movie[] = [];
   moviesAccion: Movie[] = [];
   moviesRomance: Movie[] = [];
@@ -40,7 +39,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     category: '',
     description: '',
     trailerUrl: '',
-    movieUrl: ''
+    movieUrl: '',
+    isLoading: false
   };
 
   modalReproducirAbierto = false;
@@ -77,12 +77,15 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data() as { items: Movie[] };
-        const allMovies = data.items || [];
-        //Aqui tambien filtrar por categoria para añadir la lista correspondiente
-        this.featuredList = allMovies;
-        this.moviesAccion = allMovies.filter(m => m.category === 'Acción');
-        this.moviesRomance = allMovies.filter(m => m.category === 'Romance');
-        this.moviesTerror = allMovies.filter(m => m.category === 'Terror');
+        const allMovies = (data.items || []).map(m => ({ ...m, isLoading: true }));
+
+        // Simulación de carga: desactivar loading después de un pequeño delay
+        setTimeout(() => {
+          this.featuredList = allMovies.map(m => ({ ...m, isLoading: false }));
+          this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
+          this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
+          this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
+        }, 800);
       }
     } catch (error: any) {
       const msg = mapFirebaseError(error);
@@ -90,7 +93,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // Slider automático
   nextSlide(): void {
     if (this.featuredList.length === 0) return;
     this.sliderIndex = (this.sliderIndex + 1) % this.featuredList.length;
@@ -154,7 +156,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       category: '',
       description: '',
       trailerUrl: '',
-      movieUrl: ''
+      movieUrl: '',
+      isLoading: false
     };
     this.modalAbierto = true;
   }
@@ -194,11 +197,16 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           category,
           description,
           trailerUrl,
-          movieUrl
+          movieUrl,
+          isLoading: true
         };
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
         this.messageService.showMessage('Película agregada.', 'success');
+
+        setTimeout(() => {
+          nuevaPeli.isLoading = false;
+        }, 800);
       }
       this.cerrarModal();
     } catch (error: any) {

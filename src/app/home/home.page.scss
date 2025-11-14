@@ -134,6 +134,47 @@
     }
   }
 
+  /* ===== MOVIE CARD ===== */
+  .movie-card {
+    position: relative;
+    width: 180px;
+    height: 260px;
+    margin: 0 8px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #222;
+    box-shadow: 0 0 12px rgba(255, 183, 3, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s ease;
+    }
+
+    h3 {
+      font-size: 0.9rem;
+      color: $neon-gold;
+      text-align: center;
+      margin: 8px 0;
+      text-shadow: $neon-shadow;
+    }
+
+    /* Loading overlay */
+    app-movie-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(20, 20, 20, 0.85);
+    }
+  }
+
   /* ===== PANEL ADMIN ===== */
   .admin-panel {
     padding: 24px 40px;

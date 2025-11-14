@@ -1,5 +1,7 @@
 <ion-content class="ion-padding custom-login">
 
+  <app-loading *ngIf="isLoading" message="Iniciando sesión..." />
+
   <app-message-box></app-message-box>
 
   <div class="login-container">
@@ -34,7 +36,6 @@
         </ion-button>
       </ion-item>
 
-      <!-- Ajuste: el botón depende de validateForm() -->
       <ion-button 
         expand="block" 
         type="submit" 
