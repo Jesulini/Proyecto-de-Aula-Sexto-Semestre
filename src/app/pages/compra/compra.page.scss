@@ -1,0 +1,202 @@
+.custom-compra {
+  --background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.compra-inner {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.compra-wrapper {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.compra-container {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+  animation: fadeIn 0.8s ease;
+
+  h2 {
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+.compra-card {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+  color: #fff;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+
+  ion-card-title {
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  ion-card-content {
+    p {
+      margin-bottom: 1rem;
+      color: #ddd;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.gold-btn {
+  --background: linear-gradient(90deg, #ffd700, #c5a100);
+  --color: #000;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  transition: all 0.2s ease;
+
+  &:hover {
+    --background: linear-gradient(90deg, #ffe766, #ffd700);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.subtle-btn {
+  --background: #111;
+  --color: #ffd700;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    --background: #222;
+  }
+}
+
+.selected-btn {
+  --background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+  --color: #ffd700;
+  font-weight: 700;
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+  transition: all 0.2s ease;
+
+  &:hover {
+    --background: linear-gradient(90deg, #2a2a2a, #3a3a3a);
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.delete-btn {
+  --background: linear-gradient(90deg, #3a1f1f, #2a1a1a);
+  --color: #ffd700;
+  font-weight: 700;
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+  margin-top: 1.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    --background: linear-gradient(90deg, #4a2a2a, #3a1f1f);
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.request-form {
+  margin-top: 1rem;
+  background: rgba(25, 25, 25, 0.85);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+
+  ion-item {
+    --background: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(255, 215, 0, 0.3);
+    --color: #fff;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+
+  ion-label {
+    color: #ffd700;
+    font-weight: 500;
+  }
+
+  ion-input {
+    color: #fff;
+  }
+
+  .cancel-btn {
+    color: #ccc;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #ffd700;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .compra-inner {
+    padding: 1rem;
+  }
+
+  .compra-wrapper {
+    max-width: 360px;
+  }
+
+  .compra-container {
+    padding: 1.25rem;
+    border-radius: 14px;
+  }
+
+  ion-button {
+    font-size: 14px;
+    height: 44px;
+  }
+
+  ion-card-title {
+    font-size: 1rem;
+  }
+}

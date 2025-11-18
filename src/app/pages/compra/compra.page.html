@@ -1,13 +1,140 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>compra</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="custom-compra">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">compra</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <app-loading *ngIf="isLoading" message="Procesando compra..."></app-loading>
+
+  <app-header [pageTitle]="'Compra'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+  <app-sidebar-menu #menu></app-sidebar-menu>
+
+  <app-message-box></app-message-box>
+
+  <div class="compra-inner">
+    <div class="compra-wrapper">
+      <div class="compra-container">
+        <h2>Opciones de Suscripción</h2>
+        <p>Elige cómo quieres disfrutar las películas</p>
+
+        <ion-card class="compra-card">
+          <ion-card-header>
+            <ion-card-title>Cuenta Gratis</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>✔ Acceso a películas gratis con anuncios</p>
+            <p>✔ Catálogo limitado</p>
+            <p>✔ Sin descargas offline</p>
+            <ion-button expand="block" class="subtle-btn" 
+                        *ngIf="currentPlan !== 'gratis'" 
+                        (click)="selectOption('gratis')">
+              Seleccionar
+            </ion-button>
+            <ion-button expand="block" class="selected-btn" *ngIf="currentPlan === 'gratis'" disabled>
+              Seleccionado
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="compra-card">
+          <ion-card-header>
+            <ion-card-title>Suscripción Premium</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>✔ Ver películas por adelantado</p>
+            <p>✔ Sin anuncios</p>
+            <p>✔ Descargas offline</p>
+            <p>✔ Acceso a estrenos exclusivos</p>
+            <ion-button expand="block" class="gold-btn" 
+                        *ngIf="currentPlan !== 'premium'" 
+                        (click)="selectOption('premium')">
+              Comprar $39,900 COP / mes
+            </ion-button>
+            <ion-button expand="block" class="selected-btn" *ngIf="currentPlan === 'premium'" disabled>
+              Seleccionado
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="compra-card">
+          <ion-card-header>
+            <ion-card-title>Suscripción Familiar</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>✔ Hasta 4 perfiles</p>
+            <p>✔ Control parental</p>
+            <p>✔ Todo lo de Premium incluido</p>
+            <ion-button expand="block" class="gold-btn" 
+                        *ngIf="currentPlan !== 'familiar'" 
+                        (click)="selectOption('familiar')">
+              Comprar $69,900 COP / mes
+            </ion-button>
+            <ion-button expand="block" class="selected-btn" *ngIf="currentPlan === 'familiar'" disabled>
+              Seleccionado
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="compra-card">
+          <ion-card-header>
+            <ion-card-title>Suscripción Estudiantes</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>✔ Precio especial para estudiantes</p>
+            <p>✔ Acceso completo al catálogo</p>
+            <p>✔ Sin anuncios</p>
+            <p>✔ Descargas offline</p>
+            <ion-button expand="block" class="gold-btn" 
+                        *ngIf="currentPlan !== 'estudiantes'" 
+                        (click)="selectOption('estudiantes')">
+              Comprar $19,900 COP / mes
+            </ion-button>
+            <ion-button expand="block" class="selected-btn" *ngIf="currentPlan === 'estudiantes'" disabled>
+              Seleccionado
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="compra-card">
+          <ion-card-header>
+            <ion-card-title>Solicitar Película</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>✔ Pide una película específica</p>
+            <p>✔ Disponible en tu cuenta en 48 horas</p>
+            <ion-button expand="block" class="gold-btn" (click)="selectOption('solicitud')">
+              Solicitar $12,000 COP
+            </ion-button>
+
+            <div *ngIf="showRequestForm" class="request-form">
+              <ion-item>
+                <ion-label position="floating">Nombre de la película</ion-label>
+                <ion-input [(ngModel)]="movieName"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Descripción</ion-label>
+                <ion-input [(ngModel)]="movieDescription"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Idioma</ion-label>
+                <ion-input [(ngModel)]="movieLanguage"></ion-input>
+              </ion-item>
+
+              <ion-button expand="block" class="gold-btn" (click)="enviarSolicitud()">
+                Enviar Solicitud
+              </ion-button>
+              <ion-button expand="block" fill="clear" class="cancel-btn" (click)="cancelarSolicitud()">
+                Cancelar
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="delete-subscription" *ngIf="currentPlan">
+          <ion-button expand="block" class="delete-btn" (click)="eliminarSuscripcion()">
+            Eliminar Suscripción Actual ({{ currentPlan | titlecase }})
+          </ion-button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </ion-content>
