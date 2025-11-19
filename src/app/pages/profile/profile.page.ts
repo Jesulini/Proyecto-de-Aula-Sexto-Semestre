@@ -184,8 +184,8 @@ export class ProfilePage implements OnInit {
     this.router.navigate(['/home']);
   }
 
-  goToSubscription() {
-    this.router.navigate(['/subscription']);
+  goToCompra() {
+    this.router.navigate(['/compra']);
   }
 
   goToPayments() {

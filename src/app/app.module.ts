@@ -9,8 +9,6 @@ import { AppComponent } from './app.component';
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-
-// 🔥 AÑADE ESTOS IMPORTS
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
 import { environment } from '../environments/environment';
@@ -25,10 +23,12 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     FormsModule,
 
-    // 🔥 Inicializa Firebase y servicios
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()), // <-- ESTE ES EL QUE TE FALTABA
+    provideFirestore(() => getFirestore()),
+
+    provideFirebaseApp(() => initializeApp(environment.firebaseSubscriptionsConfig, "subscriptionsApp")),
+    provideFirestore(() => getFirestore(initializeApp(environment.firebaseSubscriptionsConfig, "subscriptionsApp"))),
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

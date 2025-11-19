@@ -13,6 +13,7 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
+import { SubscriptionService, Subscription } from './subscription.service';
 
 export interface User {
   uid: string;
@@ -28,10 +29,12 @@ export class AuthService {
   private usuarioActualSubject = new BehaviorSubject<User | null>(null);
   private auth: Auth;
   private firestore: Firestore;
+  private subscriptionService: SubscriptionService;
 
-  constructor(auth: Auth, firestore: Firestore) {
+  constructor(auth: Auth, firestore: Firestore, subscriptionService: SubscriptionService) {
     this.auth = auth;
     this.firestore = firestore;
+    this.subscriptionService = subscriptionService;
 
     onAuthStateChanged(this.auth, async (user: FirebaseUser | null) => {
       if (user) {
@@ -46,6 +49,17 @@ export class AuthService {
         };
         this.usuarioActualSubject.next(usuario);
         localStorage.setItem('usuario', JSON.stringify(usuario));
+
+        const subs = await this.subscriptionService.getSubscription(user.uid);
+        if (!subs) {
+          await this.subscriptionService.saveSubscription(user.uid, {
+            email: usuario.email,
+            subscriptionType: 'gratis',
+            subscriptionDate: new Date(),
+            status: 'activo',
+            priceCOP: 0
+          });
+        }
       } else {
         this.usuarioActualSubject.next(null);
         localStorage.removeItem('usuario');
@@ -78,6 +92,15 @@ export class AuthService {
     const docRef = doc(this.firestore, `usuarios/${cred.user.uid}`);
     await setDoc(docRef, { nombre, email, foto: '' });
     localStorage.setItem('usuario', JSON.stringify(usuario));
+
+    await this.subscriptionService.saveSubscription(usuario.uid, {
+      email: usuario.email,
+      subscriptionType: 'gratis',
+      subscriptionDate: new Date(),
+      status: 'activo',
+      priceCOP: 0
+    });
+
     return cred;
   }
 
@@ -95,6 +118,18 @@ export class AuthService {
     };
     this.usuarioActualSubject.next(usuario);
     localStorage.setItem('usuario', JSON.stringify(usuario));
+
+    const subs = await this.subscriptionService.getSubscription(usuario.uid);
+    if (!subs) {
+      await this.subscriptionService.saveSubscription(usuario.uid, {
+        email: usuario.email,
+        subscriptionType: 'gratis',
+        subscriptionDate: new Date(),
+        status: 'activo',
+        priceCOP: 0
+      });
+    }
+
     return cred;
   }
 
@@ -121,5 +156,17 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  async updateSubscription(subscription: Subscription) {
+    const user = this.getUser();
+    if (!user) throw new Error('No hay usuario autenticado');
+    await this.subscriptionService.saveSubscription(user.uid, subscription);
+  }
+
+  async deleteSubscription() {
+    const user = this.getUser();
+    if (!user) throw new Error('No hay usuario autenticado');
+    await this.subscriptionService.deleteSubscription(user.uid);
   }
 }

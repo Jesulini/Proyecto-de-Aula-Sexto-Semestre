@@ -22,7 +22,7 @@
           Editar perfil
         </ion-button>
 
-        <ion-button expand="block" class="subtle-btn" (click)="goToSubscription()">
+        <ion-button expand="block" class="subtle-btn" (click)="goToCompra()">
           <ion-icon name="star-outline" slot="start"></ion-icon>
           Suscripción
         </ion-button>
@@ -40,15 +40,9 @@
 
       <ng-template #editForm>
         <div class="edit-form">
-          <app-avatar-upload
-            [photoURL]="photoURL"
-            [newPhotoURL]="newPhotoURL"
-            [previewUrl]="previewUrl"
-            (fileSelected)="selectedFileSetter = $event"
-            (previewGenerated)="previewUrl = $event"
-            (revert)="revertImage()"
-            (error)="handleUploadError($event)"
-            (success)="handleUploadSuccess($event)">
+          <app-avatar-upload [photoURL]="photoURL" [newPhotoURL]="newPhotoURL" [previewUrl]="previewUrl"
+            (fileSelected)="selectedFileSetter = $event" (previewGenerated)="previewUrl = $event"
+            (revert)="revertImage()" (error)="handleUploadError($event)" (success)="handleUploadSuccess($event)">
           </app-avatar-upload>
 
           <ion-item>
@@ -68,10 +62,7 @@
 
           <ion-item>
             <ion-label position="floating">Nueva contraseña</ion-label>
-            <ion-input
-              type="password"
-              [ngModel]="newPassword"
-              (ngModelChange)="newPasswordSetter = $event"
+            <ion-input type="password" [ngModel]="newPassword" (ngModelChange)="newPasswordSetter = $event"
               placeholder="Deja en blanco si no deseas cambiarla">
             </ion-input>
           </ion-item>
