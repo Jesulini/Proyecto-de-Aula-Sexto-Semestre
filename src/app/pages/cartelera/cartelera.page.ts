@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService } from 'src/app/services/auth/auth';
-import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-cartelera',
@@ -30,7 +30,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
     category: '',
     description: '',
     trailerUrl: '',
-    movieUrl: ''
+    movieUrl: '',
+    AgeRating: '',
+    ParaTodosOAdultos: '',
+    PegiRating: ''
   };
 
   constructor(
@@ -43,6 +46,7 @@ export class CarteleraPage implements OnInit, OnDestroy {
   ngOnInit() {
     const user = this.authService.getUsuarioActual();
     const email = user?.email?.trim().toLowerCase() || '';
+
     this.esAdmin = email === 'jesulini14@gmail.com';
     this.cargarPeliculas();
   }
@@ -51,6 +55,7 @@ export class CarteleraPage implements OnInit, OnDestroy {
     try {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
         const data = docSnap.data() as { items: Movie[] };
         this.peliculas = data.items || [];
@@ -85,7 +90,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
       category: '',
       description: '',
       trailerUrl: '',
-      movieUrl: ''
+      movieUrl: '',
+      AgeRating: '',
+      ParaTodosOAdultos: '',
+      PegiRating: ''
     };
     this.modalAbierto = true;
   }
@@ -101,7 +109,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
   }
 
   async guardarPelicula() {
-    const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
+    const {
+      title, imageUrl, category, description, trailerUrl,
+      movieUrl, AgeRating, ParaTodosOAdultos, PegiRating, id
+    } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
       alert('Todos los campos obligatorios deben estar completos.');
@@ -113,8 +124,22 @@ export class CarteleraPage implements OnInit, OnDestroy {
     try {
       if (this.editando && id) {
         this.peliculas = this.peliculas.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
+          p.id === id
+            ? {
+                ...p,
+                title,
+                imageUrl,
+                category,
+                description,
+                trailerUrl,
+                movieUrl,
+                AgeRating,
+                ParaTodosOAdultos,
+                PegiRating
+              }
+            : p
         );
+
         await updateDoc(docRef, { items: this.peliculas });
         alert('Película actualizada correctamente.');
       } else {
@@ -125,10 +150,15 @@ export class CarteleraPage implements OnInit, OnDestroy {
           category,
           description,
           trailerUrl,
-          movieUrl
+          movieUrl,
+          AgeRating,
+          ParaTodosOAdultos,
+          PegiRating
         };
-        await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
+
         this.peliculas.push(nuevaPeli);
+        await updateDoc(docRef, { items: this.peliculas });
+
         alert('Película agregada exitosamente.');
       }
 

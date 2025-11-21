@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService, User } from 'src/app/services/auth/auth';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MoviesService } from 'src/app/services/movies/movies.service';
 
@@ -27,6 +27,7 @@ export class DetallePeliculaPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private toastController: ToastController,
+    private alertController: AlertController,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -45,6 +46,13 @@ export class DetallePeliculaPage implements OnInit {
   private async loadPelicula(id: string) {
     try {
       this.pelicula = await this.moviesService.cargarMovieById(id);
+
+      // asegurar que los campos existan (por compatibilidad con datos viejos)
+      if (this.pelicula) {
+        (this.pelicula as any).ParaTodosOAdultos = (this.pelicula as any).ParaTodosOAdultos || '';
+        (this.pelicula as any).PegiRating = (this.pelicula as any).PegiRating || '';
+        (this.pelicula as any).AgeRating = (this.pelicula as any).AgeRating || '';
+      }
     } catch (e) {
       console.error('Error cargando película', e);
     }
@@ -94,10 +102,64 @@ export class DetallePeliculaPage implements OnInit {
     toast.present();
   }
 
-  abrirTrailer() { this.trailerAbierto = true; }
+  abrirTrailer() {
+    // si la película es para "Adultos", validamos acceso
+    if (this.pelicula?.ParaTodosOAdultos === 'Adultos') {
+      const usuario = this.authService.getUsuarioActual();
+      if (!usuario) {
+        this.showToast('Debes iniciar sesión para ver contenido para adultos.');
+        this.router.navigate(['/login']);
+        return;
+      }
+      this.presentConfirmAge('trailer');
+    } else {
+      this.trailerAbierto = true;
+    }
+  }
   cerrarTrailer() { this.trailerAbierto = false; }
 
   async abrirPelicula() {
+    // si la película es para "Adultos", validamos acceso
+    if (this.pelicula?.ParaTodosOAdultos === 'Adultos') {
+      const usuario = this.authService.getUsuarioActual();
+      if (!usuario) {
+        this.showToast('Debes iniciar sesión para ver contenido para adultos.');
+        this.router.navigate(['/login']);
+        return;
+      }
+      // pedimos confirmación de ser mayor de edad
+      this.presentConfirmAge('movie');
+      return;
+    }
+
+    await this.openMovieAndRegisterHistory();
+  }
+
+  cerrarPelicula() { this.peliculaAbierta = false; }
+
+  private async presentConfirmAge(kind: 'movie' | 'trailer') {
+    const alert = await this.alertController.create({
+      header: 'Verificación de edad',
+      message: 'Este contenido está clasificado como SOLO ADULTOS. ¿Confirmas que eres mayor de edad?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Confirmar',
+          handler: async () => {
+            if (kind === 'movie') {
+              await this.openMovieAndRegisterHistory();
+            } else {
+              this.trailerAbierto = true;
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async openMovieAndRegisterHistory() {
     this.peliculaAbierta = true;
     const usuario: User | null = this.authService.getUsuarioActual();
     if (usuario && this.pelicula) {
@@ -108,8 +170,6 @@ export class DetallePeliculaPage implements OnInit {
       }
     }
   }
-
-  cerrarPelicula() { this.peliculaAbierta = false; }
 
   esVideoArchivo(url?: string | null): boolean {
     if (!url) return false;
