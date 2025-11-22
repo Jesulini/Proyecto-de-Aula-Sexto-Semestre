@@ -6,9 +6,8 @@
     <aside class="categorias">
       <h3>Categorías</h3>
       <ul>
-        <li *ngFor="let categoria of categorias" 
-            (click)="filtrarPorCategoria(categoria)"
-            [class.active]="categoriaSeleccionada === categoria">
+        <li *ngFor="let categoria of categorias" (click)="filtrarPorCategoria(categoria)"
+          [class.active]="categoriaSeleccionada === categoria">
           {{ categoria }}
         </li>
       </ul>
@@ -27,18 +26,13 @@
         <div class="movie-card" *ngFor="let movie of peliculasFiltradas" (click)="verDetalle(movie.id)">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h4>{{ movie.title }}</h4>
-
-          <p class="cat">{{ movie.category }}</p>
-
-          <div class="ratings">
-            <span *ngIf="movie.ParaTodosOAdultos" class="badge">{{ movie.ParaTodosOAdultos }}</span>
-            <span *ngIf="movie.PegiRating" class="badge">{{ movie.PegiRating }}</span>
-            <span *ngIf="movie.AgeRating" class="badge">{{ movie.AgeRating }}</span>
-          </div>
+          <p>{{ movie.category }}</p>
 
           <div *ngIf="esAdmin" class="admin-controls">
-            <button (click)="abrirModalEditar(movie); $event.stopPropagation()" class="edit-btn">Editar</button>
-            <button (click)="confirmarEliminacion(movie.id); $event.stopPropagation()" class="delete-btn">Eliminar</button>
+            <button (click)="abrirModalEditar(movie); $event.stopPropagation()" class="edit-btn"
+              title="Editar">Editar</button>
+            <button (click)="confirmarEliminacion(movie.id); $event.stopPropagation()" class="delete-btn"
+              title="Eliminar">Eliminar</button>
           </div>
         </div>
       </div>
@@ -51,7 +45,6 @@
     </main>
   </div>
 
-  <!-- MODAL -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -64,7 +57,6 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-
         <ion-item>
           <ion-label position="floating">Título</ion-label>
           <ion-input [(ngModel)]="peliculaTemp.title" required></ion-input>
@@ -77,7 +69,7 @@
 
         <ion-item>
           <ion-label>Categoría</ion-label>
-          <ion-select [(ngModel)]="peliculaTemp.category" interface="alert">
+          <ion-select [(ngModel)]="peliculaTemp.category" interface="alert" placeholder="Seleccionar categoría">
             <ion-select-option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</ion-select-option>
           </ion-select>
         </ion-item>
@@ -89,39 +81,12 @@
 
         <ion-item>
           <ion-label position="floating">URL del tráiler</ion-label>
-          <ion-input [(ngModel)]="peliculaTemp.trailerUrl"></ion-input>
+          <ion-input [(ngModel)]="peliculaTemp.trailerUrl" placeholder="https://youtube.com/..."></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="floating">URL de la película</ion-label>
-          <ion-input [(ngModel)]="peliculaTemp.movieUrl"></ion-input>
-        </ion-item>
-
-        <!-- NUEVO: Para Todos o Adultos -->
-        <ion-item>
-          <ion-label>Público</ion-label>
-          <ion-select [(ngModel)]="peliculaTemp.ParaTodosOAdultos" interface="alert">
-            <ion-select-option value="Para Todos">Para Todos</ion-select-option>
-            <ion-select-option value="Adultos">Solo Adultos</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <!-- NUEVO: PEGI -->
-        <ion-item>
-          <ion-label>PEGI</ion-label>
-          <ion-select [(ngModel)]="peliculaTemp.PegiRating" interface="alert">
-            <ion-select-option value="PEGI 3">PEGI 3</ion-select-option>
-            <ion-select-option value="PEGI 7">PEGI 7</ion-select-option>
-            <ion-select-option value="PEGI 12">PEGI 12</ion-select-option>
-            <ion-select-option value="PEGI 16">PEGI 16</ion-select-option>
-            <ion-select-option value="PEGI 18">PEGI 18</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <!-- NUEVO: Age Rating -->
-        <ion-item>
-          <ion-label position="floating">Age Rating</ion-label>
-          <ion-input [(ngModel)]="peliculaTemp.AgeRating" placeholder="Ej: +13, PG-13"></ion-input>
+          <ion-input [(ngModel)]="peliculaTemp.movieUrl" placeholder="https://cdn.mi-sitio/..."></ion-input>
         </ion-item>
 
         <ion-button expand="block" color="warning" (click)="guardarPelicula()">

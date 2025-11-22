@@ -5,9 +5,6 @@ export interface Movie {
   movieUrl?: string;
   trailerUrl?: string;
   category?: string;
-  AgeRating?: string;
   description?: string;
-  ParaTodosOAdultos?: string;
-  PegiRating?: string;
   isLoading?: boolean;
 }
