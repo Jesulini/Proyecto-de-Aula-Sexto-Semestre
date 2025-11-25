@@ -14,6 +14,12 @@
           <h2>{{ movie.title }}</h2>
           <p *ngIf="movie.description">{{ movie.description }}</p>
 
+          <div class="ratings">
+            <span *ngIf="movie.ParaTodosOAdultos" class="badge">{{ movie.ParaTodosOAdultos }}</span>
+            <span *ngIf="movie.PegiRating" class="badge">{{ movie.PegiRating }}</span>
+            <span *ngIf="movie.AgeRating" class="badge">{{ movie.AgeRating }}</span>
+          </div>
+
           <div class="buttons">
             <button class="boton" (click)="abrirModalReproducir(featuredList[sliderIndex])">
               <i class="fa-solid fa-circle-play"></i> Reproducir
@@ -42,6 +48,11 @@
         <ng-container *ngIf="!movie.isLoading; else loadingMovie">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h3>{{ movie.title }}</h3>
+          <div class="ratings-small">
+            <span *ngIf="movie.ParaTodosOAdultos" class="badge small">{{ movie.ParaTodosOAdultos }}</span>
+            <span *ngIf="movie.PegiRating" class="badge small">{{ movie.PegiRating }}</span>
+            <span *ngIf="movie.AgeRating" class="badge small">{{ movie.AgeRating }}</span>
+          </div>
         </ng-container>
         <ng-template #loadingMovie>
           <app-movie-loading message="Cargando película..." />
@@ -56,6 +67,11 @@
         <ng-container *ngIf="!movie.isLoading; else loadingMovieAccion">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h3>{{ movie.title }}</h3>
+          <div class="ratings-small">
+            <span *ngIf="movie.ParaTodosOAdultos" class="badge small">{{ movie.ParaTodosOAdultos }}</span>
+            <span *ngIf="movie.PegiRating" class="badge small">{{ movie.PegiRating }}</span>
+            <span *ngIf="movie.AgeRating" class="badge small">{{ movie.AgeRating }}</span>
+          </div>
         </ng-container>
         <ng-template #loadingMovieAccion>
           <app-movie-loading message="Cargando película..." />
@@ -70,6 +86,11 @@
         <ng-container *ngIf="!movie.isLoading; else loadingMovieRomance">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h3>{{ movie.title }}</h3>
+          <div class="ratings-small">
+            <span *ngIf="movie.ParaTodosOAdultos" class="badge small">{{ movie.ParaTodosOAdultos }}</span>
+            <span *ngIf="movie.PegiRating" class="badge small">{{ movie.PegiRating }}</span>
+            <span *ngIf="movie.AgeRating" class="badge small">{{ movie.AgeRating }}</span>
+          </div>
         </ng-container>
         <ng-template #loadingMovieRomance>
           <app-movie-loading message="Cargando película..." />
@@ -84,6 +105,11 @@
         <ng-container *ngIf="!movie.isLoading; else loadingMovieTerror">
           <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
           <h3>{{ movie.title }}</h3>
+          <div class="ratings-small">
+            <span *ngIf="movie.ParaTodosOAdultos" class="badge small">{{ movie.ParaTodosOAdultos }}</span>
+            <span *ngIf="movie.PegiRating" class="badge small">{{ movie.PegiRating }}</span>
+            <span *ngIf="movie.AgeRating" class="badge small">{{ movie.AgeRating }}</span>
+          </div>
         </ng-container>
         <ng-template #loadingMovieTerror>
           <app-movie-loading message="Cargando película..." />
@@ -97,6 +123,7 @@
       <button class="admin-add" (click)="abrirModalAgregar()">Agregar Película</button>
     </section>
 
+    <!-- MODAL AGREGAR / EDITAR -->
     <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
       <ng-template>
         <ion-header>
@@ -141,6 +168,33 @@
             <ion-input [(ngModel)]="peliculaTemp.movieUrl"></ion-input>
           </ion-item>
 
+          <!-- NUEVO: Para Todos o Adultos -->
+          <ion-item>
+            <ion-label>Público</ion-label>
+            <ion-select [(ngModel)]="peliculaTemp.ParaTodosOAdultos" interface="alert" placeholder="Seleccionar">
+              <ion-select-option value="Para Todos">Para Todos</ion-select-option>
+              <ion-select-option value="Adultos">Solo Adultos</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- NUEVO: PEGI -->
+          <ion-item>
+            <ion-label>PEGI</ion-label>
+            <ion-select [(ngModel)]="peliculaTemp.PegiRating" interface="alert" placeholder="Seleccionar PEGI">
+              <ion-select-option value="PEGI 3">PEGI 3</ion-select-option>
+              <ion-select-option value="PEGI 7">PEGI 7</ion-select-option>
+              <ion-select-option value="PEGI 12">PEGI 12</ion-select-option>
+              <ion-select-option value="PEGI 16">PEGI 16</ion-select-option>
+              <ion-select-option value="PEGI 18">PEGI 18</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- NUEVO: Age Rating -->
+          <ion-item>
+            <ion-label position="floating">Age Rating</ion-label>
+            <ion-input [(ngModel)]="peliculaTemp.AgeRating" placeholder="Ej: +13, PG-13"></ion-input>
+          </ion-item>
+
           <ion-button expand="block" color="warning" (click)="guardarPelicula()">
             {{ editando ? 'Guardar Cambios' : 'Agregar Película' }}
           </ion-button>
@@ -148,6 +202,7 @@
       </ng-template>
     </ion-modal>
 
+    <!-- MODAL REPRODUCIR -->
     <ion-modal [isOpen]="modalReproducirAbierto" (didDismiss)="cerrarModalReproducir()">
       <ng-template>
         <ion-header>

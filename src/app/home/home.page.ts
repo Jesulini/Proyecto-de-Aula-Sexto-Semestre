@@ -7,7 +7,7 @@ import {
 import { Router } from '@angular/router';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService, User } from 'src/app/services/auth/auth';
-import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MoviesService } from 'src/app/services/movies/movies.service';
 import { MessageService } from 'src/app/services/message.service';
@@ -40,6 +40,10 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     description: '',
     trailerUrl: '',
     movieUrl: '',
+    // nuevos campos inicializados
+    AgeRating: '',
+    ParaTodosOAdultos: '',
+    PegiRating: '',
     isLoading: false
   };
 
@@ -77,7 +81,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data() as { items: Movie[] };
-        const allMovies = (data.items || []).map(m => ({ ...m, isLoading: true }));
+        // Aseguramos que los nuevos campos existan y ponemos isLoading para el efecto
+        const allMovies = (data.items || []).map(m => ({
+          ...m,
+          AgeRating: (m as any).AgeRating || '',
+          ParaTodosOAdultos: (m as any).ParaTodosOAdultos || '',
+          PegiRating: (m as any).PegiRating || '',
+          isLoading: true
+        }));
 
         // Simulación de carga: desactivar loading después de un pequeño delay
         setTimeout(() => {
@@ -157,6 +168,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       description: '',
       trailerUrl: '',
       movieUrl: '',
+      AgeRating: '',
+      ParaTodosOAdultos: '',
+      PegiRating: '',
       isLoading: false
     };
     this.modalAbierto = true;
@@ -164,7 +178,13 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   abrirModalEditar(movie: Movie): void {
     this.editando = true;
-    this.peliculaTemp = { ...movie };
+    // Aseguramos que existan los campos nuevos
+    this.peliculaTemp = {
+      ...movie,
+      AgeRating: (movie as any).AgeRating || '',
+      ParaTodosOAdultos: (movie as any).ParaTodosOAdultos || '',
+      PegiRating: (movie as any).PegiRating || ''
+    };
     this.modalAbierto = true;
   }
 
@@ -173,7 +193,18 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async guardarPelicula(): Promise<void> {
-    const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
+    const {
+      title,
+      imageUrl,
+      category,
+      description,
+      trailerUrl,
+      movieUrl,
+      AgeRating,
+      ParaTodosOAdultos,
+      PegiRating,
+      id
+    } = this.peliculaTemp as any;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-fields' }), 'error');
@@ -185,8 +216,22 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
       if (this.editando && id) {
         this.featuredList = this.featuredList.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
+          p.id === id
+            ? {
+                ...p,
+                title,
+                imageUrl,
+                category,
+                description,
+                trailerUrl,
+                movieUrl,
+                AgeRating,
+                ParaTodosOAdultos,
+                PegiRating
+              }
+            : p
         );
+        // Actualizamos la lista completa en Firestore
         await updateDoc(docRef, { items: this.featuredList });
         this.messageService.showMessage('Película actualizada.', 'success');
       } else {
@@ -198,15 +243,25 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           description,
           trailerUrl,
           movieUrl,
+          AgeRating,
+          ParaTodosOAdultos,
+          PegiRating,
           isLoading: true
-        };
+        } as any;
+
+        // Añadimos localmente y guardamos la lista completa
         this.featuredList.push(nuevaPeli);
-        await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
+        await updateDoc(docRef, { items: this.featuredList });
         this.messageService.showMessage('Película agregada.', 'success');
 
         setTimeout(() => {
           nuevaPeli.isLoading = false;
         }, 800);
+
+        // Recalcular filtros
+        this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
+        this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
+        this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
       }
       this.cerrarModal();
     } catch (error: any) {
@@ -221,6 +276,11 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       await updateDoc(docRef, { items: this.featuredList });
       this.messageService.showMessage('Película eliminada.', 'success');
+
+      // Recalcular filtros
+      this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
+      this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
+      this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
     } catch (error: any) {
       const msg = mapFirebaseError(error);
       this.messageService.showMessage(msg, 'error');
