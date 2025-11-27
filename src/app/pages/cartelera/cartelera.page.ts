@@ -8,7 +8,7 @@ import { MessageService } from 'src/app/services/message.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
 
 const PEGI_LIMITS: Record<string, number> = {
-  gratis: 3,
+  gratis: 7,
   estudiantes: 7,
   familiar: 12,
   premium: 18
