@@ -13,8 +13,7 @@
 
       <h1>{{ pelicula.title }}</h1>
 
-      <!-- BADGES: Clasificación / PEGI / AgeRating -->
-      <div class="ratings-detail">
+       <div class="ratings-detail">
         <span *ngIf="pelicula.ParaTodosOAdultos" class="badge">{{ pelicula.ParaTodosOAdultos }}</span>
         <span *ngIf="pelicula.PegiRating" class="badge">{{ pelicula.PegiRating }}</span>
         <span *ngIf="pelicula.AgeRating" class="badge">{{ pelicula.AgeRating }}</span>
@@ -46,7 +45,6 @@
     <p>Película no encontrada.</p>
   </div>
 
-  <!-- MODAL PELÍCULA -->
   <ion-modal [isOpen]="peliculaAbierta" (didDismiss)="cerrarPelicula()">
     <ng-template>
       <ion-header>
@@ -89,7 +87,6 @@
     </ng-template>
   </ion-modal>
 
-  <!-- MODAL TRÁILER -->
   <ion-modal [isOpen]="trailerAbierto" (didDismiss)="cerrarTrailer()">
     <ng-template>
       <ion-header>

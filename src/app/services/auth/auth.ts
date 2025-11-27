@@ -3,7 +3,6 @@ import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signO
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 
-// Exportar la interfaz User
 export interface User {
   uid: string;
   email: string;
@@ -24,7 +23,6 @@ export class AuthService {
     this.auth = auth;
     this.firestore = firestore;
 
-    // Suscripción al estado del usuario
     onAuthStateChanged(this.auth, async (user: FirebaseUser | null) => {
       if (user) {
         const docRef = doc(this.firestore, `usuarios/${user.uid}`);
@@ -45,23 +43,19 @@ export class AuthService {
     });
   }
 
-  // Observable del usuario actual
   usuarioActual$() {
     return this.usuarioActualSubject.asObservable();
   }
 
-  // Usuario actual síncrono
   getUsuarioActual(): User | null {
     const usuario = localStorage.getItem('usuario');
     return usuario ? JSON.parse(usuario) : null;
   }
 
-  // ✅ Alias para compatibilidad con tus páginas
   getUser(): User | null {
     return this.getUsuarioActual();
   }
 
-  // Registro
   async registro(email: string, password: string, nombre: string) {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
     await updateProfile(cred.user, { displayName: nombre });
@@ -71,19 +65,16 @@ export class AuthService {
       nombre,
       foto: ''
     };
-    // Guardar info en Firestore
     const docRef = doc(this.firestore, `usuarios/${cred.user.uid}`);
     await setDoc(docRef, { nombre, email, foto: '' });
     localStorage.setItem('usuario', JSON.stringify(usuario));
     return cred;
   }
 
-  // ✅ Alias para compatibilidad con tus páginas
   register(nombre: string, email: string, password: string) {
     return this.registro(email, password, nombre);
   }
 
-  // Login
   async login(email: string, password: string) {
     const cred = await signInWithEmailAndPassword(this.auth, email, password);
     const usuario: User = {
@@ -97,14 +88,12 @@ export class AuthService {
     return cred;
   }
 
-  // Logout
   logout() {
     this.usuarioActualSubject.next(null);
     localStorage.removeItem('usuario');
     return signOut(this.auth);
   }
 
-  // Reset password
   async resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }

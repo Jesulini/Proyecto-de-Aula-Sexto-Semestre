@@ -32,28 +32,22 @@ export class MovieCarouselComponent implements AfterViewInit, OnChanges {
 
   carruselIndices: { [key: string]: number } = {};
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['categoriasConfig']) {
-      // Resetear índices por categoría y aplicar update cuando la vista esté lista
       this.carruselIndices = {};
       this.categoriasConfig.forEach(cat => (this.carruselIndices[cat.titulo] = 0));
 
-      // Forzar render y luego actualizar posiciones
       this.cdr.detectChanges();
-      // Si aún no hay containers, espera al próximo ciclo
       setTimeout(() => this.updateAll(), 0);
     }
   }
 
   ngAfterViewInit(): void {
-    // Primera aplicación
     this.updateAll();
 
-    // Reaplicar cuando cambie el QueryList (p. ej., al cambiar categoriasConfig)
     this.carruselContainers.changes.subscribe(() => {
-      // Espera microtarea para asegurar DOM listo
       setTimeout(() => this.updateAll(), 0);
     });
   }

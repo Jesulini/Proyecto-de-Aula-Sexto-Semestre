@@ -7,14 +7,12 @@
 
   <div class="home-container" [class.menu-open]="menu.menuAbierto">
 
-    <!-- Carrusel automático -->
-    <app-carousel 
+¿    <app-carousel 
       [items]="featuredList" 
       (play)="abrirModalReproducir($event)" 
       (info)="goToMovie($event)">
     </app-carousel>
 
-    <!-- Carruseles dinámicos -->
     <app-movie-carousel 
       [categoriasConfig]="categoriasConfig" 
       [isAdmin]="isAdmin"
@@ -23,16 +21,15 @@
       (delete)="deleteMovie($event)">
     </app-movie-carousel>
 
-    <!-- Panel admin -->
+
     <section *ngIf="isAdmin" class="admin-panel">
       <h2>Panel de Administración</h2>
       <p>Desde aquí puedes agregar nuevas películas a la cartelera.</p>
       <button class="admin-add" (click)="abrirModalAgregar()">Agregar Película</button>
     </section>
 
-  </div> <!-- cierre único del home-container -->
+  </div> 
 
-  <!-- MODAL AGREGAR / EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -108,7 +105,6 @@
     </ng-template>
   </ion-modal>
 
-  <!-- MODAL REPRODUCIR -->
   <ion-modal [isOpen]="modalReproducirAbierto" (didDismiss)="cerrarModalReproducir()">
     <ng-template>
       <ion-header>

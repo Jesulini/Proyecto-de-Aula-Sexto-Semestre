@@ -52,7 +52,7 @@ export class HomePage implements OnInit, OnDestroy {
   modalReproducirAbierto = false;
   peliculaReproducir: Movie | null = null;
 
-  categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror', 'Comedia'];
+  categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
 
   constructor(
     private router: Router,

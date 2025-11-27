@@ -1,6 +1,4 @@
-// utils/error-utils.ts
 
-// "Mapa centralizado de errores Firebase y personalizados"
 export const firebaseErrorMap: Record<string, string> = {
   // Autenticación
   // "Errores relacionados con login, registro y credenciales"
@@ -107,8 +105,6 @@ export const firebaseErrorMap: Record<string, string> = {
   'eliminar-mi-lista': 'Error al eliminar la película de tu lista',
   'eliminar-historial': 'Error al eliminar la película del historial',
 
-  // Errores personalizados de negocio
-  // "Validaciones internas de CompraPage y solicitudes"
   'suscripcion/ya-activa': 'Ya tienes activa esta suscripción',
   'solicitud/missing-fields': 'Completa todos los campos de la solicitud',
   'solicitud/error': 'Error al registrar la solicitud de película',

@@ -29,7 +29,7 @@ export class DetallePeliculaPage implements OnInit {
     private toastController: ToastController,
     private alertController: AlertController,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.peliculaId = this.route.snapshot.queryParamMap.get('id');
@@ -47,7 +47,6 @@ export class DetallePeliculaPage implements OnInit {
     try {
       this.pelicula = await this.moviesService.cargarMovieById(id);
 
-      // asegurar que los campos existan (por compatibilidad con datos viejos)
       if (this.pelicula) {
         (this.pelicula as any).ParaTodosOAdultos = (this.pelicula as any).ParaTodosOAdultos || '';
         (this.pelicula as any).PegiRating = (this.pelicula as any).PegiRating || '';
@@ -103,7 +102,6 @@ export class DetallePeliculaPage implements OnInit {
   }
 
   abrirTrailer() {
-    // si la película es para "Adultos", validamos acceso
     if (this.pelicula?.ParaTodosOAdultos === 'Adultos') {
       const usuario = this.authService.getUsuarioActual();
       if (!usuario) {
@@ -119,7 +117,6 @@ export class DetallePeliculaPage implements OnInit {
   cerrarTrailer() { this.trailerAbierto = false; }
 
   async abrirPelicula() {
-    // si la película es para "Adultos", validamos acceso
     if (this.pelicula?.ParaTodosOAdultos === 'Adultos') {
       const usuario = this.authService.getUsuarioActual();
       if (!usuario) {
@@ -127,7 +124,6 @@ export class DetallePeliculaPage implements OnInit {
         this.router.navigate(['/login']);
         return;
       }
-      // pedimos confirmación de ser mayor de edad
       this.presentConfirmAge('movie');
       return;
     }
