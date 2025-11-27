@@ -11,6 +11,14 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MoviesService } from 'src/app/services/movies/movies.service';
 import { MessageService } from 'src/app/services/message.service';
 import { mapFirebaseError } from 'src/app/utils/error-utils';
+import { SubscriptionService } from 'src/app/services/subscription.service';
+
+const PEGI_LIMITS: Record<string, number> = {
+  gratis: 3,
+  estudiantes: 7,
+  familiar: 12,
+  premium: 18
+};
 
 @Component({
   selector: 'app-home',
@@ -23,6 +31,7 @@ export class HomePage implements OnInit, OnDestroy {
   categoriasConfig: { titulo: string; lista: Movie[] }[] = [];
 
   isAdmin = false;
+  currentPlan: string = 'gratis';
 
   modalAbierto = false;
   editando = false;
@@ -51,13 +60,20 @@ export class HomePage implements OnInit, OnDestroy {
     private firestore: Firestore,
     private sanitizer: DomSanitizer,
     private moviesService: MoviesService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private subscriptionService: SubscriptionService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const user = this.authService.getUser();
     const email = user?.email?.trim().toLowerCase() || '';
     this.isAdmin = email === 'jesulini14@gmail.com';
+
+    if (user) {
+      const subs = await this.subscriptionService.getSubscription(user.uid);
+      this.currentPlan = subs?.subscriptionType || 'gratis';
+    }
+
     this.loadMovies();
   }
 
@@ -65,12 +81,20 @@ export class HomePage implements OnInit, OnDestroy {
 
   private updateCategoriasConfig(): void {
     this.categoriasConfig = [
-      { titulo: 'Destacadas', lista: this.featuredList },
+      { titulo: 'Destacadas', lista: this.featuredList.filter(m => this.puedeVerPelicula(m)) },
       ...this.categorias.map(cat => ({
         titulo: cat,
-        lista: this.featuredList.filter(m => m.category === cat)
+        lista: this.featuredList.filter(m => m.category === cat && this.puedeVerPelicula(m))
       }))
     ];
+  }
+
+  puedeVerPelicula(movie: Movie): boolean {
+    const plan = this.currentPlan || 'gratis';
+    const limite = PEGI_LIMITS[plan];
+    const pegiStr = movie.PegiRating || '';
+    const pegi = parseInt(pegiStr.replace(/\D/g, ''), 10);
+    return isNaN(pegi) ? true : pegi <= limite;
   }
 
   async loadMovies(): Promise<void> {
@@ -88,7 +112,9 @@ export class HomePage implements OnInit, OnDestroy {
         }));
 
         setTimeout(() => {
-          this.featuredList = allMovies.map(m => ({ ...m, isLoading: false }));
+          this.featuredList = allMovies
+            .map(m => ({ ...m, isLoading: false }))
+            .filter(m => this.puedeVerPelicula(m));
           this.updateCategoriasConfig();
         }, 800);
       }
@@ -97,22 +123,34 @@ export class HomePage implements OnInit, OnDestroy {
       this.messageService.showMessage(msg, 'error');
     }
   }
-
   goToCurrentSliderMovie(): void {
     if (!this.featuredList.length) return;
     const movie = this.featuredList[0];
     if (movie?.id) {
+      if (!this.puedeVerPelicula(movie)) {
+        this.messageService.showMessage('Tu plan no permite ver esta película por clasificación PEGI.', 'error');
+        return;
+      }
       this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
     }
   }
 
   goToMovie(movie: Movie): void {
     if (movie?.id) {
+      if (!this.puedeVerPelicula(movie)) {
+        this.messageService.showMessage('Tu plan no permite ver esta película por clasificación PEGI.', 'error');
+        return;
+      }
       this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
     }
   }
 
   async abrirModalReproducir(movie: Movie): Promise<void> {
+    if (!this.puedeVerPelicula(movie)) {
+      this.messageService.showMessage('Tu plan no permite reproducir esta película por clasificación PEGI.', 'error');
+      return;
+    }
+
     this.peliculaReproducir = movie;
     this.modalReproducirAbierto = true;
 
@@ -168,7 +206,7 @@ export class HomePage implements OnInit, OnDestroy {
   async guardarPelicula(): Promise<void> {
     const { title, imageUrl, category, description, trailerUrl, movieUrl, AgeRating, ParaTodosOAdultos, PegiRating, id } = this.peliculaTemp;
 
-    if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
+    if (!title?.trim() || !imageUrl?.trim() || !category?.trim() || !PegiRating?.trim()) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-fields' }), 'error');
       return;
     }

@@ -3,7 +3,16 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService } from 'src/app/services/auth/auth';
-import { Firestore, doc, getDoc, updateDoc, arrayUnion } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { MessageService } from 'src/app/services/message.service';
+import { SubscriptionService } from 'src/app/services/subscription.service';
+
+const PEGI_LIMITS: Record<string, number> = {
+  gratis: 3,
+  estudiantes: 7,
+  familiar: 12,
+  premium: 18
+};
 
 @Component({
   selector: 'app-cartelera',
@@ -23,6 +32,8 @@ export class CarteleraPage implements OnInit, OnDestroy {
   modalAbierto = false;
   editando = false;
 
+  currentPlan: string = 'gratis';
+
   peliculaTemp: Movie = {
     id: '',
     title: '',
@@ -30,20 +41,29 @@ export class CarteleraPage implements OnInit, OnDestroy {
     category: '',
     description: '',
     trailerUrl: '',
-    movieUrl: ''
+    movieUrl: '',
+    PegiRating: ''
   };
 
   constructor(
     private router: Router,
     private alertCtrl: AlertController,
     private authService: AuthService,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private messageService: MessageService,
+    private subscriptionService: SubscriptionService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     const user = this.authService.getUsuarioActual();
     const email = user?.email?.trim().toLowerCase() || '';
     this.esAdmin = email === 'jesulini14@gmail.com';
+
+    if (user) {
+      const subs = await this.subscriptionService.getSubscription(user.uid);
+      this.currentPlan = subs?.subscriptionType || 'gratis';
+    }
+
     this.cargarPeliculas();
   }
 
@@ -61,13 +81,22 @@ export class CarteleraPage implements OnInit, OnDestroy {
     }
   }
 
+  puedeVerPelicula(movie: Movie): boolean {
+    const plan = this.currentPlan || 'gratis';
+    const limite = PEGI_LIMITS[plan];
+    const pegiStr = movie.PegiRating || '';
+    const pegi = parseInt(pegiStr.replace(/\D/g, ''), 10);
+    return isNaN(pegi) ? true : pegi <= limite;
+  }
+
   buscarPeliculas() {
     const termino = this.terminoBusqueda.toLowerCase();
     this.peliculasFiltradas = this.peliculas.filter(movie => {
       const coincideTitulo = (movie.title || '').toLowerCase().includes(termino);
       const coincideCategoria =
         this.categoriaSeleccionada === 'Todos' || movie.category === this.categoriaSeleccionada;
-      return coincideTitulo && coincideCategoria;
+      const permitidoPorPEGI = this.puedeVerPelicula(movie);
+      return coincideTitulo && coincideCategoria && permitidoPorPEGI;
     });
   }
 
@@ -85,7 +114,8 @@ export class CarteleraPage implements OnInit, OnDestroy {
       category: '',
       description: '',
       trailerUrl: '',
-      movieUrl: ''
+      movieUrl: '',
+      PegiRating: ''
     };
     this.modalAbierto = true;
   }
@@ -101,10 +131,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
   }
 
   async guardarPelicula() {
-    const { title, imageUrl, category, description, trailerUrl, movieUrl, id } = this.peliculaTemp;
+    const { title, imageUrl, category, description, trailerUrl, movieUrl, id, PegiRating } = this.peliculaTemp;
 
-    if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
-      alert('Todos los campos obligatorios deben estar completos.');
+    if (!title?.trim() || !imageUrl?.trim() || !category?.trim() || !PegiRating?.trim()) {
+      this.messageService.showMessage('Todos los campos obligatorios deben estar completos.', 'error');
       return;
     }
 
@@ -113,10 +143,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
     try {
       if (this.editando && id) {
         this.peliculas = this.peliculas.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl } : p
+          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl, PegiRating } : p
         );
         await updateDoc(docRef, { items: this.peliculas });
-        alert('Película actualizada correctamente.');
+        this.messageService.showMessage('Película actualizada correctamente.', 'success');
       } else {
         const nuevaPeli: Movie = {
           id: this.generarId(),
@@ -125,18 +155,19 @@ export class CarteleraPage implements OnInit, OnDestroy {
           category,
           description,
           trailerUrl,
-          movieUrl
+          movieUrl,
+          PegiRating
         };
-        await updateDoc(docRef, { items: arrayUnion(nuevaPeli) });
         this.peliculas.push(nuevaPeli);
-        alert('Película agregada exitosamente.');
+        await updateDoc(docRef, { items: this.peliculas });
+        this.messageService.showMessage('Película agregada exitosamente.', 'success');
       }
 
       this.cerrarModal();
       this.buscarPeliculas();
     } catch (error) {
       console.error('Error guardando película:', error);
-      alert('Error al guardar la película.');
+      this.messageService.showMessage('Error al guardar la película.', 'error');
     }
   }
 
@@ -154,11 +185,11 @@ export class CarteleraPage implements OnInit, OnDestroy {
               this.peliculas = this.peliculas.filter(p => p.id !== id);
               const docRef = doc(this.firestore, 'peliculas/peliculas');
               await updateDoc(docRef, { items: this.peliculas });
-              alert('Película eliminada.');
+              this.messageService.showMessage('Película eliminada.', 'success');
               this.buscarPeliculas();
             } catch (error) {
               console.error('Error eliminando película:', error);
-              alert('Error al eliminar la película.');
+              this.messageService.showMessage('Error al eliminar la película.', 'error');
             }
           }
         }
@@ -169,6 +200,11 @@ export class CarteleraPage implements OnInit, OnDestroy {
   }
 
   verDetalle(id: string) {
+    const movie = this.peliculas.find(p => p.id === id);
+    if (movie && !this.puedeVerPelicula(movie)) {
+      this.messageService.showMessage('Tu plan no permite ver esta película por clasificación PEGI.', 'error');
+      return;
+    }
     this.router.navigate(['/detalle-pelicula'], { queryParams: { id } });
   }
 

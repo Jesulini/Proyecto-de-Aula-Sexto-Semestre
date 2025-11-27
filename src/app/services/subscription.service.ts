@@ -18,7 +18,7 @@ const subscriptionsDb = getFirestore(subscriptionsApp);
 export interface Subscription {
   email: string;
   subscriptionType: string;
-  subscriptionDate: any; // serverTimestamp
+  subscriptionDate: any;
   status: string;
   priceCOP: number;
 }
@@ -26,7 +26,7 @@ export interface Subscription {
 export interface MovieRequest {
   email: string;
   requestType: string;
-  requestDate: any; // serverTimestamp
+  requestDate: any;
   status: string;
   priceCOP: number;
   movieName: string;
