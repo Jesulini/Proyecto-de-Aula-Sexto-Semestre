@@ -114,7 +114,6 @@ export const firebaseErrorMap: Record<string, string> = {
   'solicitud/error': 'Error al registrar la solicitud de película',
 };
 
-// "Función que traduce cualquier error a un mensaje amigable"
 export function mapFirebaseError(err: any): string {
   if (!err) return 'Ocurrió un error';
   const code = err?.code || err?.message || String(err);

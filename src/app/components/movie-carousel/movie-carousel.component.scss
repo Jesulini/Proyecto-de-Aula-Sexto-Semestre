@@ -1,4 +1,5 @@
 .movie-carousel {
+
   $neon-gold: #ffb703;
   $neon-red: #ff0054;
   $neon-blue: #00f5ff;
@@ -19,7 +20,6 @@
     display: flex;
     align-items: center;
     position: relative;
-    gap: 12px;
 
     .btn {
       background: none;
@@ -36,17 +36,16 @@
     }
 
     .contenedor-carrusel {
-      display: flex;
-      overflow-x: auto;
-      scroll-behavior: smooth;
-      gap: 20px;
-      padding: 20px 10px;
+      overflow: hidden;
       width: 100%;
       max-width: 1400px;
       margin: 0 auto;
 
-      scrollbar-width: thin;
-      scrollbar-color: #555 #1e1e1e;
+      .track {
+        display: inline-flex;
+        transition: transform 0.5s ease;
+        will-change: transform;
+      }
 
       .movie {
         background-color: #1e1e1e;
@@ -56,6 +55,7 @@
         text-align: center;
         box-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
         transition: 0.3s;
+        margin-right: 20px; 
 
         &:hover {
           transform: scale(1.05);
@@ -121,6 +121,41 @@
           }
         }
       }
+    }
+  }
+
+
+  @media (max-width: 768px) {
+    padding: 20px;
+
+    .carrusel {
+      flex-direction: column;
+      align-items: center;
+
+      .btn {
+        font-size: 1.5rem;
+        margin: 10px 0;
+      }
+
+      .contenedor-carrusel {
+        width: 100%;
+        overflow-x: hidden; 
+        .track {
+          display: flex;
+          flex-wrap: nowrap;
+        }
+
+        .movie {
+          min-width: 85%;    
+          margin-right: 0;   
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contenedor-carrusel .movie {
+      min-width: 100%;     
     }
   }
 }

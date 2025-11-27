@@ -1,9 +1,9 @@
 .message-box {
-  position: fixed;          // se fija en la ventana
-  top: 20px;                // distancia desde arriba
-  left: 50%;                // centrado horizontal
+  position: fixed;          
+  top: 20px;              
+  left: 50%;               
   transform: translateX(-50%);
-  z-index: 9999;            // por encima de todo
+  z-index: 9999;         
 
   display: flex;
   align-items: center;

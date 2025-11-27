@@ -1,0 +1,36 @@
+<section class="slider"
+         (pointerdown)="onPointerDown($event)"
+         (pointermove)="onPointerMove($event)"
+         (pointerup)="onPointerUp()"
+         (pointercancel)="onPointerUp()">
+  <div class="slide" *ngFor="let movie of limitedItems; let i = index; trackBy: trackById"
+       [class.active]="i === sliderIndex"
+       [style.backgroundImage]="'url(' + movie.imageUrl + ')'">
+    <div class="content" (click)="$event.stopPropagation()">
+      <h2>{{ movie.title }}</h2>
+      <p *ngIf="movie.description">{{ movie.description }}</p>
+
+      <div class="ratings">
+        <span *ngIf="movie.ParaTodosOAdultos" class="badge">{{ movie.ParaTodosOAdultos }}</span>
+        <span *ngIf="movie.PegiRating" class="badge">{{ movie.PegiRating }}</span>
+        <span *ngIf="movie.AgeRating" class="badge">{{ movie.AgeRating }}</span>
+      </div>
+
+      <div class="buttons">
+        <button class="boton" type="button" (click)="onPlay(); $event.stopPropagation()">
+          <i class="fa-solid fa-circle-play"></i> Reproducir
+        </button>
+
+        <button class="boton" type="button" (click)="onInfo(); $event.stopPropagation()">
+          <i class="fa-solid fa-circle-question"></i> Más información
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="indicators">
+    <span class="dot" *ngFor="let movie of limitedItems; let i = index"
+          [class.active]="i === sliderIndex"
+          (click)="showSlide(i); $event.stopPropagation()"></span>
+  </div>
+</section>

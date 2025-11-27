@@ -9,7 +9,7 @@ import { MessageBoxComponent } from 'src/app/components/message-box/message-box.
 import { MovieCarouselComponent } from 'src/app/components/movie-carousel/movie-carousel.component';
 import { LoadingComponent } from 'src/app/components/loading/loading.component';
 import { MovieLoadingComponent } from '../components/movie-loading/movie-loading.component';
-
+import { CarouselComponent } from '../components/carousel/carousel.component';
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -17,7 +17,8 @@ import { MovieLoadingComponent } from '../components/movie-loading/movie-loading
     MessageBoxComponent,
     MovieCarouselComponent,
     LoadingComponent,
-    MovieLoadingComponent
+    MovieLoadingComponent,
+    CarouselComponent
   ],
   imports: [
     CommonModule,
@@ -30,7 +31,9 @@ import { MovieLoadingComponent } from '../components/movie-loading/movie-loading
     MessageBoxComponent,
     MovieCarouselComponent,
     LoadingComponent,
-    MovieLoadingComponent
+    MovieLoadingComponent,
+    CarouselComponent
   ]
 })
-export class SharedModule {}
+export class SharedModule { }
+ 

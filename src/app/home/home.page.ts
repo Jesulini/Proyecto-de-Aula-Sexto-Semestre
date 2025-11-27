@@ -1,8 +1,7 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
-  AfterViewInit
+  OnDestroy
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Movie } from 'src/app/models/movie.model';
@@ -19,14 +18,9 @@ import { mapFirebaseError } from 'src/app/utils/error-utils';
   styleUrls: ['./home.page.scss'],
   standalone: false
 })
-export class HomePage implements OnInit, AfterViewInit, OnDestroy {
+export class HomePage implements OnInit, OnDestroy {
   featuredList: Movie[] = [];
-  moviesAccion: Movie[] = [];
-  moviesRomance: Movie[] = [];
-  moviesTerror: Movie[] = [];
-
-  sliderIndex = 0;
-  slideInterval: any;
+  categoriasConfig: { titulo: string; lista: Movie[] }[] = [];
 
   isAdmin = false;
 
@@ -40,7 +34,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     description: '',
     trailerUrl: '',
     movieUrl: '',
-    // nuevos campos inicializados
     AgeRating: '',
     ParaTodosOAdultos: '',
     PegiRating: '',
@@ -50,7 +43,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   modalReproducirAbierto = false;
   peliculaReproducir: Movie | null = null;
 
-  categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
+  categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror', 'Comedia'];
 
   constructor(
     private router: Router,
@@ -62,17 +55,22 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
     const user = this.authService.getUser();
     const email = user?.email?.trim().toLowerCase() || '';
     this.isAdmin = email === 'jesulini14@gmail.com';
     this.loadMovies();
   }
 
-  ngAfterViewInit(): void { }
+  ngOnDestroy(): void { }
 
-  ngOnDestroy(): void {
-    if (this.slideInterval) clearInterval(this.slideInterval);
+  private updateCategoriasConfig(): void {
+    this.categoriasConfig = [
+      { titulo: 'Destacadas', lista: this.featuredList },
+      ...this.categorias.map(cat => ({
+        titulo: cat,
+        lista: this.featuredList.filter(m => m.category === cat)
+      }))
+    ];
   }
 
   async loadMovies(): Promise<void> {
@@ -81,21 +79,17 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data() as { items: Movie[] };
-        // Aseguramos que los nuevos campos existan y ponemos isLoading para el efecto
         const allMovies = (data.items || []).map(m => ({
           ...m,
-          AgeRating: (m as any).AgeRating || '',
-          ParaTodosOAdultos: (m as any).ParaTodosOAdultos || '',
-          PegiRating: (m as any).PegiRating || '',
+          AgeRating: m.AgeRating || '',
+          ParaTodosOAdultos: m.ParaTodosOAdultos || '',
+          PegiRating: m.PegiRating || '',
           isLoading: true
         }));
 
-        // Simulación de carga: desactivar loading después de un pequeño delay
         setTimeout(() => {
           this.featuredList = allMovies.map(m => ({ ...m, isLoading: false }));
-          this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
-          this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
-          this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
+          this.updateCategoriasConfig();
         }, 800);
       }
     } catch (error: any) {
@@ -104,29 +98,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  nextSlide(): void {
-    if (this.featuredList.length === 0) return;
-    this.sliderIndex = (this.sliderIndex + 1) % this.featuredList.length;
-  }
-
-  prevSlide(): void {
-    if (this.featuredList.length === 0) return;
-    this.sliderIndex = (this.sliderIndex - 1 + this.featuredList.length) % this.featuredList.length;
-  }
-
-  showSlide(index: number): void {
-    this.sliderIndex = index;
-    this.resetInterval();
-  }
-
-  resetInterval(): void {
-    clearInterval(this.slideInterval);
-    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
-  }
-
   goToCurrentSliderMovie(): void {
     if (!this.featuredList.length) return;
-    const movie = this.featuredList[this.sliderIndex];
+    const movie = this.featuredList[0];
     if (movie?.id) {
       this.router.navigate(['/detalle-pelicula'], { queryParams: { id: movie.id } });
     }
@@ -178,12 +152,11 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   abrirModalEditar(movie: Movie): void {
     this.editando = true;
-    // Aseguramos que existan los campos nuevos
     this.peliculaTemp = {
       ...movie,
-      AgeRating: (movie as any).AgeRating || '',
-      ParaTodosOAdultos: (movie as any).ParaTodosOAdultos || '',
-      PegiRating: (movie as any).PegiRating || ''
+      AgeRating: movie.AgeRating || '',
+      ParaTodosOAdultos: movie.ParaTodosOAdultos || '',
+      PegiRating: movie.PegiRating || ''
     };
     this.modalAbierto = true;
   }
@@ -193,18 +166,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async guardarPelicula(): Promise<void> {
-    const {
-      title,
-      imageUrl,
-      category,
-      description,
-      trailerUrl,
-      movieUrl,
-      AgeRating,
-      ParaTodosOAdultos,
-      PegiRating,
-      id
-    } = this.peliculaTemp as any;
+    const { title, imageUrl, category, description, trailerUrl, movieUrl, AgeRating, ParaTodosOAdultos, PegiRating, id } = this.peliculaTemp;
 
     if (!title?.trim() || !imageUrl?.trim() || !category?.trim()) {
       this.messageService.showMessage(mapFirebaseError({ code: 'auth/missing-fields' }), 'error');
@@ -217,21 +179,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       if (this.editando && id) {
         this.featuredList = this.featuredList.map(p =>
           p.id === id
-            ? {
-                ...p,
-                title,
-                imageUrl,
-                category,
-                description,
-                trailerUrl,
-                movieUrl,
-                AgeRating,
-                ParaTodosOAdultos,
-                PegiRating
-              }
+            ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl, AgeRating, ParaTodosOAdultos, PegiRating }
             : p
         );
-        // Actualizamos la lista completa en Firestore
         await updateDoc(docRef, { items: this.featuredList });
         this.messageService.showMessage('Película actualizada.', 'success');
       } else {
@@ -247,9 +197,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           ParaTodosOAdultos,
           PegiRating,
           isLoading: true
-        } as any;
+        };
 
-        // Añadimos localmente y guardamos la lista completa
         this.featuredList.push(nuevaPeli);
         await updateDoc(docRef, { items: this.featuredList });
         this.messageService.showMessage('Película agregada.', 'success');
@@ -257,12 +206,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
           nuevaPeli.isLoading = false;
         }, 800);
-
-        // Recalcular filtros
-        this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
-        this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
-        this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
       }
+      this.updateCategoriasConfig();
       this.cerrarModal();
     } catch (error: any) {
       const msg = mapFirebaseError(error);
@@ -276,11 +221,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       const docRef = doc(this.firestore, 'peliculas/peliculas');
       await updateDoc(docRef, { items: this.featuredList });
       this.messageService.showMessage('Película eliminada.', 'success');
-
-      // Recalcular filtros
-      this.moviesAccion = this.featuredList.filter(m => m.category === 'Acción');
-      this.moviesRomance = this.featuredList.filter(m => m.category === 'Romance');
-      this.moviesTerror = this.featuredList.filter(m => m.category === 'Terror');
+      this.updateCategoriasConfig();
     } catch (error: any) {
       const msg = mapFirebaseError(error);
       this.messageService.showMessage(msg, 'error');
@@ -296,7 +237,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   generarId(): string {
     return Math.random().toString(36).substring(2, 10);
   }
-
+ 
   esYoutubeUrl(url?: string): boolean {
     if (!url) return false;
     return url.includes('youtube.com') || url.includes('youtu.be');
