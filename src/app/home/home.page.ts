@@ -119,8 +119,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.messageService.showMessage(msg, 'error');
     }
   }
-
-  goToCurrentSliderMovie(): void {
+    goToCurrentSliderMovie(): void {
     if (!this.featuredList.length) return;
     const movie = this.featuredList[0];
     if (movie?.id) {
@@ -220,3 +219,5 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 }
+
+

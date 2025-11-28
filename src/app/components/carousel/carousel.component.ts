@@ -19,12 +19,11 @@ export class CarouselComponent implements OnInit, OnDestroy, OnChanges {
   private pointerEndX = 0;
   private dragging = false;
 
-  // Limitamos a 5 películas
   get limitedItems(): Movie[] {
     return this.items.slice(0, 5);
   }
 
-  // Película activa actual
+
   get activeMovie(): Movie | undefined {
     return this.limitedItems[this.sliderIndex];
   }

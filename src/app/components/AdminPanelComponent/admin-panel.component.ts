@@ -47,15 +47,18 @@ export class AdminPanelComponent implements OnInit {
       const colRef = collection(this.firestore, 'peliculas');
       const snap = await getDocs(colRef);
       this.peliculas = snap.docs.map(d => {
-        const m = d.data() as Movie;
-        return {
-          ...m,
-          AgeRating: m.AgeRating || '',
-          ParaTodosOAdultos: m.ParaTodosOAdultos || '',
-          PegiRating: m.PegiRating || '',
-          isLoading: false
-        };
-      });
+  const m = d.data() as Movie;
+  const { id, ...rest } = m; 
+  return {
+    id: d.id,
+    ...rest,
+    AgeRating: m.AgeRating || '',
+    ParaTodosOAdultos: m.ParaTodosOAdultos || '',
+    PegiRating: m.PegiRating || '',
+    isLoading: false
+  };
+});
+
     } catch (error: any) {
       const msg = mapFirebaseError(error);
       this.messageService.showMessage(msg, 'error');
