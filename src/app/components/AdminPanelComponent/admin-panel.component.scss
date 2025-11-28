@@ -27,11 +27,14 @@
       color: $neon-gold;
       text-shadow: $neon-shadow;
       margin-bottom: 10px;
+      font-size: 1.6rem;
+      font-weight: 700;
     }
 
     p {
       color: #ccc;
       margin-bottom: 16px;
+      font-size: 0.95rem;
     }
 
     .movies-list {
@@ -46,6 +49,12 @@
         padding: 12px;
         box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
         text-align: center;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
 
         img {
           width: 100%;
@@ -59,6 +68,7 @@
           font-size: 14px;
           margin-bottom: 8px;
           color: #fff;
+          font-weight: 600;
         }
 
         .actions {
@@ -104,6 +114,7 @@
     ion-textarea,
     ion-select {
       color: #fff;
+      font-size: 0.95rem;
     }
 
     .gold-btn {
@@ -112,6 +123,7 @@
       font-weight: 700;
       box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
       margin-top: 1rem;
+      border-radius: 10px;
 
       &:hover {
         --background: linear-gradient(90deg, #fff, #fff);
@@ -125,6 +137,7 @@
       display: block;
       width: 100%;
       margin-top: 1rem;
+      text-align: center;
 
       &:hover {
         color: $neon-gold;

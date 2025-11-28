@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth, updateProfile, updateEmail, updatePassword, User } from '@angular/fire/auth';
+import { Auth, User, deleteUser, updateProfile, updateEmail, updatePassword } from '@angular/fire/auth';
 import { StorageService } from '../../services/storage.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
+import { MoviesService } from '../../services/movies/movies.service';
 import { mapFirebaseError } from '../../utils/error-utils';
 
 @Component({
@@ -18,6 +19,7 @@ export class ProfilePage implements OnInit {
   private storageService = inject(StorageService);
   private messageService = inject(MessageService);
   private profileService = inject(ProfileService);
+  private moviesService = inject(MoviesService);
 
   user: User | null = null;
   displayName = '';
@@ -29,7 +31,6 @@ export class ProfilePage implements OnInit {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   canSaveChanges = false;
-
   isLoading: boolean = false;
 
   ngOnInit() {
@@ -59,7 +60,6 @@ export class ProfilePage implements OnInit {
     const hasImageChange = !!this.selectedFile;
     this.canSaveChanges = hasNameChange || hasEmailChange || hasPasswordChange || hasImageChange;
   }
-
   async saveChanges() {
     if (!this.user) {
       this.messageService.showMessage('No estás autenticado. Inicia sesión para guardar cambios.', 'error');
@@ -193,7 +193,37 @@ export class ProfilePage implements OnInit {
   }
 
   confirmDeleteAccount() {
-    this.router.navigate(['/delete-account']);
+    this.deleteAccount();
+  }
+
+  async deleteAccount() {
+    if (!this.user) {
+      this.messageService.showMessage('No hay usuario autenticado', 'error');
+      return;
+    }
+    this.isLoading = true;
+    try {
+      const uid = this.user.uid;
+      if (this.photoURL) {
+        await this.storageService.deletePreviousImage(this.photoURL);
+      }
+      await this.profileService.deleteFirestoreProfile(uid);
+      const myList = await this.moviesService.getMyList(uid);
+      for (const movie of myList) {
+        await this.moviesService.removeFromMyList(uid, movie);
+      }
+      const history = await this.moviesService.getHistory(uid);
+      for (const movie of history) {
+        await this.moviesService.removeFromHistory(uid, movie);
+      }
+      await deleteUser(this.user);
+      this.messageService.showMessage('Cuenta eliminada correctamente', 'success');
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      this.messageService.showMessage(mapFirebaseError(err), 'error');
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   handleUploadError(msg: string) {

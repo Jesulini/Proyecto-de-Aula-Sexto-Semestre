@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, deleteDoc } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -12,5 +12,11 @@ export class ProfileService {
     await setDoc(ref, { nombre, email, foto }, { merge: true });
     const usuario = { uid, nombre, email, foto };
     localStorage.setItem('usuario', JSON.stringify(usuario));
+  }
+
+  async deleteFirestoreProfile(uid: string): Promise<void> {
+    const ref = doc(this.firestore, `usuarios/${uid}`);
+    await deleteDoc(ref);
+    localStorage.removeItem('usuario');
   }
 }

@@ -9,12 +9,14 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent {
   @Output() toggleMenuEvent = new EventEmitter<void>();
+  @Output() goHomeEvent = new EventEmitter<void>();
   @Input() pageTitle = '';  
 
   constructor(private router: Router) {}
 
   goHome() {
     this.router.navigate(['/home']);
+    this.goHomeEvent.emit();
   }
 
   toggleMenu() {

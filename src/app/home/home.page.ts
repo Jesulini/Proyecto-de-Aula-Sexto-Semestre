@@ -25,17 +25,15 @@ const PEGI_LIMITS: Record<string, number> = {
 })
 export class HomePage implements OnInit, OnDestroy {
   @ViewChild('adminPanel') adminPanel!: AdminPanelComponent;
+  @ViewChild('menu') menu: any;
 
   featuredList: Movie[] = [];
   categoriasConfig: { titulo: string; lista: Movie[] }[] = [];
   isAdmin = false;
   currentPlan: string = 'gratis';
-
   modalReproducirAbierto = false;
   peliculaReproducir: Movie | null = null;
-
   categorias: string[] = ['Acción', 'Romance', 'Ciencia Ficción', 'Animación', 'Terror'];
-
   isEditingGlobal = false;
 
   constructor(
@@ -49,18 +47,18 @@ export class HomePage implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    const user = this.authService.getUser();
-    if (user && user.email) {
-      const email = user.email.trim().toLowerCase();
-      this.isAdmin = email === 'jesulini14@gmail.com';
-    } else {
-      this.isAdmin = false;
-    }
-    if (user) {
-      const subs = await this.subscriptionService.getSubscription(user.uid);
-      this.currentPlan = subs?.subscriptionType || 'gratis';
-    }
-    this.loadMovies();
+    this.authService.usuarioActual$().subscribe(async user => {
+      if (user && user.email) {
+        const email = user.email.trim().toLowerCase();
+        this.isAdmin = email === 'jesulini14@gmail.com';
+        const subs = await this.subscriptionService.getSubscription(user.uid);
+        this.currentPlan = subs?.subscriptionType || 'gratis';
+      } else {
+        this.isAdmin = false;
+        this.currentPlan = 'gratis';
+      }
+      this.loadMovies();
+    });
   }
 
   ngOnDestroy(): void {}
@@ -105,13 +103,13 @@ export class HomePage implements OnInit, OnDestroy {
         const snap = await getDocs(colRef);
         allMovies = snap.docs.map(d => {
           const m = d.data() as Movie;
-       return {
-    ...m,
-    AgeRating: m.AgeRating || '',
-    ParaTodosOAdultos: m.ParaTodosOAdultos || '',
-    PegiRating: m.PegiRating || '',
-    isLoading: true
-  };
+          return {
+            ...m,
+            AgeRating: m.AgeRating || '',
+            ParaTodosOAdultos: m.ParaTodosOAdultos || '',
+            PegiRating: m.PegiRating || '',
+            isLoading: true
+          };
         });
       }
       this.featuredList = allMovies.map(m => ({ ...m, isLoading: false })).filter(m => this.puedeVerPelicula(m));
@@ -197,10 +195,28 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onEditMovie(movie: Movie): void {
-    this.adminPanel.abrirEditar(movie);
+    this.isEditingGlobal = true;
+    setTimeout(() => {
+      if (this.adminPanel) {
+        this.adminPanel.abrirEditar(movie);
+      }
+    });
   }
 
   onDeleteMovie(movie: Movie): void {
+    if (!this.adminPanel) {
+      this.isEditingGlobal = true;
+      setTimeout(() => this.adminPanel?.deleteMovie(movie));
+      return;
+    }
     this.adminPanel.deleteMovie(movie);
+  }
+
+  volverAlHome(): void {
+    if (this.menu) {
+      this.menu.menuAbierto = false;
+    }
+    this.isEditingGlobal = false;
+    this.router.navigate(['/home']);
   }
 }

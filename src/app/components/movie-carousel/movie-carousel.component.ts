@@ -32,13 +32,12 @@ export class MovieCarouselComponent implements AfterViewInit, OnChanges {
 
   carruselIndices: { [key: string]: number } = {};
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['categoriasConfig']) {
       this.carruselIndices = {};
       this.categoriasConfig.forEach(cat => (this.carruselIndices[cat.titulo] = 0));
-
       this.cdr.detectChanges();
       setTimeout(() => this.updateAll(), 0);
     }
@@ -46,7 +45,6 @@ export class MovieCarouselComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.updateAll();
-
     this.carruselContainers.changes.subscribe(() => {
       setTimeout(() => this.updateAll(), 0);
     });
@@ -81,14 +79,11 @@ export class MovieCarouselComponent implements AfterViewInit, OnChanges {
     const index = this.categoriasConfig.findIndex(c => c.titulo === titulo);
     const container = this.carruselContainers?.toArray()[index]?.nativeElement;
     if (!container) return;
-
     const track = container.querySelector<HTMLDivElement>('.track');
     const item = container.querySelector<HTMLDivElement>('.movie');
     if (!track || !item) return;
-
     const itemWidth = this.getItemWidth(item);
     const offset = (this.carruselIndices[titulo] || 0) * itemWidth;
-
     track.style.transform = `translateX(-${offset}px)`;
   }
 

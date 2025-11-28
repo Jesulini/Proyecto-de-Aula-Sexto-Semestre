@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc } from '@angular/fire/firestore';
 import { Movie } from 'src/app/models/movie.model';
-import { FirestoreItems } from 'src/app/models/firestore-items.model';
 import { MovieViewed, MovieForStore } from 'src/app/models/movie-extended.model';
 import { AuthService } from 'src/app/services/auth/auth';
+import { FirestoreItems } from 'src/app/models/firestore-items.model';
 
 @Injectable({
   providedIn: 'root',
@@ -12,42 +12,31 @@ export class MoviesService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
   async cargarMovieById(id: string): Promise<Movie | null> {
-    const ref = doc(this.firestore, 'peliculas/peliculas');
+    const ref = doc(this.firestore, 'peliculas', id);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return null;
-    const data = snap.data() as FirestoreItems<Movie>;
-    return data.items.find(p => p.id === id) || null;
+    return snap.exists() ? (snap.data() as Movie) : null;
   }
 
   async cargarTodas(): Promise<Movie[]> {
-    const ref = doc(this.firestore, 'peliculas/peliculas');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return [];
-    const data = snap.data() as FirestoreItems<Movie>;
-    return data.items || [];
+    const colRef = collection(this.firestore, 'peliculas');
+    const snap = await getDocs(colRef);
+    return snap.docs.map(d => d.data() as Movie);
   }
 
-  async guardarPeliculas(movies: Movie[]): Promise<void> {
-    const ref = doc(this.firestore, 'peliculas/peliculas');
-    await updateDoc(ref, { items: movies });
+  async agregarPelicula(movie: Movie): Promise<void> {
+    const colRef = collection(this.firestore, 'peliculas');
+    const ref = doc(colRef, movie.id);
+    await setDoc(ref, movie);
   }
 
-  async agregarPelicula(movie: Movie, movies: Movie[]): Promise<Movie[]> {
-    const nuevaLista = [...movies, movie];
-    await this.guardarPeliculas(nuevaLista);
-    return nuevaLista;
+  async actualizarPelicula(movie: Movie): Promise<void> {
+    const ref = doc(this.firestore, 'peliculas', movie.id);
+    await setDoc(ref, movie, { merge: true });
   }
 
-  async actualizarPelicula(movie: Movie, movies: Movie[]): Promise<Movie[]> {
-    const nuevaLista = movies.map(p => p.id === movie.id ? movie : p);
-    await this.guardarPeliculas(nuevaLista);
-    return nuevaLista;
-  }
-
-  async eliminarPelicula(movieId: string, movies: Movie[]): Promise<Movie[]> {
-    const nuevaLista = movies.filter(p => p.id !== movieId);
-    await this.guardarPeliculas(nuevaLista);
-    return nuevaLista;
+  async eliminarPelicula(movieId: string): Promise<void> {
+    const ref = doc(this.firestore, 'peliculas', movieId);
+    await deleteDoc(ref);
   }
 
   async isInMyList(uid: string, movieId: string): Promise<boolean> {
@@ -62,7 +51,7 @@ export class MoviesService {
     const ref = doc(this.firestore, `usuarios/${uid}/mi-lista/lista`);
     const snap = await getDoc(ref);
     if (snap.exists()) {
-      await updateDoc(ref, { items: [...(snap.data() as FirestoreItems<MovieForStore>).items, movie] });
+      await setDoc(ref, { items: [...(snap.data() as FirestoreItems<MovieForStore>).items, movie] }, { merge: true });
     } else {
       await setDoc(ref, { items: [movie] });
     }
@@ -74,7 +63,7 @@ export class MoviesService {
     if (!snap.exists()) return;
     const data = snap.data() as FirestoreItems<MovieForStore>;
     const nuevaLista = data.items.filter(p => p.id !== movie.id);
-    await updateDoc(ref, { items: nuevaLista });
+    await setDoc(ref, { items: nuevaLista }, { merge: true });
   }
 
   async getMyList(uid: string): Promise<MovieForStore[]> {
@@ -94,7 +83,7 @@ export class MoviesService {
       const data = snap.data() as FirestoreItems<MovieViewed>;
       const exists = data.items.some(p => p.id === movie.id);
       if (!exists) {
-        await updateDoc(historialRef, { items: [...data.items, movieViewed] });
+        await setDoc(historialRef, { items: [...data.items, movieViewed] }, { merge: true });
       }
     } else {
       await setDoc(historialRef, { items: [movieViewed] });
@@ -110,7 +99,7 @@ export class MoviesService {
       const data = snap.data() as FirestoreItems<MovieViewed>;
       const exists = data.items.some(p => p.id === movieViewed.id);
       if (!exists) {
-        await updateDoc(ref, { items: [...data.items, movieViewed] });
+        await setDoc(ref, { items: [...data.items, movieViewed] }, { merge: true });
       }
     } else {
       await setDoc(ref, { items: [movieViewed] });
@@ -131,7 +120,7 @@ export class MoviesService {
     if (!snap.exists()) return;
     const data = snap.data() as FirestoreItems<MovieViewed>;
     const nuevaLista = data.items.filter(p => p.id !== movie.id);
-    await updateDoc(ref, { items: nuevaLista });
+    await setDoc(ref, { items: nuevaLista }, { merge: true });
   }
 
   getCurrentUid(): string | null {

@@ -18,6 +18,35 @@
       margin-left: 0;
       margin-right: 0;
     }
+
+    ion-button.gold-btn {
+      --background: linear-gradient(90deg, #ffd700, #c5a100);
+      --color: #000;
+      font-weight: 700;
+      font-family: "Poppins", sans-serif;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+      margin-top: 20px;
+      transition: all 0.3s ease;
+
+      ion-icon {
+        color: #000;
+        font-size: 1.2rem;
+      }
+
+      &:hover {
+        --background: linear-gradient(90deg, #fff, #fff);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: scale(0.97);
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+      }
+    }
   }
 
   .video-container {
@@ -30,6 +59,22 @@
     video {
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-home {
+    .home-container {
+      ion-button.gold-btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+      }
+    }
+
+    .video-container {
+      max-width: 100%;
     }
   }
 }

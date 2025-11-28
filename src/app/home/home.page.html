@@ -1,6 +1,12 @@
 <ion-content class="custom-home">
   <app-message-box></app-message-box>
-  <app-header [pageTitle]="'Inicio'" (toggleMenuEvent)="menu.toggleMenu()"></app-header>
+
+  <app-header 
+    [pageTitle]="'Inicio'" 
+    (toggleMenuEvent)="menu.toggleMenu()" 
+    (goHomeEvent)="volverAlHome()">
+  </app-header>
+
   <app-sidebar-menu #menu [esAdmin]="isAdmin"></app-sidebar-menu>
 
   <div class="home-container" [class.menu-open]="menu.menuAbierto" *ngIf="!isEditingGlobal">
@@ -18,9 +24,15 @@
       (delete)="onDeleteMovie($event)">
     </app-movie-carousel>
 
+    <ion-button *ngIf="isAdmin" expand="block" class="gold-btn" (click)="isEditingGlobal = true">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Abrir Panel de Administración
+    </ion-button>
+  </div>
+
+  <div class="admin-container" *ngIf="isAdmin && isEditingGlobal">
     <app-admin-panel 
       #adminPanel
-      *ngIf="isAdmin" 
       (editingChange)="onEditingChange($event)">
     </app-admin-panel>
   </div>
