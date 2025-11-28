@@ -20,39 +20,16 @@
     }
   }
 
-  .admin-panel {
-    padding: 24px 40px;
-    margin-top: 16px;
+  .video-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
 
-    h2 {
-      color: $neon-gold;
-      text-shadow: $neon-shadow;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: #ccc;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .admin-add {
-      display: block;
-      margin: 0 auto;
-      background: $neon-gold;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-
-      &:hover {
-        background: #fff;
-        box-shadow: 0 0 15px $neon-gold;
-      }
+    iframe,
+    video {
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     }
   }
 }

@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 
 import { environment } from '../environments/environment';
 
@@ -26,9 +27,10 @@ import { environment } from '../environments/environment';
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
+    provideStorage(() => getStorage()),
 
-    provideFirebaseApp(() => initializeApp(environment.firebaseSubscriptionsConfig, "subscriptionsApp")),
-    provideFirestore(() => getFirestore(initializeApp(environment.firebaseSubscriptionsConfig, "subscriptionsApp"))),
+    provideFirebaseApp(() => initializeApp(environment.firebaseSubscriptionsConfig, 'subscriptionsApp')),
+    provideFirestore(() => getFirestore(initializeApp(environment.firebaseSubscriptionsConfig, 'subscriptionsApp')))
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

@@ -93,7 +93,6 @@ export class MovieCarouselComponent implements AfterViewInit, OnChanges {
   }
 
   private getItemWidth(item: HTMLDivElement): number {
-    // Usa bounding rect + margin-right para cálculo consistente, sin depender de imagen cargada
     const rect = item.getBoundingClientRect();
     const style = getComputedStyle(item);
     const mr = parseInt(style.marginRight || '0', 10);

@@ -1,19 +1,5 @@
 import { Injectable } from '@angular/core';
-import { initializeApp } from '@angular/fire/app';
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  deleteDoc, 
-  serverTimestamp, 
-  collection, 
-  getDocs 
-} from '@angular/fire/firestore';
-import { environment } from '../../environments/environment';
-
-const subscriptionsApp = initializeApp(environment.firebaseSubscriptionsConfig, "subscriptionsApp");
-const subscriptionsDb = getFirestore(subscriptionsApp);
+import { Firestore, doc, setDoc, getDoc, deleteDoc, serverTimestamp, collection, getDocs } from '@angular/fire/firestore';
 
 export interface Subscription {
   email: string;
@@ -38,8 +24,10 @@ export interface MovieRequest {
   providedIn: 'root'
 })
 export class SubscriptionService {
+  constructor(private firestore: Firestore) {}
+
   async saveSubscription(uid: string, subscription: Subscription) {
-    const userRef = doc(subscriptionsDb, `users_subscriptions/${uid}`);
+    const userRef = doc(this.firestore, `users_subscriptions/${uid}`);
     await setDoc(userRef, {
       ...subscription,
       subscriptionDate: serverTimestamp()
@@ -47,18 +35,18 @@ export class SubscriptionService {
   }
 
   async getSubscription(uid: string): Promise<Subscription | null> {
-    const userRef = doc(subscriptionsDb, `users_subscriptions/${uid}`);
+    const userRef = doc(this.firestore, `users_subscriptions/${uid}`);
     const snap = await getDoc(userRef);
     return snap.exists() ? (snap.data() as Subscription) : null;
   }
 
   async deleteSubscription(uid: string) {
-    const userRef = doc(subscriptionsDb, `users_subscriptions/${uid}`);
+    const userRef = doc(this.firestore, `users_subscriptions/${uid}`);
     await deleteDoc(userRef);
   }
 
   async saveMovieRequest(uid: string, request: MovieRequest) {
-    const requestRef = doc(subscriptionsDb, `users_requests/${uid}/solicitudes/${Date.now()}`);
+    const requestRef = doc(this.firestore, `users_requests/${uid}/solicitudes/${Date.now()}`);
     await setDoc(requestRef, {
       ...request,
       requestDate: serverTimestamp()
@@ -66,7 +54,7 @@ export class SubscriptionService {
   }
 
   async getMovieRequests(uid: string): Promise<MovieRequest[]> {
-    const requestsCol = collection(subscriptionsDb, `users_requests/${uid}/solicitudes`);
+    const requestsCol = collection(this.firestore, `users_requests/${uid}/solicitudes`);
     const snap = await getDocs(requestsCol);
     return snap.docs.map(doc => doc.data() as MovieRequest);
   }

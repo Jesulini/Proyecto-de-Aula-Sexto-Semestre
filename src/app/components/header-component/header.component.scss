@@ -69,3 +69,72 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
     }
   }
 }
+
+
+.description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;  
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+/* 📱 Responsive ajustes */
+@media (max-width: 768px) {
+  .custom-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+
+    .page-title {
+      gap: 8px;
+
+      .logo-img {
+        height: 38px;
+      }
+
+      .page-title-text {
+        font-size: 1rem;
+      }
+    }
+
+    .menu-toggle {
+      align-self: flex-end;
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .custom-header {
+    padding: 10px 12px;
+
+    .page-title {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .logo-img {
+        height: 32px;
+      }
+
+      .page-title-text {
+        font-size: 0.9rem;
+      }
+    }
+
+    .menu-toggle {
+      font-size: 1.3rem;
+    }
+  }
+
+  .description-text {
+    -webkit-line-clamp: 2; 
+    font-size: 0.85rem;
+  }
+}

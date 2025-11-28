@@ -1,0 +1,95 @@
+<div class="admin-panel-wrapper">
+  <div class="admin-panel-container" *ngIf="!isEditing; else editForm">
+    <h2>Panel de Administración</h2>
+    <p>Desde aquí puedes agregar, editar o eliminar películas de la cartelera.</p>
+
+    <ion-button *ngIf="!isEditing" expand="block" class="gold-btn" (click)="abrirAgregar()">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Agregar Película
+    </ion-button>
+
+    <div class="movies-list">
+      <div class="movie-card" *ngFor="let movie of peliculas">
+        <img [src]="movie.imageUrl" alt="{{ movie.title }}" />
+        <h3>{{ movie.title }}</h3>
+        <div class="actions">
+          <ion-button fill="clear" (click)="abrirEditar(movie)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="danger" (click)="deleteMovie(movie)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #editForm>
+    <div class="edit-form">
+      <ion-item>
+        <ion-label position="floating">Título</ion-label>
+        <ion-input [(ngModel)]="peliculaTemp.title"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">URL de la imagen</ion-label>
+        <ion-input [(ngModel)]="peliculaTemp.imageUrl"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Categoría</ion-label>
+        <ion-select [(ngModel)]="peliculaTemp.category" interface="alert">
+          <ion-select-option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-textarea [(ngModel)]="peliculaTemp.description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">URL del tráiler</ion-label>
+        <ion-input [(ngModel)]="peliculaTemp.trailerUrl"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">URL de la película</ion-label>
+        <ion-input [(ngModel)]="peliculaTemp.movieUrl"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Público</ion-label>
+        <ion-select [(ngModel)]="peliculaTemp.ParaTodosOAdultos" interface="alert">
+          <ion-select-option value="Para Todos">Para Todos</ion-select-option>
+          <ion-select-option value="Adultos">Solo Adultos</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>PEGI</ion-label>
+        <ion-select [(ngModel)]="peliculaTemp.PegiRating" interface="alert">
+          <ion-select-option value="PEGI 3">PEGI 3</ion-select-option>
+          <ion-select-option value="PEGI 7">PEGI 7</ion-select-option>
+          <ion-select-option value="PEGI 12">PEGI 12</ion-select-option>
+          <ion-select-option value="PEGI 16">PEGI 16</ion-select-option>
+          <ion-select-option value="PEGI 18">PEGI 18</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Age Rating</ion-label>
+        <ion-input [(ngModel)]="peliculaTemp.AgeRating"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="gold-btn" (click)="guardarPelicula()">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        {{ editando ? 'Guardar Cambios' : 'Agregar Película' }}
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" class="cancel-btn" (click)="cancelarEdicion()">
+        Cancelar
+      </ion-button>
+    </div>
+  </ng-template>
+</div>
