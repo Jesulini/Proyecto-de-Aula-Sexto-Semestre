@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
 import { Movie } from 'src/app/models/movie.model';
 import { AuthService } from 'src/app/services/auth/auth';
-import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs } from '@angular/fire/firestore';
 import { MessageService } from 'src/app/services/message.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
+import { AdminPanelComponent } from 'src/app/components/AdminPanelComponent/admin-panel.component';
 
 const PEGI_LIMITS: Record<string, number> = {
   gratis: 7,
@@ -21,6 +21,7 @@ const PEGI_LIMITS: Record<string, number> = {
   standalone: false
 })
 export class CarteleraPage implements OnInit, OnDestroy {
+  @ViewChild('adminPanel') adminPanel!: AdminPanelComponent;
 
   peliculas: Movie[] = [];
   peliculasFiltradas: Movie[] = [];
@@ -29,32 +30,22 @@ export class CarteleraPage implements OnInit, OnDestroy {
   terminoBusqueda = '';
 
   esAdmin = false;
-  modalAbierto = false;
-  editando = false;
-
   currentPlan: string = 'gratis';
-
-  peliculaTemp: Movie = {
-    id: '',
-    title: '',
-    imageUrl: '',
-    category: '',
-    description: '',
-    trailerUrl: '',
-    movieUrl: '',
-    PegiRating: ''
-  };
+  isEditingGlobal = false;
 
   constructor(
     private router: Router,
-    private alertCtrl: AlertController,
     private authService: AuthService,
     private firestore: Firestore,
     private messageService: MessageService,
     private subscriptionService: SubscriptionService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.ionViewWillEnter();
+  }
+
+  async ionViewWillEnter() {
     const user = this.authService.getUsuarioActual();
     const email = user?.email?.trim().toLowerCase() || '';
     this.esAdmin = email === 'jesulini14@gmail.com';
@@ -62,6 +53,10 @@ export class CarteleraPage implements OnInit, OnDestroy {
     if (user) {
       const subs = await this.subscriptionService.getSubscription(user.uid);
       this.currentPlan = subs?.subscriptionType || 'gratis';
+    } else {
+      this.currentPlan = 'gratis';
+      this.peliculas = [];
+      this.peliculasFiltradas = [];
     }
 
     this.cargarPeliculas();
@@ -69,13 +64,14 @@ export class CarteleraPage implements OnInit, OnDestroy {
 
   async cargarPeliculas() {
     try {
-      const docRef = doc(this.firestore, 'peliculas/peliculas');
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data() as { items: Movie[] };
-        this.peliculas = data.items || [];
-        this.buscarPeliculas();
-      }
+      const colRef = collection(this.firestore, 'peliculas');
+      const snap = await getDocs(colRef);
+      this.peliculas = snap.docs.map(d => {
+        const m = d.data() as Movie;
+        const { id, ...rest } = m;
+        return { id: d.id, ...rest };
+      });
+      this.buscarPeliculas();
     } catch (error) {
       console.error('Error cargando películas:', error);
     }
@@ -104,99 +100,22 @@ export class CarteleraPage implements OnInit, OnDestroy {
     this.categoriaSeleccionada = categoria;
     this.buscarPeliculas();
   }
-
-  abrirModalAgregar() {
-    this.editando = false;
-    this.peliculaTemp = {
-      id: '',
-      title: '',
-      imageUrl: '',
-      category: '',
-      description: '',
-      trailerUrl: '',
-      movieUrl: '',
-      PegiRating: ''
-    };
-    this.modalAbierto = true;
-  }
-
-  abrirModalEditar(movie: Movie) {
-    this.editando = true;
-    this.peliculaTemp = { ...movie };
-    this.modalAbierto = true;
-  }
-
-  cerrarModal() {
-    this.modalAbierto = false;
-  }
-
-  async guardarPelicula() {
-    const { title, imageUrl, category, description, trailerUrl, movieUrl, id, PegiRating } = this.peliculaTemp;
-
-    if (!title?.trim() || !imageUrl?.trim() || !category?.trim() || !PegiRating?.trim()) {
-      this.messageService.showMessage('Todos los campos obligatorios deben estar completos.', 'error');
-      return;
-    }
-
-    const docRef = doc(this.firestore, 'peliculas/peliculas');
-
-    try {
-      if (this.editando && id) {
-        this.peliculas = this.peliculas.map(p =>
-          p.id === id ? { ...p, title, imageUrl, category, description, trailerUrl, movieUrl, PegiRating } : p
-        );
-        await updateDoc(docRef, { items: this.peliculas });
-        this.messageService.showMessage('Película actualizada correctamente.', 'success');
-      } else {
-        const nuevaPeli: Movie = {
-          id: this.generarId(),
-          title,
-          imageUrl,
-          category,
-          description,
-          trailerUrl,
-          movieUrl,
-          PegiRating
-        };
-        this.peliculas.push(nuevaPeli);
-        await updateDoc(docRef, { items: this.peliculas });
-        this.messageService.showMessage('Película agregada exitosamente.', 'success');
-      }
-
-      this.cerrarModal();
-      this.buscarPeliculas();
-    } catch (error) {
-      console.error('Error guardando película:', error);
-      this.messageService.showMessage('Error al guardar la película.', 'error');
+  abrirAgregar() {
+    if (this.adminPanel) {
+      this.adminPanel.abrirAgregar();
     }
   }
 
-  async confirmarEliminacion(id: string) {
-    const alerta = await this.alertCtrl.create({
-      header: 'Eliminar película',
-      message: '¿Seguro que deseas eliminar esta película?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              this.peliculas = this.peliculas.filter(p => p.id !== id);
-              const docRef = doc(this.firestore, 'peliculas/peliculas');
-              await updateDoc(docRef, { items: this.peliculas });
-              this.messageService.showMessage('Película eliminada.', 'success');
-              this.buscarPeliculas();
-            } catch (error) {
-              console.error('Error eliminando película:', error);
-              this.messageService.showMessage('Error al eliminar la película.', 'error');
-            }
-          }
-        }
-      ]
-    });
+  abrirEditar(movie: Movie) {
+    if (this.adminPanel) {
+      this.adminPanel.abrirEditar(movie);
+    }
+  }
 
-    await alerta.present();
+  eliminar(movie: Movie) {
+    if (this.adminPanel) {
+      this.adminPanel.deleteMovie(movie);
+    }
   }
 
   verDetalle(id: string) {
@@ -212,9 +131,9 @@ export class CarteleraPage implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
-  ngOnDestroy() {}
-
-  generarId() {
-    return Math.random().toString(36).substring(2, 10);
+  onEditingChange(editing: boolean) {
+    this.isEditingGlobal = editing;
   }
+
+  ngOnDestroy() {}
 }

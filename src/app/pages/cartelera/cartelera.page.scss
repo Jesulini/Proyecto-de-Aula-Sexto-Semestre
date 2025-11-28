@@ -3,17 +3,6 @@ $neon-red: #ff0054;
 $neon-blue: #00f5ff;
 $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
 
-.custom-header {
-  ion-toolbar {
-    --background: rgba(20, 20, 20, 0.9);
-    backdrop-filter: blur(8px);
-    color: #ffd700;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.1);
-  }
-}
-
 .custom-cartelera {
   background-color: #050505;
   color: #fff;
@@ -22,43 +11,8 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 22px;
-    background: linear-gradient(90deg, #0d0d0d, #111);
-    border-bottom: 2px solid $neon-gold;
-    box-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
-
-    .logo-img {
-      height: 45px;
-      filter: drop-shadow(0 0 10px rgba(255, 183, 3, 0.6));
-      transition: 0.3s;
-
-      &:hover {
-        transform: scale(1.08);
-        filter: drop-shadow(0 0 15px rgba(255, 183, 3, 1));
-      }
-    }
-
-    .menu-toggle {
-      font-size: 1.8rem;
-      background: none;
-      border: none;
-      color: $neon-gold;
-      cursor: pointer;
-      text-shadow: $neon-shadow;
-      transition: 0.3s;
-
-      &:hover {
-        color: $neon-blue;
-        text-shadow: 0 0 15px $neon-blue;
-      }
-    }
-  }
 }
+
 .cartelera-container {
   display: flex;
   flex: 1;
@@ -101,30 +55,6 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
           color: $neon-gold;
           text-shadow: 0 0 12px $neon-gold;
           transform: translateX(4px);
-        }
-      }
-    }
-
-    .admin-actions {
-      margin-top: 25px;
-      text-align: center;
-
-      .add-btn {
-        background-color: $neon-gold;
-        color: #000;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        box-shadow: 0 0 15px rgba(255, 183, 3, 0.7);
-        transition: 0.3s;
-
-        &:hover {
-          background-color: #fff;
-          color: #111;
-          box-shadow: 0 0 25px rgba(255, 183, 3, 1);
-          transform: scale(1.05);
         }
       }
     }
@@ -295,18 +225,6 @@ $neon-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
 }
 
 @media (max-width: 480px) {
-  header {
-    padding: 10px 15px;
-
-    .logo-img {
-      height: 35px;
-    }
-
-    .menu-toggle {
-      font-size: 1.5rem;
-    }
-  }
-
   .cartelera-container {
     .main-content {
       padding: 10px;
